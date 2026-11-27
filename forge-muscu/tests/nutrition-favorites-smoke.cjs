@@ -30,6 +30,7 @@ const port = 4177;
       await page.route('https://world.openfoodfacts.org/**', route => route.fulfill({
         status: 200,
         contentType: 'application/json',
+        headers: { 'access-control-allow-origin': '*' },
         body: JSON.stringify({
           products: [{
             product_name: 'Forge Protein Bar',
