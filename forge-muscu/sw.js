@@ -1,11 +1,11 @@
 /* Hors ligne. Change VERSION après toute modification d'un fichier. */
-const VERSION = 'forge-muscu-v29';
+const VERSION = 'forge-muscu-v30';
 const FICHIERS = [
-  "./","index.html","manifest.webmanifest","css/styles.css","css/liftoff.css","css/coach.css","css/navigation.css","css/premium.css","css/start-ranks.css","css/body-forge-avatar-3d.css","css/progress-photos.css",
+  "./","index.html","manifest.webmanifest","css/styles.css","css/liftoff.css","css/coach.css","css/navigation.css","css/premium.css","css/start-ranks.css","css/body-forge-avatar-3d.css","css/progress-photos.css","css/progression-hub.css",
   "js/data.js","js/program.js","js/progression.js","js/store.js","js/timer.js","js/ui.js","js/charts.js",
   "js/view-home.js","js/view-program.js","js/view-exercises.js","js/view-session.js","js/view-track.js",
   "js/view-cardio.js","js/view-profile.js","js/view-forge.js","js/view-liftoff.js","js/view-advanced.js",
-  "js/view-pro.js","js/coach.js","js/view-seance.js","js/body-forge-ranks.js","js/body-forge-avatar-3d.js","js/progress-photos.js","js/session-enhancements.js","js/cloud-sync.js","js/coach-3d.js","js/app.js",
+  "js/view-pro.js","js/coach.js","js/view-seance.js","js/body-forge-ranks.js","js/body-forge-avatar-3d.js","js/progress-photos.js","js/progression-hub.js","js/session-enhancements.js","js/cloud-sync.js","js/coach-3d.js","js/app.js",
   "images/exercises/bench-press/start.webp","images/exercises/bench-press/end.webp",
   "images/exercises/incline-bench-press/start.webp","images/exercises/incline-bench-press/end.webp",
   "images/exercises/squat/start.webp","images/exercises/squat/end.webp",
