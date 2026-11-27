@@ -28,6 +28,7 @@
     {re:/élévation latérale|lateral raise/i,factor:1800,label:'Épaules'},
     {re:/leg curl|ischio|curl jambes/i,factor:1200,label:'Ischio-jambiers'},
     {re:/extension jambes|leg extension|quadriceps/i,factor:1200,label:'Quadriceps'},
+    {re:/crunch|gainage|relevé de jambes|abdominaux|abdos/i,factor:900,label:'Abdominaux'},
     {re:/mollets|calf raise/i,factor:1600,label:'Mollets'}
   ];
   const readSettings=()=>{
