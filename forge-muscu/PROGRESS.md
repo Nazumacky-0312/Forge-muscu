@@ -49,7 +49,8 @@ Refonte en cours. L'application de production sur `main` n'a pas été modifiée
 - [x] Tests Playwright étendus : reprise, pagehide, métadonnées, échauffement, pause/reprise et profil hors ligne.
 - [x] Première couche de refonte visuelle globale : palette sombre premium, accent vert Forge, fonds et cartes en profondeur, typographie et boutons harmonisés, formulaires, navigation flottante mobile / intégrée desktop ; feuille dédiée chargée après les styles existants et incluse au cache hors ligne (v24).
 - [x] Finition responsive de l'espace Séance : hiérarchie visuelle, onglets sticky, états actifs/focus, prise en compte de `prefers-reduced-motion` et boutons Modifier maintenus sur une seule ligne et actions Nouvelle séance / Régénérer sans chevauchement sur mobile.
-- [x] Deuxième passe visuelle transversale : cartes et lignes de bibliothèque, tableaux, dialogues, formulaires, états désactivés, zones tactiles et prise en compte globale de la réduction des animations ; cache PWA incrémenté à v25.
+- [x] Deuxième passe visuelle transversale : cartes et lignes de bibliothèque, tableaux, dialogues, formulaires, états désactivés, zones tactiles et prise en compte globale de la réduction des animations.
+- [x] Correction du fallback des illustrations 3D dans les petites vignettes : le texte long ne déborde plus et laisse un repère compact « 3D » ; cache PWA incrémenté à v26.
 
 ## En cours / à faire
 
@@ -66,6 +67,7 @@ Refonte en cours. L'application de production sur `main` n'a pas été modifiée
 - [ ] Relier plus profondément le Coach Forge aux données réelles sans supprimer son moteur local.
 - [ ] Améliorer les vues de suivi physique, calendrier, nutrition et trophées.
 - [ ] Étendre les tests d'import/export, hors-ligne, service worker et mise à jour PWA.
+- [ ] Rejouer la CI après les derniers changements de workflow, de fallback média et de cache PWA (aucune nouvelle exécution n'a été déclenchée par le connecteur).
 - [ ] Faire une vérification visuelle manuelle Android et ordinateur.
 - [ ] Fusionner puis publier uniquement après validation complète.
 
