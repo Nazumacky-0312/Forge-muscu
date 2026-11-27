@@ -13,3 +13,11 @@
 @media(prefers-reduced-motion:reduce){.forge-avatar-3d-stage{scroll-behavior:auto}}
 
 .forge-avatar-attribution{margin:10px 0 0;color:var(--muted,#aab0b8);font-size:.68rem;line-height:1.5;text-align:center;overflow-wrap:anywhere}
+
+.forge-avatar-muscle-details{display:grid;gap:8px;margin-top:12px;padding:14px;border:1px solid rgba(197,243,107,.18);border-radius:14px;background:rgba(197,243,107,.045)}
+.forge-avatar-muscle-details h3{margin:2px 0;font-size:1.05rem}
+.forge-avatar-muscle-detail-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.forge-avatar-muscle-detail-head>strong{padding:6px 9px;border-radius:9px;background:rgba(197,243,107,.1);color:var(--accent,#c5f36b);font-size:.82rem}
+.forge-avatar-muscle-exercises{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.forge-avatar-muscle-exercises li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,.07);font-size:.8rem}
+.forge-avatar-muscle-exercises li strong{color:var(--accent,#c5f36b);white-space:nowrap}
