@@ -65,8 +65,12 @@
       const favorites=read();
       view.querySelectorAll('.forge-nutrition-favorite-toggle').forEach(button=>{
         const saved=favorites.some(food=>food.key===button.dataset.foodKey);
-        button.textContent=saved?'★ Favori':'☆ Ajouter aux favoris';
-        button.setAttribute('aria-pressed',saved?'true':'false');
+        const label=saved?'★ Favori':'☆ Ajouter aux favoris';
+        const pressed=saved?'true':'false';
+        // Ne pas réécrire le texte à chaque passage du MutationObserver :
+        // textContent déclenche lui-même une mutation childList et créerait une boucle.
+        if(button.textContent!==label)button.textContent=label;
+        if(button.getAttribute('aria-pressed')!==pressed)button.setAttribute('aria-pressed',pressed);
       });
     }
     function addButtons(){
