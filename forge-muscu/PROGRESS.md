@@ -113,23 +113,27 @@ Les sections historiques ci-dessus décrivent un état antérieur. L'état véri
 
 - Body Forge : modèles anatomiques 3D masculin/féminin, rotation, vues avant/arrière, sélection des groupes musculaires, rang et performances disponibles, bodygraph SVG de secours, crédits de licence.
 - Photos de progression : galerie locale-first, compression, IndexedDB, téléchargement, suppression et synchronisation facultative vers le bucket privé Supabase.
-- Progression : nouvelle destination principale regroupant rangs, Body Forge, statistiques/photos, records, historique, mensurations et nutrition.
-- PWA : cache v30 avec les nouveaux modules et feuilles de style.
+- Progression : nouvelle destination principale regroupant rangs, Body Forge, statistiques/photos, records, historique, mensurations, récupération musculaire et nutrition.
+- Récupération : estimation locale par groupe musculaire, séries validées, effort récent, volume 72 h / 7 jours et groupes peu sollicités ; les limites du modèle sont affichées.
+- Séance : tempo par série, suivi gauche/droite/alterné, conservation après rechargement et calculateur de disques accessible pendant l'entraînement. Les types échauffement/dégressif, RPE/RIR et notes restent disponibles.
+- PWA : cache v32 avec les nouveaux modules et feuilles de style.
 - Supabase : table `forge_progress_photos` créée avec RLS ; migration appliquée en version `20261127121314`. Le bucket `forge-progress-photos` reste privé et limité au dossier de l'utilisateur.
 
 ### Validation
 
-- Les suites Playwright Séance et Body Forge ont réussi sur mobile et ordinateur.
-- La suite Photos a réussi sur mobile et ordinateur : ajout, conservation après rechargement, état hors ligne et suppression.
-- La prévisualisation de la branche a été construite et l'artefact Pages généré. Cela ne signifie pas que la version publique a été remplacée.
-- La dernière série de modifications (hub Progression et documentation) doit encore repasser la CI avant d'être considérée comme validée.
+- Les suites Playwright Séance, Body Forge et Photos/Progression/Récupération ont réussi sur mobile et ordinateur.
+- Séance vérifie aussi la conservation du tempo et du côté après rechargement, le sélecteur de type de série et le calculateur de barre.
+- Photos vérifie l'ajout local, IndexedDB après rechargement, le mode hors ligne et la suppression.
+- Dernière CI : run #318, succès complet ; prévisualisation de la branche construite et artefact Pages généré. Cela ne signifie pas que la version publique a été remplacée.
 
 ### Limites externes restantes
 
 - La configuration Supabase Auth `Site URL` / `Redirect URLs` n'est pas modifiable via les actions Supabase disponibles. Valeur attendue par Forge : `https://nazumacky-0312.github.io/Forge-muscu/`.
 - La synchronisation réelle des photos entre deux comptes/appareils n'a pas été testée avec un compte utilisateur authentifié.
+- Les enchaînements Superset/Circuit avec alternance automatique des séries, le glisser-déposer des exercices, les classements entre amis et Health Connect restent à développer.
+- Les favoris alimentaires dédiés ne sont pas encore ajoutés ; la recherche Open Food Facts et le scanner quand BarcodeDetector est disponible existent déjà.
 - L'advisor Supabase signale que la protection contre les mots de passe compromis est désactivée. À activer dans le Dashboard si l'authentification par mot de passe est utilisée.
-- La vérification visuelle sur un vrai téléphone Android et la publication en production restent à effectuer après validation finale.
+- La vérification visuelle sur un vrai téléphone Android, la configuration Auth externe et la publication en production restent à effectuer après validation finale.
 
 ### Règle de reprise
 
