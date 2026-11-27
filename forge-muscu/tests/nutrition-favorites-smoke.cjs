@@ -24,26 +24,35 @@ const port = 4177;
   const errors = [];
   try {
     for (const viewport of [{ name: 'mobile', width: 390, height: 844 }, { name: 'desktop', width: 1365, height: 900 }]) {
-      const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
+      const context = await browser.newContext({
+        viewport: { width: viewport.width, height: viewport.height },
+        serviceWorkers: 'block'
+      });
+      const page = await context.newPage();
       page.setDefaultTimeout(15000);
       page.on('pageerror', error => errors.push(viewport.name + ': ' + error.message));
-      await page.route('https://world.openfoodfacts.org/**', async route => {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            products: [{
-              product_name: 'Forge Protein Bar',
-              brands: 'Forge QA',
-              nutriments: {
-                'energy-kcal_100g': 350,
-                proteins_100g: 20,
-                carbohydrates_100g: 40,
-                fat_100g: 10
-              }
-            }]
-          })
-        });
+      // Fixture réseau déterministe : le test ne dépend ni d'Open Food Facts,
+      // ni d'un éventuel service worker déjà installé dans le navigateur.
+      await page.addInitScript(() => {
+        const nativeFetch = window.fetch.bind(window);
+        window.fetch = async (input, init) => {
+          const url = typeof input === 'string' ? input : input && input.url;
+          if (url && url.startsWith('https://world.openfoodfacts.org/')) {
+            return new Response(JSON.stringify({
+              products: [{
+                product_name: 'Forge Protein Bar',
+                brands: 'Forge QA',
+                nutriments: {
+                  'energy-kcal_100g': 350,
+                  proteins_100g: 20,
+                  carbohydrates_100g: 40,
+                  fat_100g: 10
+                }
+              }]
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          }
+          return nativeFetch(input, init);
+        };
       });
       await page.goto('http://127.0.0.1:' + port + '/#/pro/aliments', { waitUntil: 'domcontentloaded' });
       await page.locator('input[type="search"]').waitFor();
@@ -78,7 +87,7 @@ const port = 4177;
       if (!(await page.locator('.forge-nutrition-favorites').textContent()).includes('Enregistre un aliment')) {
         throw new Error('La suppression du favori ne fonctionne pas sur ' + viewport.name);
       }
-      await page.close();
+      await context.close();
     }
     if (errors.length) throw new Error(errors.join('\n'));
     console.log('Nutrition favorites smoke test passed on mobile and desktop.');
