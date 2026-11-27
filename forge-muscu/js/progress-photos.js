@@ -198,7 +198,7 @@
     gallery.replaceChildren();
     let photos=await getPhotos();
     photos=photos.filter(photo=>photo.blob|| (cloud&&cloud.user&&photo.cloudUserId===cloud.user.id&&photo.cloudPath));
-    photos.sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.createdAt||0)-(a.createdAt||0));
+    photos.sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(new Date(b.createdAt||0).getTime()-new Date(a.createdAt||0).getTime()));
     if(!photos.length){
       gallery.append(node('p','forge-progress-photos-empty','Aucune photo pour le moment. Ajoute une photo de face, de profil ou de dos pour commencer ton suivi.'));
       return;
@@ -227,7 +227,8 @@
       if(photo.blob){
         const download=node('a','btn petit','Télécharger');
         download.href=src;
-        download.download='forge-muscu-'+(photo.date||'photo')+'-'+poseLabel.toLowerCase()+'.webp';
+        const extension=photo.blob.type==='image/png'?'png':photo.blob.type==='image/jpeg'?'jpg':'webp';
+        download.download='forge-muscu-'+(photo.date||'photo')+'-'+poseLabel.toLowerCase()+'.'+extension;
         actions.append(download);
       }
       const remove=node('button','btn petit danger','Supprimer');
@@ -301,6 +302,7 @@
       const selected=file.files&&file.files[0];
       if(!selected){status.textContent='Choisis une image avant de continuer.';return;}
       if(!selected.type.startsWith('image/')){status.textContent='Le fichier choisi n’est pas une image.';return;}
+      if(selected.size>40*1024*1024){status.textContent='Cette image dépasse 40 Mo. Choisis une version moins volumineuse.';return;}
       add.disabled=true;
       status.textContent='Compression et enregistrement de la photo…';
       try{
@@ -339,6 +341,11 @@
     }
     return section;
   }
+
+  root.addEventListener('hashchange',()=>{
+    activeUrls.forEach(url=>root.URL.revokeObjectURL(url));
+    activeUrls=[];
+  });
 
   const original=FM.vues.suivi;
   FM.vues.suivi=function(app,onglet){
