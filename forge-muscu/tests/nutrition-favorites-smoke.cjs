@@ -27,26 +27,23 @@ const port = 4177;
       const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
       page.setDefaultTimeout(15000);
       page.on('pageerror', error => errors.push(viewport.name + ': ' + error.message));
-      await page.addInitScript(() => {
-        const originalFetch = window.fetch.bind(window);
-        window.fetch = async (input, init) => {
-          const url = typeof input === 'string' ? input : input.url;
-          if (url.includes('world.openfoodfacts.org')) {
-            return new Response(JSON.stringify({
-              products: [{
-                product_name: 'Forge Protein Bar',
-                brands: 'Forge QA',
-                nutriments: {
-                  'energy-kcal_100g': 350,
-                  proteins_100g: 20,
-                  carbohydrates_100g: 40,
-                  fat_100g: 10
-                }
-              }]
-            }), { status: 200, headers: { 'content-type': 'application/json' } });
-          }
-          return originalFetch(input, init);
-        };
+      await page.route('https://world.openfoodfacts.org/**', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            products: [{
+              product_name: 'Forge Protein Bar',
+              brands: 'Forge QA',
+              nutriments: {
+                'energy-kcal_100g': 350,
+                proteins_100g: 20,
+                carbohydrates_100g: 40,
+                fat_100g: 10
+              }
+            }]
+          })
+        });
       });
       await page.goto('http://127.0.0.1:' + port + '/#/pro/aliments', { waitUntil: 'domcontentloaded' });
       await page.locator('input[type="search"]').waitFor();
