@@ -35,6 +35,7 @@ const mime = {
       page.setDefaultTimeout(8000);
       page.on('pageerror', error => failures.push(`${viewport.name}: ${error.message}`));
       page.on('console', msg => { if (msg.type() === 'error') failures.push(`${viewport.name} console: ${msg.text()}`); });
+      page.on('requestfailed', req => failures.push(`${viewport.name} request failed: ${req.url()} :: ${req.failure()?.errorText || 'unknown'}`));
       try {
         await page.goto(`http://127.0.0.1:${port}/#/programme`, { waitUntil: 'domcontentloaded' });
         await page.getByRole('heading', { name: 'Séance' }).waitFor();
@@ -67,7 +68,10 @@ const mime = {
         await page.locator('.forge-seance-panel h2').first().waitFor();
       } catch (error) {
         const body = await page.locator('body').innerText().catch(() => '[body inaccessible]');
-        console.error(`DIAGNOSTIC ${viewport.name}: ${error.message}\nBODY:\n${body}\nPAGE ERRORS:\n${failures.join('\n')}`);
+        const html = await page.locator('html').evaluate(el => el.outerHTML).catch(() => '[html inaccessible]');
+        const diagnostic = `DIAGNOSTIC ${viewport.name}: ${error.message}\nURL: ${page.url()}\nBODY:\n${body}\nPAGE ERRORS:\n${failures.join('\n')}\nHTML:\n${html.slice(0, 18000)}`;
+        console.error(diagnostic);
+        require('node:fs').writeFileSync(`/tmp/forge-seance-${viewport.name}-diagnostics.txt`, diagnostic);
         await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-failure.png`, fullPage: true }).catch(() => {});
         throw error;
       } finally {
