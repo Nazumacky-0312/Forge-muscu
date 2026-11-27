@@ -72,10 +72,10 @@ function slugImageExercice(n){
  const rules=[
   [/presse.*(cuisse|jambe)|leg press/,'leg-press'],
   [/squat/,'squat'],
-  [/developpe.*(couche|incline).*halter|dumbbell chest press/,'dumbbell-chest-press'],
-  [/developpe.*couche|bench press|chest press barre/,'bench-press'],
-  [/ecarte.*poulie|crossover|vis.?a.?vis|cable fly/,'cable-crossover'],
-  [/ecarte.*halter|dumbbell fly/,'dumbbell-fly'],
+  [/developpe.*incline/,'incline-bench-press'],
+  [/developpe.*couche|bench press|chest press barre|developpe couche barre/,'bench-press'],
+  [/developpe.*halter/,'bench-press'],
+  [/ecarte.*poulie|crossover|vis.?a.?vis|cable fly/,'cable-fly-high-to-low'],
   [/souleve.*terre.*halter|romanian deadlift|souleve roumain/,'dumbbell-romanian-deadlift'],
   [/souleve.*terre|deadlift/,'deadlift'],
   [/tirage vertical|lat pulldown|tirage poitrine/,'lat-pulldown'],
@@ -84,7 +84,6 @@ function slugImageExercice(n){
   [/traction|pull.?up/,'pull-up'],
   [/elevation laterale|lateral raise/,'lateral-raises'],
   [/curl.*barre|barbell curl/,'barbell-curl'],
-  [/curl.*poulie|cable curl/,'cable-curl'],
   [/crunch.*poulie|cable crunch/,'cable-crunch'],
   [/crunch|releve.*buste/,'crunches'],
   [/gainage|planche|plank/,'plank'],
@@ -112,7 +111,7 @@ function monterDemo(el){
   img.src='images/exercises/'+slug+'/'+frame+'.webp';
   img.alt=name+' — '+(frame==='start'?'position de départ':frame==='end'?'position finale':'position de gainage');
   img.decoding='async';img.loading=mini?'lazy':'eager';
-  img.onerror=()=>{if(!img.dataset.flatFallback){img.dataset.flatFallback='1';img.src='images/exercises/'+slug+'-'+frame+'.webp';return;}img.remove();if(!frames.querySelector('img')){const msg=document.createElement('div');msg.className='forge-media-fallback';msg.textContent='Illustration 3D indisponible pour cet exercice.';el.replaceChildren(msg);}};
+  img.onerror=()=>{img.remove();if(!frames.querySelector('img')){const msg=document.createElement('div');msg.className='forge-media-fallback';msg.textContent='Illustration 3D indisponible pour cet exercice.';el.replaceChildren(msg);}};
   frames.append(img);
  }
  const title=document.createElement('div');title.className='forge-demo-title';title.textContent=name;
@@ -144,8 +143,15 @@ F.vues.coach=function(app){
  return h('div',{class:'forge-page forge-coach-page forge-ai-page'},...content);
 };
 const listBefore=F.vues.exercices;
+/* Accès direct au coach depuis l'en-tête de la bibliothèque d'exercices. */
+
 F.vues.exercices=function(app){
  const v=listBefore(app);
+ const titre=v.querySelector('h1');
+ if(titre&&!v.querySelector('.forge-exercises-heading')){
+  const head=h('div',{class:'forge-exercises-heading'},titre,F.btn('Coach Forge ↗',()=>ouvrirPageCoach(null,app),'petit primaire'));
+  titre.replaceWith(head);
+ }
  v.querySelectorAll('.liste .ligne').forEach(a=>{
   const id=(a.getAttribute('href')||'').split('/').pop(),ex=F.EX[id];if(!ex)return;
   a.classList.add('exercise-main');a.prepend(F.animationExercice(ex,true));
