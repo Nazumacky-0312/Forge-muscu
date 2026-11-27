@@ -92,11 +92,14 @@
     barre.querySelector('[data-a=moins]').hidden = fini;
     barre.querySelector('[data-a=passer]').textContent = fini ? 'OK' : 'Passer';
     /* Après un rechargement, le navigateur exige un appui avant de rejouer un son. */
-    barre.querySelector('[data-a=son]').hidden = fini || !app.etat.reglages.son || !['aucun', 'bloque'].includes(FM.timer.mode);
+    /* Forge reste silencieux : aucun son au démarrage ni à la fin du repos. */
+    barre.querySelector('[data-a=son]').hidden = true;
   };
 
   function demarrer() {
     app.etat = FM.store.charger();
+    /* Désactivation permanente du son du minuteur, y compris pour les anciens profils. */
+    if (app.etat.reglages) app.etat.reglages.son = false;
     FM.store.avertir = FM.toast;
     FM.timer.init(app);
     const barre = document.getElementById('repos');
