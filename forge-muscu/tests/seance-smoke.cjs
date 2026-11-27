@@ -33,6 +33,9 @@ const mime = {
     for (const viewport of [{ width: 390, height: 844, name: 'mobile' }, { width: 1365, height: 900, name: 'desktop' }]) {
       const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
       page.setDefaultTimeout(8000);
+      /* Le classement en ligne est testé côté Supabase séparément ; le smoke test UI utilise un flux vide déterministe. */
+      await page.route('https://xqvmfdvzgywinddxkbdl.supabase.co/rest/v1/body_forge_leaderboard**', route =>
+        route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
       page.on('pageerror', error => failures.push(`${viewport.name}: ${error.message}`));
       page.on('console', msg => { if (msg.type() === 'error' && !msg.text().includes('Failed to load resource')) failures.push(`${viewport.name} console: ${msg.text()}`); });
       page.on('requestfailed', req => failures.push(`${viewport.name} request failed: ${req.url()} :: ${req.failure()?.errorText || 'unknown'}`));
