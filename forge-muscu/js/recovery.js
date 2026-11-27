@@ -80,7 +80,7 @@
     const page=el('div','forge-page forge-recovery-page');
     const header=el('header','forge-recovery-header');
     header.append(el('p','surtitre','RÉCUPÉRATION'),el('h1','','Récupération musculaire'));
-    header.append(el('p','discret','Une estimation par groupe musculaire, basée sur tes séries validées et le temps écoulé depuis tes dernières séances.'));
+    header.append(el('p','discret','Une estimation indicative par groupe musculaire, basée sur tes séries validées, les noms d’exercices reconnus et le temps écoulé depuis tes dernières séances.'));
     const grid=el('div','forge-recovery-grid');
     stats.forEach(stat=>grid.append(muscleCard(stat)));
     const forgotten=stats.filter(stat=>stat.sets7d===0);
@@ -89,7 +89,7 @@
       neglected.append(el('strong','','Groupes peu sollicités cette semaine'),el('p','',forgotten.map(stat=>stat.label).join(' · ')));
     }
     const note=el('aside','forge-recovery-note');
-    note.append(el('strong','','À savoir'),el('p','','Ce calcul est indicatif, pas une mesure physiologique ou médicale. Il ne connaît pas ton sommeil, ton stress, tes douleurs ni toute ta fatigue. La récupération varie selon les personnes et les exercices. Ne retravaille pas intensément un muscle douloureux ou insuffisamment récupéré.'));
+    note.append(el('strong','','À savoir'),el('p','','Ce calcul est indicatif, pas une mesure physiologique ou médicale. Les groupes sont estimés à partir des noms d’exercices reconnus : un mouvement non reconnu peut ne pas être comptabilisé. Le modèle ne connaît pas ton sommeil, ton stress, tes douleurs ni toute ta fatigue. La récupération varie selon les personnes et les exercices. Ne retravaille pas intensément un muscle douloureux ou insuffisamment récupéré.'));
     const links=el('div','forge-recovery-links');
     const programme=el('a','btn primaire','Voir mon programme');programme.href='#/programme';
     const statsLink=el('a','btn','Voir mes statistiques');statsLink.href='#/suivi/progres';
