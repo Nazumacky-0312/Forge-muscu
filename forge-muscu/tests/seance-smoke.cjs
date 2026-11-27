@@ -99,6 +99,23 @@ const mime = {
         if (libraryStyle.radius !== '14px' || libraryStyle.border === '0px') {
           throw new Error('Les lignes de la bibliothèque ne reçoivent pas le style premium partagé : ' + JSON.stringify(libraryStyle));
         }
+        const mediaFallbackStyle = await page.evaluate(() => {
+          const card = document.createElement('div');
+          card.className = 'forge-exercise-media mini';
+          const fallback = document.createElement('div');
+          fallback.className = 'forge-media-fallback';
+          fallback.textContent = 'Illustration 3D indisponible pour cet exercice.';
+          card.append(fallback);
+          document.body.append(card);
+          const style = getComputedStyle(fallback);
+          const after = getComputedStyle(fallback, '::after');
+          const result = { fontSize: style.fontSize, badge: after.content, badgeSize: after.fontSize };
+          card.remove();
+          return result;
+        });
+        if (mediaFallbackStyle.fontSize !== '0px' || mediaFallbackStyle.badge !== '"3D"' || mediaFallbackStyle.badgeSize !== '10.56px') {
+          throw new Error('Le fallback média miniature doit rester compact et lisible : ' + JSON.stringify(mediaFallbackStyle));
+        }
         const exerciseName = await firstExercise.locator('strong').innerText();
         await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-exercices.png`, fullPage: true });
         await firstExercise.click();
