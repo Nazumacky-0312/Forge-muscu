@@ -87,7 +87,7 @@
         if (state.user) {
           state.auto = autoEnabled();
           Promise.resolve().then(async () => {
-            try { await loadRemote(); }
+            try { await loadRemote(); if (autoEnabled()) scheduleAutoSync(); }
             catch (error) { state.message = 'Lecture cloud impossible : ' + error.message; }
             refresh();
           });
@@ -101,7 +101,7 @@
       if (error) throw error;
       state.user = data.session ? data.session.user : null;
       state.auto = autoEnabled();
-      if (state.user) await loadRemote();
+      if (state.user) { await loadRemote(); if (autoEnabled()) scheduleAutoSync(); }
       else state.message = 'Connecte-toi par lien envoyé par e-mail pour activer la sauvegarde cloud.';
       state.error = '';
     } catch (error) {
