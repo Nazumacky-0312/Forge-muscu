@@ -124,7 +124,9 @@ Les sections historiques ci-dessus décrivent un état antérieur. L'état véri
 - Les suites Playwright Séance, Body Forge et Photos/Progression/Récupération ont réussi sur mobile et ordinateur.
 - Séance vérifie aussi la conservation du tempo et du côté après rechargement, le sélecteur de type de série et le calculateur de barre.
 - Photos vérifie l'ajout local, IndexedDB après rechargement, le mode hors ligne et la suppression.
-- Dernière CI complète : run #320. Build, tests et artefact Pages réussis ; le job de déploiement a été refusé avant démarrage par la protection de l'environnement `github-pages`. Le workflow utilise maintenant un environnement distinct `github-pages-preview` pour tenter de publier uniquement `/preview/`, en gardant la racine issue de `main`. Validation de ce nouvel environnement encore en attente.
+- Dernière CI complète : run #322, succès complet. Le déploiement Pages utilise l'environnement distinct `github-pages-preview` et publie la candidate sous `/preview/` en conservant la racine issue de `main`.
+- URL de prévisualisation publiée : `https://nazumacky-0312.github.io/Forge-muscu/preview/`. La production à la racine n'a pas été remplacée.
+- L'inspection visuelle finale par navigateur automatisé n'a pas pu être faite dans cette session (crédits du navigateur de test épuisés) ; le succès du déploiement et des tests CI est confirmé.
 
 ### Limites externes restantes
 
