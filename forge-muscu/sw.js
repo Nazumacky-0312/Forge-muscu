@@ -1,7 +1,7 @@
 /* Hors ligne. Change VERSION après toute modification d'un fichier. */
-const VERSION = 'forge-muscu-v7';
+const VERSION = 'forge-muscu-v8';
 const FICHIERS = ['./', 'index.html', 'manifest.webmanifest', 'css/styles.css', 'css/liftoff.css', 'css/coach.css',
-  ...['data', 'program', 'progression', 'store', 'timer', 'ui', 'charts', 'view-home', 'view-program', 'view-exercises', 'view-session', 'view-track', 'view-cardio', 'view-profile', 'view-forge', 'view-liftoff', 'view-advanced', 'view-pro', 'coach', 'app'].map(f => `js/${f}.js`),
+  ...['data', 'program', 'progression', 'store', 'timer', 'ui', 'charts', 'view-home', 'view-program', 'view-exercises', 'view-session', 'view-track', 'view-cardio', 'view-profile', 'view-forge', 'view-liftoff', 'view-advanced', 'view-pro', 'coach', 'coach-3d', 'app'].map(f => `js/${f}.js`),
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png'];
 
 self.addEventListener('install', e => {
