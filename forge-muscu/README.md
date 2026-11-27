@@ -21,3 +21,7 @@ Application web progressive (PWA) en français pour Android, Windows et navigate
 
 ## Limites
 Les rangs Forge et les XP sont des indicateurs personnels, pas des classements officiels Liftoff ni des normes de force. Le bodygraph ne mesure pas la masse musculaire. La nutrition est saisie manuellement : aucun scan d'aliment, lecteur de code-barres ou catalogue connecté n'est intégré. Les classements mondiaux, amis, synchronisation multi-appareils, widgets natifs et Apple Watch nécessitent une infrastructure ou des API externes et ne sont pas simulés.
+
+## Illustrations 3D des exercices
+
+Les images de démonstration intégrées dans `images/exercises/` proviennent du projet [Open Exercise Illustrations](https://github.com/hitmanrepo/open-exercise-illustrations), diffusé sous licence CC0 1.0. Elles sont fournies à titre indicatif : les détails de certains équipements ou trajectoires peuvent être imparfaits. Vérifie toujours la technique d'un mouvement avec une source qualifiée.
