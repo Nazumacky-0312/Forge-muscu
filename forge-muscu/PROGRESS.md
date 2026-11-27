@@ -13,7 +13,7 @@ Refonte en cours. L'application de production sur `main` n'a pas été modifiée
 - Branche de sauvegarde : `backup/pre-forge-premium-2026-11-27`
 - Branche de travail : `forge-premium-upgrade`
 - PR de travail : https://github.com/Nazumacky-0312/Forge-muscu/pull/2
-- Dernier commit de travail avant la mise à jour documentaire : `b130b886de7fd835278f45dc42d10660e69c9cfc`
+- Dernier commit de travail validé par CI avant cette mise à jour documentaire : `b0eed459fd1797e5c63eb432cc56adc53e212535`
 
 ## Audit réalisé
 
@@ -47,11 +47,11 @@ Refonte en cours. L'application de production sur `main` n'a pas été modifiée
 - [x] Client Supabase facultatif intégré : Magic Link, synchronisation manuelle, auto-sync opt-in, gestion explicite des conflits et suppression de la sauvegarde cloud.
 - [x] Cache PWA incrémenté à v23.
 - [x] Tests Playwright étendus : reprise, pagehide, métadonnées, échauffement, pause/reprise et profil hors ligne.
-- [ ] Finition responsive de l'espace Séance : hiérarchie visuelle, onglets sticky, états actifs/focus et prise en compte de `prefers-reduced-motion` (validation CI du dernier commit en attente).
+- [x] Finition responsive de l'espace Séance : hiérarchie visuelle, onglets sticky, états actifs/focus et prise en compte de `prefers-reduced-motion`.
 
 ## En cours / à faire
 
-- [ ] Obtenir un résultat CI vert sur le commit contenant la finition visuelle de l'espace Séance.
+- [x] CI verte sur le commit `b0eed459fd1797e5c63eb432cc56adc53e212535` : préparation, médias CC0, Playwright mobile + desktop, captures QA et upload de l'artefact ; déploiement ignoré.
 - [ ] Configurer le Site URL et Redirect URL dans Supabase Auth.
 - [ ] Tester réellement Magic Link, premier envoi cloud et restauration.
 - [ ] Tester les conflits avec deux appareils / deux sessions authentifiées.
