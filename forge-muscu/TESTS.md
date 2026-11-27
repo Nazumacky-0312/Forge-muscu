@@ -13,6 +13,7 @@ Parcours couverts :
 - vérification des trois onglets Programme / Exercices / Suivi ;
 - vérification du style responsive de la navigation Séance : position sticky, trois colonnes, onglet actif et absence de débordement horizontal sur mobile et desktop ;
 - vérification que le bouton « Modifier » reste sur une seule ligne et que son libellé tient dans sa zone sur mobile et desktop ;
+- vérification que les boutons « Nouvelle séance » et « Régénérer le programme » ne se chevauchent pas ;
 - recherche, ouverture d'une fiche exercice et retour ;
 - affichage de l'état vide du suivi ;
 - rappel de reprise d'une séance active ;
