@@ -15,21 +15,22 @@
     {name:'Titan',min:800,max:899,icon:'⚡'},
     {name:'Olympian',min:900,max:1000,icon:'👑'}
   ];
-  /* Coefficients Forge indicatifs : les courbes propriétaires de Liftoff ne sont pas publiques. */
+  /* Repères moyens estimés par rapport au poids de corps.
+     100 % du repère = Gold. Ce sont des références Forge, pas une statistique mondiale mesurée. */
   const PROFILES=[
-    {re:/développé couché|bench press|chest press|presse poitrine/i,factor:400,label:'Poussée horizontale'},
-    {re:/squat|presse à cuisses|leg press|hack squat/i,factor:330,label:'Jambes'},
-    {re:/soulevé de terre|deadlift|trap bar/i,factor:300,label:'Soulevé de terre'},
-    {re:/développé militaire|shoulder press|overhead press|développé épaules/i,factor:750,label:'Poussée verticale'},
-    {re:/rowing|tirage horizontal|barbell row|seated row/i,factor:420,label:'Tirage horizontal'},
-    {re:/tirage vertical|lat pulldown|traction|pull.?up/i,factor:450,label:'Tirage vertical'},
-    {re:/curl biceps|curl barre|curl haltères|biceps/i,factor:1200,label:'Biceps'},
-    {re:/extension triceps|push.?down|barre au front|triceps/i,factor:1200,label:'Triceps'},
-    {re:/élévation latérale|lateral raise/i,factor:1800,label:'Épaules'},
-    {re:/leg curl|ischio|curl jambes/i,factor:1200,label:'Ischio-jambiers'},
-    {re:/extension jambes|leg extension|quadriceps/i,factor:1200,label:'Quadriceps'},
-    {re:/crunch|gainage|relevé de jambes|abdominaux|abdos/i,factor:900,label:'Abdominaux'},
-    {re:/mollets|calf raise/i,factor:1600,label:'Mollets'}
+    {re:/développé couché|bench press|chest press|presse poitrine/i,label:'Poussée horizontale',avgM:.60,avgF:.35},
+    {re:/squat|presse à cuisses|leg press|hack squat/i,label:'Jambes',avgM:.90,avgF:.60},
+    {re:/soulevé de terre|deadlift|trap bar/i,label:'Soulevé de terre',avgM:1.10,avgF:.70},
+    {re:/développé militaire|shoulder press|overhead press|développé épaules/i,label:'Poussée verticale',avgM:.35,avgF:.22},
+    {re:/rowing|tirage horizontal|barbell row|seated row/i,label:'Tirage horizontal',avgM:.55,avgF:.35},
+    {re:/tirage vertical|lat pulldown|traction|pull.?up/i,label:'Tirage vertical',avgM:.60,avgF:.40},
+    {re:/curl biceps|curl barre|curl haltères|biceps/i,label:'Biceps',avgM:.18,avgF:.12},
+    {re:/extension triceps|push.?down|barre au front|triceps/i,label:'Triceps',avgM:.16,avgF:.11},
+    {re:/élévation latérale|lateral raise/i,label:'Épaules',avgM:.10,avgF:.07},
+    {re:/leg curl|ischio|curl jambes/i,label:'Ischio-jambiers',avgM:.30,avgF:.22},
+    {re:/extension jambes|leg extension|quadriceps/i,label:'Quadriceps',avgM:.40,avgF:.28},
+    {re:/crunch|gainage|relevé de jambes|abdominaux|abdos/i,label:'Abdominaux',avgM:.20,avgF:.14},
+    {re:/mollets|calf raise/i,label:'Mollets',avgM:.30,avgF:.22}
   ];
   const readSettings=()=>{
     try{const x=JSON.parse(root.localStorage.getItem(KEY)||'{}');return{weight:Number(x.weight)||0,sex:x.sex==='f'?'f':x.sex==='m'?'m':''};}
@@ -50,10 +51,13 @@
         if(!set.fait||set.type==='echauffement'||!Number.isFinite(kg)||kg<=0||!Number.isFinite(reps)||reps<1||reps>30)return;
         const one=estimate(kg,reps),ratio=one/settings.weight;
         if(!Number.isFinite(ratio)||ratio<=0)return;
-        const sexFactor=settings.sex==='f'?1.12:1;
-        const score=Math.max(1,Math.min(1000,Math.round(ratio*profile.factor*sexFactor)));
+        const averageRatio=settings.sex==='f'?profile.avgF:profile.avgM;
+        const benchmark=settings.weight*averageRatio;
+        /* 100 % du repère moyen = 400 points, donc rang Gold. */
+        const relative=one/benchmark;
+        const score=Math.max(1,Math.min(1000,Math.round(relative*400)));
         const old=best.get(item.exId);
-        if(!old||score>old.score)best.set(item.exId,{id:item.exId,name,profile:profile.label,oneRm:one,score,ratio});
+        if(!old||score>old.score)best.set(item.exId,{id:item.exId,name,profile:profile.label,oneRm:one,score,ratio,benchmark,relative});
       });
     }));
     return [...best.values()].sort((a,b)=>b.score-a.score).map(x=>({...x,rank:getRank(x.score)}));
@@ -118,19 +122,19 @@
         h('a',{class:'forge-seance-tab active',href:'#/classement/body','aria-current':'page'},'Body Forge')),
       h('p',{class:'surtitre'},'TES PERFORMANCES · TON NIVEAU'),
       h('h1',{},'Body Forge'),
-      h('p',{class:'discret'},'Chaque exercice possède son propre rang. Fais progresser tes performances pour faire monter ton rang général.'),
+      h('p',{class:'discret'},'Chaque exercice est comparé à un repère moyen estimé selon ton poids de corps et ton profil. Atteindre ce repère correspond à Gold ; dépasser ce niveau fait monter ton rang.'),
       card(h('div',{class:'forge-body-overall'},
         h('div',{class:'forge-body-overall-icon'},overall.icon),
         h('div',{class:'forge-body-overall-main'},h('span',{class:'surtitre'},'RANG GÉNÉRAL'),h('h2',{},ranked.length?overall.name:'Pas encore classé'),h('strong',{},ranked.length?overallScore+'/1000':'—')),
         h('div',{class:'forge-body-overall-lp'},h('b',{},ranked.length?overall.lp+' LP':'0 LP'),h('span',{},'dans ce rang'))),
         h('div',{class:'forge-body-progress'},h('i',{style:'width:'+overall.progress+'%'})),
         h('div',{class:'forge-body-progress-label'},h('span',{},overall.next?'Progression vers '+overall.next.name:'Rang maximum'),h('b',{},overall.next?Math.max(0,100-overall.lp)+' LP':'MAX')),
-        h('p',{class:'discret'},ranked.length?'Calculé à partir de tes cinq meilleurs exercices classés.':'Ajoute ton poids de corps, puis valide des séries de travail pour obtenir tes premiers rangs.')),
+        h('p',{class:'discret'},ranked.length?'Rang général calculé à partir de tes cinq meilleurs exercices. Gold correspond au repère moyen Forge estimé.':'Ajoute ton poids de corps et ton profil, puis valide des séries de travail pour obtenir tes premiers rangs.')),
       muscleGraph(ranked),
       card(h('div',{class:'forge-card-head'},h('h2',{},'Tes rangs par exercice'),h('span',{class:'forge-tag'},ranked.length+' CLASSÉ(S)')),
         ranked.length?h('div',{class:'forge-body-exercise-list'},...ranked.map(x=>h('div',{class:'forge-body-exercise'},
           h('div',{class:'forge-body-exercise-icon'},x.rank.icon),
-          h('div',{class:'forge-body-exercise-info'},h('strong',{},x.name),h('span',{},x.profile+' · 1RM estimé '+x.oneRm.toFixed(1)+' kg'),h('div',{class:'forge-body-mini-track'},h('i',{style:'width:'+x.rank.progress+'%'}))),
+          h('div',{class:'forge-body-exercise-info'},h('strong',{},x.name),h('span',{},x.profile+' · 1RM estimé '+x.oneRm.toFixed(1)+' kg · repère Gold '+x.benchmark.toFixed(1)+' kg'),h('div',{class:'forge-body-mini-track'},h('i',{style:'width:'+x.rank.progress+'%'}))),
           h('div',{class:'forge-body-exercise-result'},h('b',{},x.rank.name),h('strong',{},x.rank.lp+' LP'))))):h('p',{class:'discret'},'Aucun rang pour le moment. Les rangs apparaîtront dès que tu auras enregistré des séries de travail sur les exercices compatibles.')),
       card(h('div',{class:'forge-card-head'},h('h2',{},'Ton profil de force'),h('span',{class:'forge-tag'},'CONFIGURATION')),
         h('p',{class:'discret'},'Le poids de corps et le sexe servent à contextualiser les performances, comme dans Liftoff. Ils restent enregistrés sur cet appareil.'),
