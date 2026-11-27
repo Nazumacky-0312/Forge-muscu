@@ -183,7 +183,7 @@
   FM.vues.seance = function (app) {
     const view = seanceOriginale(app);
     const active = app.etat && app.etat.active;
-    if (!active || !active.echauffement || !active.exercices.length) return view;
+    if (!active || !Array.isArray(active.exercices) || !active.exercices.length) return view;
     const entry = active.exercices[active.index];
     if (!entry || !entry.series.length) return view;
     const unfinished = entry.series.findIndex(s => !s.fait);
