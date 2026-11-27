@@ -1,122 +1,184 @@
-/* Avatar 3D Body Forge — modèles musculaires homme/femme, couleurs liées aux rangs. */
-let THREE;
+/* Body Forge — vrai atlas musculaire 3D Open Anatomy, homme et femme. */
+let THREE, GLTFLoader, MeshoptDecoder;
+async function loadEngine(base) {
+  const [three, loader, meshopt] = await Promise.all([
+    import(base === 'esm' ? 'https://esm.sh/three@0.160.0' : 'https://cdn.jsdelivr.net/npm/three@0.160.0/+esm'),
+    import(base === 'esm' ? 'https://esm.sh/three@0.160.0/examples/jsm/loaders/GLTFLoader.js' : 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js/+esm'),
+    import(base === 'esm' ? 'https://esm.sh/three@0.160.0/examples/jsm/libs/meshopt_decoder.module.js' : 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/meshopt_decoder.module.js/+esm')
+  ]);
+  THREE = three;
+  GLTFLoader = loader.GLTFLoader;
+  MeshoptDecoder = meshopt.MeshoptDecoder;
+}
 try {
-  THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js');
+  await loadEngine('esm');
 } catch (primaryError) {
-  try {
-    THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js');
-  } catch (secondaryError) {
-    window.dispatchEvent(new CustomEvent('forge-avatar-error', {detail: String(secondaryError || primaryError)}));
+  try { await loadEngine('jsdelivr'); }
+  catch (secondaryError) {
+    window.dispatchEvent(new CustomEvent('forge-avatar-error', {detail:'Le moteur 3D ne s’est pas chargé. Vérifie ta connexion puis recharge Body Forge.'}));
     throw secondaryError || primaryError;
   }
 }
 
 const RANK_COLORS=['#8b929b','#b87945','#b9c0c9','#e4bd4c','#65c5c2','#59a8f4','#a17bf2','#f07855','#f4e3a0'];
-const BASE='#29323b', EDGE='#111820';
-
-function makeAvatar(sex, ranks){
-  const root=new THREE.Group();
-  const male=sex==='m', shoulder=male?0.76:0.66, hip=male?0.48:0.62, waist=male?0.43:0.39;
-  const mats={};
-  const mat=(color,rough=.58,metal=.02)=>new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal});
-  const baseMat=mat(BASE,.72), darkMat=mat('#1b242c',.66), skinMat=mat('#aeb6bd',.58), detailMat=mat('#687681',.65);
-  const sphereGeo=new THREE.SphereGeometry(1,32,24);
-  function part(group,x,y,z,sx,sy,sz,depth=0.16,material=null){
-    const materialToUse=material||mat(RANK_COLORS[Math.max(0,Math.min(8,ranks[group]??-1))]||BASE,.52,.06);
-    const mesh=new THREE.Mesh(sphereGeo,materialToUse);
-    mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);mesh.castShadow=true;mesh.receiveShadow=true;
-    mesh.userData.muscle=group;root.add(mesh);return mesh;
-  }
-  function base(x,y,z,sx,sy,sz,material=baseMat){
-    const mesh=new THREE.Mesh(sphereGeo,material);mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);mesh.castShadow=true;mesh.receiveShadow=true;root.add(mesh);return mesh;
-  }
-  function muscle(group,x,y,z,sx,sy,sz,front=true){
-    const rank=ranks[group];const color=rank===undefined||rank<0?BASE:RANK_COLORS[rank];
-    return part(group,x,y,z,sx,sy,sz,.16,mat(color,.48,.07));
-  }
-  function capsule(x1,y1,z1,x2,y2,z2,r,material=baseMat){
-    const a=new THREE.Vector3(x1,y1,z1),b=new THREE.Vector3(x2,y2,z2),dir=new THREE.Vector3().subVectors(b,a);
-    const mesh=new THREE.Mesh(new THREE.CapsuleGeometry(r,Math.max(.05,dir.length()-2*r),6,16),material);
-    mesh.position.copy(a).add(b).multiplyScalar(.5);mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());mesh.castShadow=true;mesh.receiveShadow=true;root.add(mesh);return mesh;
-  }
-  // Silhouette générale : une seule sculpture, avec volumes musculaires indépendants.
-  base(0,1.42,0, .66,1.03,.30);
-  base(0,2.02,0, .70, male?.48:.43,.29);
-  base(0,1.15,0, hip,.44,.31);
-  base(0,2.55,0,.19,.25,.19);
-  base(0,2.91,0,.31,.40,.29,skinMat);
-  base(0,3.00,.245,.18,.11,.07,detailMat);
-  // Bras et avant-bras.
-  for(const s of [-1,1]){
-    base(s*shoulder,2.23,0,.24,.31,.25);
-    capsule(s*shoulder,2.18,0,s*(shoulder+.18),1.69,0,.16);
-    capsule(s*(shoulder+.18),1.69,0,s*(shoulder+.25),1.18,0,.12);
-    base(s*(shoulder+.26),1.07,0,.13,.17,.12,darkMat);
-    // Jambes et pieds.
-    capsule(s*.29,1.00,0,s*.31,.22,0,.19);
-    capsule(s*.31,.22,0,s*.32,-.66,0,.125);
-    base(s*.32,-.78,.10,.16,.12,.27,darkMat);
-  }
-  // Torse et muscles antérieurs.
-  muscle('shoulders',-.61,2.35,.20,.25,.25,.17);muscle('shoulders',.61,2.35,.20,.25,.25,.17);
-  muscle('chest',-.31,2.05,.275,.34,.23,.105);muscle('chest',.31,2.05,.275,.34,.23,.105);
-  muscle('biceps',-.79,1.86,.10,.15,.25,.15);muscle('biceps',.79,1.86,.10,.15,.25,.15);
-  muscle('triceps',-.83,1.82,-.10,.14,.27,.14);muscle('triceps',.83,1.82,-.10,.14,.27,.14);
-  muscle('forearms',-.90,1.39,.08,.115,.28,.12);muscle('forearms',.90,1.39,.08,.115,.28,.12);
-  for(let i=0;i<4;i++){const y=1.77-i*.17;muscle('abs',-.105,y,.292,.095,.075,.045);muscle('abs',.105,y,.292,.095,.075,.045);}
-  muscle('obliques',-.37,1.62,.19,.12,.29,.12);muscle('obliques',.37,1.62,.19,.12,.29,.12);
-  muscle('quads',-.30,.68,.19,.22,.39,.17);muscle('quads',.30,.68,.19,.22,.39,.17);
-  muscle('calves',-.32,-.30,.13,.15,.31,.13);muscle('calves',.32,-.30,.13,.15,.31,.13);
-  // Dos et muscles postérieurs.
-  muscle('back',-.30,2.04,-.245,.34,.46,.10,false);muscle('back',.30,2.04,-.245,.34,.46,.10,false);
-  muscle('traps',0,2.42,-.22,.28,.28,.12,false);
-  muscle('triceps',-.83,1.83,-.17,.14,.27,.12,false);muscle('triceps',.83,1.83,-.17,.14,.27,.12,false);
-  muscle('glutes',-.25,1.12,-.25,.25,.24,.14,false);muscle('glutes',.25,1.12,-.25,.25,.24,.14,false);
-  muscle('hamstrings',-.30,.62,-.17,.20,.38,.14,false);muscle('hamstrings',.30,.62,-.17,.20,.38,.14,false);
-  muscle('calves',-.32,-.30,-.13,.14,.30,.12,false);muscle('calves',.32,-.30,-.13,.14,.30,.12,false);
-  // Repères de séparation anatomique discrets.
-  for(const s of [-1,1]){
-    base(s*.11,1.98,.365,.012,.16,.008,detailMat);
-    base(s*.30,1.56,.31,.012,.16,.008,detailMat);
-  }
-  return root;
+const BASE_COLOR='#87939d';
+const MUSCLE_GROUP={
+  abdominal_muscles:'abs', intercostals_l:'abs', intercostals_r:'abs',
+  back_muscles_l:'back', back_muscles_r:'back',
+  calf_l:'calves', calf_r:'calves', shin_muscles_l:'calves', shin_muscles_r:'calves',
+  chest_muscles_l:'chest', chest_muscles_r:'chest',
+  deltoid_l:'shoulders', deltoid_r:'shoulders',
+  shoulder_muscles_l:'shoulders', shoulder_muscles_r:'shoulders',
+  rotator_cuff_l:'shoulders', rotator_cuff_r:'shoulders',
+  forearm_muscles_l:'forearms', forearm_muscles_r:'forearms',
+  gluteal_l:'glutes', gluteal_r:'glutes',
+  hamstrings_l:'hamstrings', hamstrings_r:'hamstrings',
+  quadriceps_l:'quads', quadriceps_r:'quads',
+  trapezius_l:'traps', trapezius_r:'traps',
+  upper_arm_muscles_l:'upperarms', upper_arm_muscles_r:'upperarms'
+};
+const loader=new GLTFLoader();
+loader.setMeshoptDecoder(MeshoptDecoder);
+const modelCache=new Map();
+async function getModel(sex,onProgress){
+  const key=sex==='f'?'female':'male';
+  if(modelCache.has(key))return modelCache.get(key);
+  const url='https://cdn.jsdelivr.net/npm/open-anatomy-3d@0.1.0/models/anatomy-'+key+'.glb';
+  const promise=loader.loadAsync(url,onProgress).then(gltf=>gltf.scene);
+  modelCache.set(key,promise);
+  try{return await promise;}catch(error){modelCache.delete(key);throw error;}
 }
-
-function mount(container, initial){
+function rankColor(key,ranks){
+  const group=MUSCLE_GROUP[key];
+  if(!group)return BASE_COLOR;
+  let rank=ranks[group]??-1;
+  if(group==='upperarms')rank=Math.max(ranks.biceps??-1,ranks.triceps??-1);
+  return rank>=0?RANK_COLORS[Math.min(8,rank)]:BASE_COLOR;
+}
+function makeAnatomy(source,ranks){
+  const model=source.clone(true);
+  model.name='forge-anatomy-model';
+  model.traverse(node=>{
+    if(node.parent===model){
+      node.visible=node.name==='muscles';
+    }
+  });
+  let muscleCount=0;
+  model.traverse(node=>{
+    if(!node.isMesh)return;
+    let owner=node;
+    while(owner&&owner!==model&&!Object.prototype.hasOwnProperty.call(MUSCLE_GROUP,owner.name))owner=owner.parent;
+    if(!owner||owner===model)return;
+    const color=rankColor(owner.name,ranks);
+    node.material=new THREE.MeshStandardMaterial({
+      color,roughness:.72,metalness:.015,side:THREE.DoubleSide
+    });
+    node.castShadow=true;
+    node.receiveShadow=true;
+    muscleCount++;
+  });
+  if(!muscleCount)throw new Error('Aucun muscle détecté dans le modèle anatomique.');
+  model.updateMatrixWorld(true);
+  const bounds=new THREE.Box3().setFromObject(model);
+  const size=bounds.getSize(new THREE.Vector3());
+  const center=bounds.getCenter(new THREE.Vector3());
+  model.position.set(-center.x,-bounds.min.y,-center.z);
+  model.userData.bodyHeight=size.y;
+  return model;
+}
+function mount(container,initial){
   if(container.__forge3d?.dispose)container.__forge3d.dispose();
-  const width=Math.max(220,container.clientWidth||300),height=Math.max(320,container.clientHeight||410);
-  const scene=new THREE.Scene();scene.background=new THREE.Color('#10171e');
-  const camera=new THREE.PerspectiveCamera(34,width/height,.1,100);camera.position.set(0,1.45,8.2);camera.lookAt(0,1.15,0);
-  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'low-power'});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));renderer.setSize(width,height);
-  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-  renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
+  const width=Math.max(220,container.clientWidth||300),height=Math.max(320,container.clientHeight||390);
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color('#111820');
+  const camera=new THREE.PerspectiveCamera(31,width/height,.01,100);
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.4));
+  renderer.setSize(width,height);
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.18;
   container.replaceChildren(renderer.domElement);
-  scene.add(new THREE.HemisphereLight('#dceaff','#26313a',2.0));
-  const key=new THREE.DirectionalLight('#ffffff',3.2);key.position.set(-3,5,5);key.castShadow=true;key.shadow.mapSize.set(1024,1024);scene.add(key);
-  const rim=new THREE.DirectionalLight('#83a9bf',2.0);rim.position.set(3,3,-4);scene.add(rim);
-  const floor=new THREE.Mesh(new THREE.CircleGeometry(1.35,64),new THREE.MeshStandardMaterial({color:'#1b2730',roughness:.9,metalness:.1}));
-  floor.rotation.x=-Math.PI/2;floor.position.y=-.93;floor.scale.set(1.15,1.15,1);floor.receiveShadow=true;scene.add(floor);
-  const ring=new THREE.Mesh(new THREE.TorusGeometry(.92,.012,8,90),new THREE.MeshBasicMaterial({color:'#4c626e',transparent:true,opacity:.45}));
-  ring.rotation.x=Math.PI/2;ring.position.y=-.91;ring.scale.set(1.2,1.2,1);scene.add(ring);
-  let sex=initial.sex==='f'?'f':'m',ranks=initial.ranks||{},avatar=makeAvatar(sex,ranks);scene.add(avatar);
-  let targetY=0,dragging=false,lastX=0,lastY=0,raf=0,disposed=false;
+  const hemi=new THREE.HemisphereLight('#f0f5ff','#46505a',2.15);scene.add(hemi);
+  const keyLight=new THREE.DirectionalLight('#fff4e8',3.1);keyLight.position.set(-2.8,4.2,4);scene.add(keyLight);
+  const fill=new THREE.DirectionalLight('#8bb9df',1.45);fill.position.set(3,2,-3);scene.add(fill);
+  const front=new THREE.DirectionalLight('#ffffff',.85);front.position.set(0,1,5);scene.add(front);
+  const ground=new THREE.Mesh(new THREE.CircleGeometry(.72,64),new THREE.MeshStandardMaterial({color:'#202a33',roughness:.9,metalness:.05}));
+  ground.rotation.x=-Math.PI/2;ground.position.y=-.018;ground.scale.set(1.3,1.3,1);scene.add(ground);
+  let sex=initial.sex==='f'?'f':'m',ranks=initial.ranks||{},avatar=null,disposed=false,loadingToken=0,raf=0;
+  let targetRotation=0,targetDistance=2.7,dragging=false,lastX=0;
+  const status=document.createElement('div');status.className='forge-avatar-model-status';status.textContent='Chargement du modèle anatomique…';container.append(status);
+  function frameModel(model){
+    avatar=model;scene.add(avatar);
+    const h=avatar.userData.bodyHeight||1.7;
+    const targetY=h*.51;
+    camera.position.set(0,targetY+h*.035,h*1.95);
+    camera.lookAt(0,targetY,0);
+    targetDistance=camera.position.z;
+    targetRotation=0;
+    avatar.rotation.y=0;
+  }
+  async function changeModel(nextSex){
+    const token=++loadingToken;
+    status.style.display='grid';status.textContent='Chargement du modèle anatomique…';
+    try{
+      const source=await getModel(nextSex,p=>{
+        if(p.total&&status.isConnected)status.textContent='Chargement du modèle anatomique… '+Math.round(p.loaded/p.total*100)+' %';
+      });
+      if(disposed||token!==loadingToken)return;
+      if(avatar){scene.remove(avatar);avatar.traverse(n=>{if(n.isMesh&&n.material)n.material.dispose();});}
+      frameModel(makeAnatomy(source,ranks));
+      sex=nextSex;
+      status.remove();
+    }catch(error){
+      if(disposed||token!==loadingToken)return;
+      console.error('Forge Muscu — modèle anatomique :',error);
+      status.style.display='grid';
+      status.textContent='Le modèle anatomique n’a pas pu être chargé. Vérifie ta connexion puis appuie sur Réessayer.';
+      let retry=status.querySelector('button');
+      if(!retry){retry=document.createElement('button');retry.type='button';retry.className='btn primaire';retry.textContent='Réessayer';retry.addEventListener('click',()=>changeModel(sex));status.append(retry);}
+    }
+  }
   const canvas=renderer.domElement;
-  function pointerDown(e){dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture?.(e.pointerId);}
-  function pointerMove(e){if(!dragging)return;const dx=e.clientX-lastX;lastX=e.clientX;lastY=e.clientY;avatar.rotation.y+=dx*.009;}
+  function pointerDown(e){dragging=true;lastX=e.clientX;canvas.setPointerCapture?.(e.pointerId);}
+  function pointerMove(e){if(!dragging||!avatar)return;const dx=e.clientX-lastX;lastX=e.clientX;targetRotation+=dx*.009;}
   function pointerUp(){dragging=false;}
-  canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
+  function wheel(e){e.preventDefault();targetDistance=THREE.MathUtils.clamp(targetDistance+Math.sign(e.deltaY)*.12,1.65,4.8);}
+  canvas.addEventListener('pointerdown',pointerDown);
+  canvas.addEventListener('pointermove',pointerMove);
+  canvas.addEventListener('pointerup',pointerUp);
+  canvas.addEventListener('pointercancel',pointerUp);
+  canvas.addEventListener('wheel',wheel,{passive:false});
   canvas.style.touchAction='pan-y';
-  function animate(){if(disposed)return;raf=requestAnimationFrame(animate);avatar.rotation.y+=(targetY-avatar.rotation.y)*.08;renderer.render(scene,camera);}
-  function releaseAvatar(group){group.traverse(node=>{if(node.geometry)node.geometry.dispose();if(node.material){if(Array.isArray(node.material))node.material.forEach(x=>x.dispose());else node.material.dispose();}});}
+  function animate(){
+    if(disposed)return;
+    raf=requestAnimationFrame(animate);
+    if(avatar)avatar.rotation.y+=(targetRotation-avatar.rotation.y)*.09;
+    const h=avatar?.userData.bodyHeight||1.7;
+    const wantedZ=targetDistance;
+    camera.position.z+=(wantedZ-camera.position.z)*.08;
+    renderer.render(scene,camera);
+  }
   animate();
-  const resize=new ResizeObserver(()=>{if(disposed)return;const w=Math.max(220,container.clientWidth||300),h=Math.max(320,container.clientHeight||410);camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);});
+  const resize=new ResizeObserver(()=>{
+    if(disposed)return;
+    const w=Math.max(220,container.clientWidth||300),h=Math.max(320,container.clientHeight||390);
+    camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);
+  });
   resize.observe(container);
+  changeModel(sex);
   const api={
-    setSex(value){sex=value==='f'?'f':'m';scene.remove(avatar);releaseAvatar(avatar);avatar=makeAvatar(sex,ranks);avatar.rotation.y=targetY;scene.add(avatar);},
-    setView(value){targetY=value==='back'?Math.PI:0;},
-    reset(){targetY=0;avatar.rotation.y=0;},
-    dispose(){if(disposed)return;disposed=true;cancelAnimationFrame(raf);resize.disconnect();canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointermove',pointerMove);canvas.removeEventListener('pointerup',pointerUp);releaseAvatar(avatar);renderer.dispose();container.replaceChildren();}
+    setSex(value){const next=value==='f'?'f':'m';if(next!==sex)changeModel(next);},
+    setView(value){targetRotation=value==='back'?Math.PI:0;},
+    reset(){targetRotation=0;},
+    dispose(){
+      if(disposed)return;disposed=true;loadingToken++;cancelAnimationFrame(raf);resize.disconnect();
+      canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointermove',pointerMove);
+      canvas.removeEventListener('pointerup',pointerUp);canvas.removeEventListener('pointercancel',pointerUp);
+      canvas.removeEventListener('wheel',wheel);
+      if(avatar){scene.remove(avatar);avatar.traverse(n=>{if(n.isMesh&&n.material)n.material.dispose();});}
+      renderer.dispose();container.replaceChildren();
+    }
   };
   container.__forge3d=api;return api;
 }
