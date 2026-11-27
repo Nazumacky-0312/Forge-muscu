@@ -16,6 +16,7 @@
   };
   const revisionKey = userId => 'forge-muscu:cloud-revision:' + userId;
   const autoKey = userId => 'forge-muscu:cloud-auto:' + userId;
+  const autoMasterKey = 'forge-muscu:cloud-auto-enabled';
   const safeGet = key => { try { return root.localStorage.getItem(key); } catch (_) { return null; } };
   const safeSet = (key, value) => { try { root.localStorage.setItem(key, value); return true; } catch (_) { return false; } };
   const safeRemove = key => { try { root.localStorage.removeItem(key); } catch (_) { /* stockage local indisponible */ } };
@@ -28,7 +29,10 @@
   const autoEnabled = () => !!(state.user && safeGet(autoKey(state.user.id)) === '1');
   const setAuto = value => {
     state.auto = !!value;
-    if (state.user) safeSet(autoKey(state.user.id), state.auto ? '1' : '0');
+    if (state.user) {
+      safeSet(autoKey(state.user.id), state.auto ? '1' : '0');
+      safeSet(autoMasterKey, state.auto ? '1' : '0');
+    }
   };
   const element = (tag, cls, value) => {
     const node = document.createElement(tag);
@@ -351,7 +355,8 @@
   };
 
   root.addEventListener('online', () => {
-    if (state.user && autoEnabled()) scheduleAutoSync();
+    if (!state.client && safeGet(autoMasterKey) === '1') initClient();
+    else if (state.user && autoEnabled()) scheduleAutoSync();
     if (location.hash.startsWith('#/profil') && !state.client) initClient();
   });
   root.addEventListener('offline', () => {
@@ -359,6 +364,10 @@
     state.message = 'Hors ligne : les données restent sur cet appareil. Synchronisation en attente.';
     refresh();
   });
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installAutoSync, { once: true });
-  else installAutoSync();
+  function demarrerCloudAutomatique() {
+    installAutoSync();
+    if (safeGet(autoMasterKey) === '1' && root.navigator.onLine) initClient();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', demarrerCloudAutomatique, { once: true });
+  else demarrerCloudAutomatique();
 })(typeof window !== 'undefined' ? window : globalThis);
