@@ -102,3 +102,19 @@
 .forge-avatar-customize>b{font-size:.82rem}
 .forge-avatar-customize>small{font-size:.68rem;color:var(--muted,#aab0b8);text-align:right}
 @media(max-width:370px){.forge-avatar-views{gap:5px}.forge-avatar-view{padding:9px 3px 4px}.forge-avatar-customize{grid-template-columns:1fr}.forge-avatar-customize>small{text-align:left}}
+
+
+/* Avatar 3D Body Forge */
+.forge-avatar-3d-card{gap:13px;overflow:hidden}
+.forge-avatar-3d-card h2{margin:2px 0 0;font-size:1.2rem}
+.forge-avatar-controls{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.forge-avatar-switch{display:inline-flex;gap:4px;padding:4px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:#111820}
+.forge-avatar-choice{min-height:38px;padding:8px 14px;border:0;border-radius:9px;background:transparent;color:#aab4bd;font:inherit;font-size:.8rem;font-weight:800;cursor:pointer}
+.forge-avatar-choice.active{background:var(--accent,#c5f36b);color:#111820;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.forge-avatar-view-switch .forge-avatar-choice{min-width:55px}
+.forge-avatar-3d-frame{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:radial-gradient(ellipse at 50% 32%,#26343f 0%,#151e26 54%,#10171e 100%);box-shadow:inset 0 0 35px rgba(0,0,0,.28)}
+.forge-avatar-3d-canvas{width:100%;height:410px;min-height:340px;touch-action:pan-y}
+.forge-avatar-3d-canvas canvas{display:block;width:100%;height:100%;outline:none}
+.forge-avatar-3d-frame:after{content:'FAIS GLISSER POUR TOURNER';position:absolute;left:0;right:0;bottom:10px;text-align:center;pointer-events:none;color:rgba(207,220,229,.48);font-size:.58rem;font-weight:850;letter-spacing:.16em}
+.forge-avatar-3d-card .forge-avatar-legend{gap:8px 11px}
+@media(max-width:420px){.forge-avatar-controls{align-items:stretch}.forge-avatar-switch{flex:1;justify-content:center}.forge-avatar-choice{flex:1;padding:8px 9px}.forge-avatar-3d-canvas{height:390px;min-height:330px}}
