@@ -98,7 +98,7 @@ function slugImageExercice(n){
   [/marche.*fermier|farmer.?s? walk|farmer carry/,'farmers-walk'],
   [/releve.*genoux.*suspendu|hanging knee raise/,'hanging-knee-raise'],
   [/traction|pull.?up/,'pull-up'],
-  [/elevation laterale|lateral raise/,'lateral-raises'],
+  [/elevations? laterales?|lateral raises?/,'lateral-raises'],
   [/crunch.*poulie|cable crunch/,'cable-crunch'],
   [/crunch|releve.*buste/,'crunches'],
   [/gainage|planche|plank/,'plank'],
