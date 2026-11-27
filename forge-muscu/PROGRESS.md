@@ -124,11 +124,11 @@ Les sections historiques ci-dessus décrivent un état antérieur. L'état véri
 - Les suites Playwright Séance, Body Forge et Photos/Progression/Récupération ont réussi sur mobile et ordinateur.
 - Séance vérifie aussi la conservation du tempo et du côté après rechargement, le sélecteur de type de série et le calculateur de barre.
 - Photos vérifie l'ajout local, IndexedDB après rechargement, le mode hors ligne et la suppression.
-- Dernière CI : run #318, succès complet ; prévisualisation de la branche construite et artefact Pages généré. Cela ne signifie pas que la version publique a été remplacée.
+- Dernière CI complète : run #320. Build, tests et artefact Pages réussis ; le job de déploiement a été refusé avant démarrage par la protection de l'environnement `github-pages`. Le workflow utilise maintenant un environnement distinct `github-pages-preview` pour tenter de publier uniquement `/preview/`, en gardant la racine issue de `main`. Validation de ce nouvel environnement encore en attente.
 
 ### Limites externes restantes
 
-- La configuration Supabase Auth `Site URL` / `Redirect URLs` n'est pas modifiable via les actions Supabase disponibles. Valeur attendue par Forge : `https://nazumacky-0312.github.io/Forge-muscu/`.
+- La configuration Supabase Auth `Site URL` / `Redirect URLs` n'est pas modifiable via les actions Supabase disponibles. Site URL attendu : `https://nazumacky-0312.github.io/Forge-muscu/` ; autoriser aussi `https://nazumacky-0312.github.io/Forge-muscu/preview/` pour les essais depuis l'aperçu.
 - La synchronisation réelle des photos entre deux comptes/appareils n'a pas été testée avec un compte utilisateur authentifié.
 - Les enchaînements Superset/Circuit avec alternance automatique des séries, le glisser-déposer des exercices, les classements entre amis et Health Connect restent à développer.
 - Les favoris alimentaires dédiés ne sont pas encore ajoutés ; la recherche Open Food Facts et le scanner quand BarcodeDetector est disponible existent déjà.
