@@ -2,11 +2,12 @@
 (function(w){
 'use strict';
 const F=w.FM,h=F.h;
+w.FORGE_COACH_ENDPOINT='https://xqvmfdvzgywinddxkbdl.supabase.co/functions/v1/forge-coach';
+w.FORGE_COACH_KEY='sb_publishable_tHLViJ0JO41Phe24lPCL_g_XepTcbeQ';
 const motion={pouss_h:'push',pouss_inc:'push',pouss_v:'up',tir_h:'row',tir_v:'pull',squat:'squat',fente:'lunge',hanche:'hinge',ischios:'curl',mollets:'calf',marteau:'curl',triceps:'tri',elev_lat:'raise',arriere:'raise',ecarte:'fly',dips:'dip',gainage:'plank',abd_bas:'leg',abd_flex:'crunch',obliques:'twist',avb_flex:'curl',avb_ext:'curl',shrug:'shrug',portage:'walk'};
 F.animationExercice=function(ex,mini){
  const type=motion[ex.pattern]||'curl';
- const el=h('div',{class:'forge3d'+(mini?' mini':''),'data-3d':'1','data-pattern':type,role:'img','aria-label':'Démonstration 3D animée : '+ex.nom});
- return el;
+ return h('div',{class:'forge3d'+(mini?' mini':''),'data-3d':'1','data-pattern':type,role:'img','aria-label':'Démonstration 3D animée : '+ex.nom});
 };
 F.ouvrirCoach=function(ex){
  const messages=h('div',{class:'coach-messages','aria-live':'polite'},h('p',{class:'coach-bot'},ex?'Je suis ton coach pour '+ex.nom+'. Pose une question sur la technique, le placement, la respiration, les charges ou les alternatives.':'Pose tes questions sur la musculation, tes exercices, ta progression ou ton programme.'));
@@ -16,25 +17,16 @@ F.ouvrirCoach=function(ex){
  form.addEventListener('submit',async ev=>{
   ev.preventDefault();const q=input.value.trim();if(!q)return;input.value='';
   messages.append(h('p',{class:'coach-user'},q));const wait=h('p',{class:'coach-bot'},'Je réfléchis…');messages.append(wait);send.disabled=true;
-  let answer='';const endpoint=w.FORGE_COACH_ENDPOINT;
-  if(typeof endpoint==='string'&&endpoint.startsWith('https://')){
-   try{const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,exercise:ex?{name:ex.nom,muscles:ex.muscles,instructions:ex.consignes,errors:ex.erreurs}:null})});if(!r.ok)throw Error('HTTP '+r.status);const d=await r.json();answer=String(d.answer||d.reply||'Aucune réponse reçue.');}
-   catch(e){answer='Le serveur IA est indisponible. '+local(q,ex);}
-  }else answer='Conseil intégré : '+local(q,ex)+'\n\nLe mode IA complet sera actif dès que le serveur sécurisé sera connecté.';
-  wait.textContent=answer;send.disabled=false;messages.scrollTop=messages.scrollHeight;
+  try{
+   const r=await fetch(w.FORGE_COACH_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','apikey':w.FORGE_COACH_KEY,'Authorization':'Bearer '+w.FORGE_COACH_KEY},body:JSON.stringify({question:q,exercise:ex?{name:ex.nom,muscles:ex.muscles,instructions:ex.consignes,errors:ex.erreurs}:null})});
+   const d=await r.json();if(!r.ok)throw new Error(d.error||'Erreur du service IA ('+r.status+').');
+   wait.textContent=String(d.answer||'Je n’ai pas reçu de réponse.'); 
+  }catch(err){wait.textContent='Le coach IA ne répond pas : '+(err.message||'erreur réseau')+' Tu peux réessayer dans un instant.';}
+  finally{send.disabled=false;messages.scrollTop=messages.scrollHeight;}
  });
  const suggestions=h('div',{class:'coach-suggestions'},...['Comment bien faire le mouvement ?','Combien de séries et répétitions ?','Comment progresser en charge ?'].map(q=>F.btn(q,()=>{input.value=q;input.focus();},'petit')));
  return F.modale(ex?'Conseils du coach':'Coach Forge',h('div',{class:'coach-panel'},ex?F.carte(h('div',{class:'coach-ex-head'},F.animationExercice(ex,true),h('strong',{},ex.nom))):null,messages,suggestions,form));
 };
-function local(q,ex){
- const s=q.toLowerCase();
- if(/douleur|mal|bless|genou|dos|épaule|epaule/.test(s))return 'Arrête si la douleur est vive, inhabituelle ou augmente. Ne force pas à travers la douleur ; demande un avis médical si elle persiste. Je ne peux pas établir de diagnostic.';
- if(/combien|série|series|répét|repet/.test(s))return 'Repère général : 2 à 4 séries de 6 à 15 répétitions, en gardant 1 à 3 répétitions en réserve. Ajuste selon ton niveau et ta récupération.';
- if(/repos|pause/.test(s))return 'Prends environ 2 à 3 minutes sur les mouvements lourds et 60 à 120 secondes sur l’isolation. Reprends quand ta technique reste propre.';
- if(/charge|progres|augment|poids/.test(s))return 'Quand tu atteins le haut de ta fourchette de répétitions sur toutes tes séries avec une technique propre, augmente légèrement la charge.';
- if(ex)return ex.nom+' : '+(ex.consignes||[]).join(' ')+' À éviter : '+(ex.erreurs||[]).join(' ; ');
- return 'Je peux conseiller sur la technique, les séries, les répétitions, les charges, le repos, la récupération et les programmes. Précise ton objectif et ton contexte pour une réponse plus utile.';
-}
 const listBefore=F.vues.exercices;
 F.vues.exercices=function(app){
  const v=listBefore(app);
