@@ -129,6 +129,13 @@ const mime = {
         if (!(await page.locator('.forge-resume-banner').innerText()).includes('Séance QA')) {
           throw new Error('Le rappel de reprise ne montre pas la séance active.');
         }
+
+        /* Le profil et le mode local restent accessibles hors ligne, même avec le cloud configuré. */
+        await page.setOffline(true);
+        await page.evaluate(() => window.FM.app.aller('#/profil'));
+        await page.locator('.forge-cloud-card').waitFor();
+        const cloudStatus = await page.locator('.forge-cloud-status').innerText();
+        if (!cloudStatus.includes('Hors ligne')) throw new Error('Le mode hors ligne ne préserve pas l’accès au profil cloud/local : ' + cloudStatus);
       } catch (error) {
         const body = await page.locator('body').innerText().catch(() => '[body inaccessible]');
         const html = await page.locator('html').evaluate(el => el.outerHTML).catch(() => '[html inaccessible]');
