@@ -240,6 +240,11 @@
     note.addEventListener('change', () => { entry.note = note.value.slice(0, 500); app.sauver(); });
     noteLabel.append(note);
     panel.append(noteLabel);
+    const tools = element('div', 'forge-meta-actions');
+    const barLink = element('a', 'btn petit', 'Calculateur de barre');
+    barLink.href = '#/pro/barre';
+    tools.append(barLink);
+    panel.append(tools);
     const activeSet = view.querySelector('.serie.active');
     if (activeSet) activeSet.after(panel);
     else view.append(panel);
