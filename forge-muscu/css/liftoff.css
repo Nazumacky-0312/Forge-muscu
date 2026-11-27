@@ -48,3 +48,12 @@
 #repos.repos-pause{border-color:var(--alerte)}
 #repos.repos-pause .titre{color:var(--alerte)}
 @media(max-width:360px){.forge-meta-grid{grid-template-columns:1fr}}
+
+
+/* Sauvegarde cloud facultative */
+.forge-cloud-card{border-color:var(--bord)}
+.forge-cloud-status{padding:10px 12px;border-left:3px solid var(--accent);border-radius:8px;background:var(--surface2);font-size:.84rem}
+.forge-cloud-auto{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:.82rem}
+.forge-cloud-auto input{width:24px;height:24px;min-height:0;accent-color:var(--accent)}
+.forge-cloud-card .btn{width:100%;margin:6px 0}
+.forge-cloud-card .btn.danger{color:var(--danger)}
