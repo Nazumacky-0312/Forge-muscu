@@ -29,7 +29,7 @@ const port = 4174;
     await page.addInitScript(() => localStorage.setItem('forge-body-rank-settings-v1', JSON.stringify({ weight: 70, sex: 'm' })));
     await page.goto('http://127.0.0.1:' + port + '/#/classement/body', { waitUntil: 'domcontentloaded' });
     await page.getByRole('heading', { name: 'Body Forge' }).waitFor();
-    await page.locator('.forge-bodygraph-figure').nth(1).waitFor();
+    await page.locator('.forge-bodygraph-figure').nth(1).waitFor({ state: 'attached' });
     const mobile = await page.evaluate(() => {
       const nodes = [...document.querySelectorAll('.forge-bodygraph-figure')];
       const pair = document.querySelector('.forge-bodygraph-pair');
