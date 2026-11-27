@@ -66,6 +66,21 @@ const mime = {
         await page.getByRole('link', { name: 'Programme' }).click();
         await page.waitForURL('**/#/programme');
         await page.locator('.forge-seance-panel h2').first().waitFor();
+
+        /* Vérifie l'accès à la reprise et le flush de sauvegarde avant fermeture. */
+        await page.evaluate(() => {
+          window.__forgeSaveCalls = 0;
+          window.FM.store.sauver = () => { window.__forgeSaveCalls += 1; };
+          window.FM.app.etat.active = { nom: 'Séance QA' };
+          window.FM.app.rendre();
+          window.dispatchEvent(new Event('pagehide'));
+        });
+        await page.locator('.forge-resume-banner').waitFor();
+        const saveCalls = await page.evaluate(() => window.__forgeSaveCalls);
+        if (saveCalls < 1) throw new Error('La sauvegarde de sécurité pagehide ne s’est pas déclenchée.');
+        if (!(await page.locator('.forge-resume-banner').innerText()).includes('Séance QA')) {
+          throw new Error('Le rappel de reprise ne montre pas la séance active.');
+        }
       } catch (error) {
         const body = await page.locator('body').innerText().catch(() => '[body inaccessible]');
         const html = await page.locator('html').evaluate(el => el.outerHTML).catch(() => '[html inaccessible]');
