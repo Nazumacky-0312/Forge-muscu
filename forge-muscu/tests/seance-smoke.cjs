@@ -172,12 +172,13 @@ const mime = {
           module: !!document.querySelector('script[type="module"][src="js/body-forge-avatar-3d.js"]'),
           stylesheet: !!document.querySelector('link[href^="css/body-forge-avatar-3d.css"]')?.sheet,
           stage: !!document.querySelector('.forge-avatar-3d-stage'),
+          muscleDetails: !!document.querySelector('.forge-avatar-muscle-details'),
           fallback: !!document.querySelector('.forge-bodygraph-pair svg'),
           attribution: document.querySelector('.forge-avatar-attribution')?.textContent.includes('BodyParts3D') && document.querySelector('.forge-avatar-attribution')?.textContent.includes('CC BY 4.0'),
           views: document.querySelectorAll('.forge-avatar-3d-views [data-view]').length,
           sexes: document.querySelectorAll('.forge-avatar-switch [data-sex]').length
         }));
-        if (!avatarIntegration.module || !avatarIntegration.stylesheet || !avatarIntegration.stage ||
+        if (!avatarIntegration.module || !avatarIntegration.stylesheet || !avatarIntegration.stage || !avatarIntegration.muscleDetails ||
             !avatarIntegration.fallback || !avatarIntegration.attribution || avatarIntegration.views !== 2 || avatarIntegration.sexes !== 2) {
           throw new Error('L’intégration de l’avatar 3D et son fallback doivent être présents : ' + JSON.stringify(avatarIntegration));
         }
