@@ -66,7 +66,7 @@ async function envoyer(messages,input,send,ex){
  send.disabled=false;send.classList.remove('is-loading');messages.scrollTop=messages.scrollHeight;input.focus();
 }
 F.animationExercice=function(ex,mini){
- return h('div',{class:'forge-exercise-media'+(mini?' mini':''),'data-forge-demo':'1','data-exercise-name':ex.nom,role:'group','aria-label':'Démonstration animée : '+ex.nom});
+ return h('div',{class:'forge-exercise-media'+(mini?' mini':''),'data-forge-demo':'1','data-exercise-name':ex.nom,'data-exercise-id':ex.id||'',role:'group','aria-label':'Démonstration animée : '+ex.nom});
 };
 function slugImageExercice(n){
  const rules=[
@@ -96,7 +96,7 @@ function slugImageExercice(n){
 function monterDemo(el){
  if(el.dataset.demoReady==='1')return;
  el.dataset.demoReady='1';
- const name=el.dataset.exerciseName||'',slug=slugImageExercice(norm(name));
+ const name=el.dataset.exerciseName||'',slug=slugImageExercice(norm(name))||slugImageExercice(norm(el.dataset.exerciseId))||String(el.dataset.exerciseId||'').trim();
  if(!slug){
   el.classList.add('forge-media-missing');
   const msg=document.createElement('div');msg.className='forge-media-fallback';
@@ -109,10 +109,10 @@ function monterDemo(el){
  for(const frame of frameNames){
   const img=document.createElement('img');
   img.className='forge-3d-frame '+(frame==='start'?'frame-start':frame==='end'?'frame-end':'frame-hold');
-  img.src='images/exercises/'+slug+'-'+frame+'.webp';
+  img.src='images/exercises/'+slug+'/'+frame+'.webp';
   img.alt=name+' — '+(frame==='start'?'position de départ':frame==='end'?'position finale':'position de gainage');
   img.decoding='async';img.loading=mini?'lazy':'eager';
-  img.onerror=()=>{img.remove();if(!frames.querySelector('img')){const msg=document.createElement('div');msg.className='forge-media-fallback';msg.textContent='Image momentanément indisponible.';el.replaceChildren(msg);}};
+  img.onerror=()=>{if(!img.dataset.flatFallback){img.dataset.flatFallback='1';img.src='images/exercises/'+slug+'-'+frame+'.webp';return;}img.remove();if(!frames.querySelector('img')){const msg=document.createElement('div');msg.className='forge-media-fallback';msg.textContent='Illustration 3D indisponible pour cet exercice.';el.replaceChildren(msg);}};
   frames.append(img);
  }
  const title=document.createElement('div');title.className='forge-demo-title';title.textContent=name;
