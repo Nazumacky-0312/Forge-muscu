@@ -34,8 +34,14 @@ jobs:
             echo "forge-muscu.zip is missing from the repository root" >&2
             exit 1
           fi
+          # Overlay des modules actualisés sans remplacer l'archive de référence.
+          if [ -d forge-muscu ]; then
+            cp -a forge-muscu/. public/
+          fi
           touch public/.nojekyll
           test -f public/index.html
+          test -f public/js/view-liftoff.js
+          test -f public/css/liftoff.css
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
