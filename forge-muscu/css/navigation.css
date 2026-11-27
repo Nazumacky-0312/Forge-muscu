@@ -10,15 +10,15 @@
 .forge-coach-page .coach-suggestions .btn{min-height:40px}
 @media(max-width:380px){#menu>a{gap:3px;padding:9px 2px;font-size:.59rem}#menu>a svg{width:15px;height:15px;flex-basis:15px}}
 
-/* Page unique Séance : navigation interne entre programme, exercices et suivi */
-.forge-seance-hub{padding-bottom:26px}
-.forge-seance-heading{padding:8px 2px 18px}
-.forge-seance-heading h1{margin:0 0 7px;font-size:clamp(1.7rem,6vw,2.25rem);letter-spacing:-.045em}
+/* Page unique Séance : navigation interne entre programme, exercices et suivi. */
+.forge-seance-hub{min-width:0;padding-bottom:28px}
+.forge-seance-heading{padding:8px 2px 16px}
+.forge-seance-heading h1{margin:0 0 6px;font-size:clamp(1.7rem,6vw,2.25rem);letter-spacing:-.045em}
 .forge-seance-heading p{margin:0}
 .forge-seance-heading .forge-seance-kicker{margin:0 0 7px;color:var(--accent,#b8f34a);font-size:.64rem;font-weight:900;letter-spacing:.13em}
 .forge-seance-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:5px;margin:0 0 18px;border:1px solid var(--bord);border-radius:15px;background:#0d141c}
-.forge-seance-tab{min-width:0;min-height:42px;padding:9px 5px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--doux);font-size:.78rem;font-weight:800}
+.forge-seance-tab{display:flex;align-items:center;justify-content:center;min-width:0;min-height:42px;padding:9px 5px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--doux);font-size:.78rem;font-weight:800;text-align:center;text-decoration:none}
 .forge-seance-tab.active{background:var(--accent,#b8f34a);color:#10150b;border-color:var(--accent,#b8f34a)}
 .forge-seance-panel{min-width:0}
-.forge-seance-panel>.forge-page{padding:0;margin:0;max-width:none}
+.forge-seance-panel>div>h1:first-child{display:none}
 @media(max-width:360px){.forge-seance-tabs{gap:4px;padding:4px}.forge-seance-tab{font-size:.7rem}}

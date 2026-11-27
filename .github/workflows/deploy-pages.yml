@@ -52,6 +52,23 @@ jobs:
           cp "${SOURCE_DIR}/LICENSE" public/credits/exercise-illustrations-CC0.txt
           test -f public/images/exercises/bench-press/start.webp
 
+      - name: Install browser test dependencies
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Test Séance on mobile and desktop
+        run: FORGE_SITE=public node forge-muscu/tests/seance-smoke.cjs
+
+      - name: Save browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-muscu-seance-qa
+          path: /tmp/forge-seance-*.png
+          if-no-files-found: ignore
+          retention-days: 3
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
@@ -66,7 +83,7 @@ jobs:
     needs: build
     environment:
       name: github-pages
-      url: \${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to Pages
