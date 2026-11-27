@@ -122,3 +122,17 @@
 .forge-avatar-load-error{min-height:320px;display:grid;align-content:center;justify-items:center;gap:12px;padding:24px;text-align:center;color:#e8edf1}.forge-avatar-load-error span{max-width:260px;color:#aab4bd;font-size:.82rem;line-height:1.5}.forge-avatar-load-error .btn{min-height:42px;padding:10px 18px}
 
 .forge-avatar-model-status{position:absolute;inset:0;z-index:2;display:grid;place-content:center;justify-items:center;gap:14px;padding:24px;text-align:center;background:rgba(13,19,25,.86);color:#eaf0f4;font-size:.84rem;line-height:1.5}.forge-avatar-model-status .btn{min-height:42px;padding:10px 18px}.forge-avatar-credit{display:block;color:var(--muted,#aab0b8);font-size:.66rem;text-align:center;line-height:1.5}
+
+
+/* Body Forge — bodygraph vectoriel simple, inspiré des silhouettes fitness */
+.forge-bodygraph-card{gap:12px;overflow:hidden}
+.forge-bodygraph-card .forge-avatar-controls{justify-content:center}
+.forge-bodygraph-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:end;padding:14px 8px 8px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:linear-gradient(180deg,#1b2530,#111820)}
+.forge-bodygraph-person{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.forge-bodygraph-person>span{font-size:.64rem;font-weight:900;letter-spacing:.16em;color:#9daab8}
+.forge-bodygraph-figure{display:block;width:100%;height:auto;max-height:340px;overflow:visible}
+.forge-bodygraph-figure .bf-base{fill:#dce2e9;stroke:#9ba8b5;stroke-width:1.35;stroke-linejoin:round}
+.forge-bodygraph-figure .bf-muscles{stroke:#17212b;stroke-width:1.15;stroke-linejoin:round;stroke-linecap:round}
+.forge-bodygraph-card .forge-avatar-legend{justify-content:center;gap:8px 12px;padding:8px 2px 2px}
+.forge-bodygraph-card .forge-avatar-legend-item{font-size:.66rem}
+@media(max-width:370px){.forge-bodygraph-pair{gap:4px;padding-inline:3px}.forge-bodygraph-figure{max-height:290px}.forge-bodygraph-card .forge-avatar-legend{gap:7px 9px}}
