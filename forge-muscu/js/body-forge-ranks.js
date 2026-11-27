@@ -58,6 +58,54 @@
     return [...best.values()].sort((a,b)=>b.score-a.score).map(x=>({...x,rank:getRank(x.score)}));
   }
   function card(...children){return FM.carte(...children);}
+
+  const MUSCLES=[
+    {id:'chest',label:'Pectoraux',test:/développé couché|bench press|chest press|presse poitrine|écarté|crossover/i},
+    {id:'shoulders',label:'Épaules',test:/développé militaire|shoulder press|overhead press|développé épaules|élévation latérale|lateral raise/i},
+    {id:'biceps',label:'Biceps',test:/curl biceps|curl barre|curl haltères|biceps/i},
+    {id:'triceps',label:'Triceps',test:/extension triceps|push.?down|barre au front|triceps/i},
+    {id:'back',label:'Dos',test:/rowing|tirage horizontal|barbell row|seated row|tirage vertical|lat pulldown|traction|pull.?up|soulevé de terre|deadlift/i},
+    {id:'abs',label:'Abdominaux',test:/crunch|gainage|relevé de jambes|abdominaux/i},
+    {id:'quads',label:'Quadriceps',test:/squat|presse à cuisses|leg press|hack squat|extension jambes|leg extension|quadriceps/i},
+    {id:'hamstrings',label:'Ischio-jambiers',test:/leg curl|ischio|curl jambes|soulevé de terre/i},
+    {id:'glutes',label:'Fessiers',test:/squat|soulevé de terre|deadlift|hip thrust|fessier/i},
+    {id:'calves',label:'Mollets',test:/mollets|calf raise/i}
+  ];
+  const RANK_COLORS=['#8b929b','#b87945','#b9c0c9','#e4bd4c','#65c5c2','#59a8f4','#a17bf2','#f07855','#f4e3a0'];
+  function muscleGraph(ranked){
+    const scoreFor=m=>ranked.filter(x=>m.test.test(x.name)).reduce((n,x)=>Math.max(n,x.score),0);
+    const colorFor=m=>scoreFor(m)?RANK_COLORS[getRank(scoreFor(m)).index]:'#39434d';
+    const titleFor=m=>{const s=scoreFor(m);return m.label+' · '+(s?getRank(s).name:'Non classé');};
+    const part=(id,d,extra='')=>{const m=MUSCLES.find(x=>x.id===id);return '<path class="forge-muscle-part '+extra+'" data-muscle="'+id+'" d="'+d+'" fill="'+colorFor(m)+'"><title>'+titleFor(m)+'</title></path>';};
+    const front='<svg class="forge-avatar-svg" viewBox="0 0 220 390" role="img" aria-label="Personnage musculaire, vue de face">'+
+      '<g class="forge-avatar-base" fill="#222b34" stroke="#66717d" stroke-width="2" stroke-linejoin="round">'+
+      '<circle cx="110" cy="31" r="23"/><path d="M91 54 Q77 57 70 70 L54 125 Q50 140 61 146 L73 139 L84 105 L80 163 Q79 179 87 190 L83 257 L72 355 Q71 369 85 370 L98 367 L110 275 L122 367 L137 370 Q150 369 148 355 L137 257 L133 190 Q141 179 140 163 L136 105 L147 139 L159 146 Q170 140 166 125 L150 70 Q143 57 129 54 Q110 62 91 54Z"/></g>'+
+      part('shoulders','M76 72 Q86 61 100 67 L97 94 Q83 101 70 91Z')+part('shoulders','M120 67 Q134 61 144 72 L150 91 Q137 101 123 94Z')+
+      part('chest','M82 96 Q96 88 108 98 L108 127 Q94 135 80 119Z')+part('chest','M112 98 Q124 88 138 96 L140 119 Q126 135 112 127Z')+
+      part('biceps','M68 100 Q77 94 83 105 L75 137 L65 139 Q60 124 68 100Z')+part('biceps','M137 105 Q143 94 152 100 Q160 124 155 139 L145 137Z')+
+      part('triceps','M59 139 Q67 135 75 140 L70 165 L60 169 Q54 156 59 139Z')+part('triceps','M145 140 Q153 135 161 139 Q166 156 160 169 L150 165Z')+
+      part('abs','M94 137 L108 133 L108 187 L91 183Z')+part('abs','M112 133 L126 137 L129 183 L112 187Z')+
+      part('quads','M87 194 Q99 190 108 198 L103 267 L87 279 L82 253Z')+part('quads','M112 198 Q121 190 133 194 L138 253 L133 279 L117 267Z')+
+      part('calves','M84 282 L101 277 L96 350 L82 351Z')+part('calves','M119 277 L136 282 L138 351 L124 350Z')+'</svg>';
+    const back='<svg class="forge-avatar-svg" viewBox="0 0 220 390" role="img" aria-label="Personnage musculaire, vue de dos">'+
+      '<g class="forge-avatar-base" fill="#222b34" stroke="#66717d" stroke-width="2" stroke-linejoin="round">'+
+      '<circle cx="110" cy="31" r="23"/><path d="M91 54 Q77 57 70 70 L54 125 Q50 140 61 146 L73 139 L84 105 L80 163 Q79 179 87 190 L83 257 L72 355 Q71 369 85 370 L98 367 L110 275 L122 367 L137 370 Q150 369 148 355 L137 257 L133 190 Q141 179 140 163 L136 105 L147 139 L159 146 Q170 140 166 125 L150 70 Q143 57 129 54 Q110 62 91 54Z"/></g>'+
+      part('shoulders','M76 72 Q86 61 100 67 L97 94 Q83 101 70 91Z')+part('shoulders','M120 67 Q134 61 144 72 L150 91 Q137 101 123 94Z')+
+      part('back','M91 94 Q102 85 108 96 L108 177 Q96 185 85 169 L84 112Z')+part('back','M112 96 Q118 85 129 94 L136 112 L135 169 Q124 185 112 177Z')+
+      part('biceps','M68 100 Q77 94 83 105 L75 137 L65 139 Q60 124 68 100Z')+part('biceps','M137 105 Q143 94 152 100 Q160 124 155 139 L145 137Z')+
+      part('triceps','M59 139 Q67 135 75 140 L70 165 L60 169 Q54 156 59 139Z')+part('triceps','M145 140 Q153 135 161 139 Q166 156 160 169 L150 165Z')+
+      part('glutes','M86 181 Q99 175 108 185 L108 222 Q93 226 84 207Z')+part('glutes','M112 185 Q121 175 134 181 L136 207 Q127 226 112 222Z')+
+      part('hamstrings','M87 222 Q99 219 108 225 L103 280 L87 279 L82 253Z')+part('hamstrings','M112 225 Q121 219 133 222 L138 253 L133 279 L117 280Z')+
+      part('calves','M84 282 L101 277 L96 350 L82 351Z')+part('calves','M119 277 L136 282 L138 351 L124 350Z')+'</svg>';
+    const legend=RANKS.map((r,i)=>'<span class="forge-avatar-legend-item"><i style="background:'+RANK_COLORS[i]+'"></i>'+r.name+'</span>').join('');
+    const trained=MUSCLES.filter(m=>scoreFor(m)>0).length;
+    return h('section',{class:'carte forge-avatar-card'},
+      h('div',{class:'forge-card-head'},h('div',{},h('span',{class:'surtitre'},'BODYGRAPH'),h('h2',{},'Ton personnage')) ,h('span',{class:'forge-tag'},trained+'/'+MUSCLES.length+' GROUPES')),
+      h('p',{class:'discret'},'Chaque zone prend la couleur du rang obtenu sur les exercices qui la sollicitent.'),
+      h('div',{class:'forge-avatar-views'},h('div',{class:'forge-avatar-view'},h('span',{},'FACE'),h('div',{innerHTML:front})),h('div',{class:'forge-avatar-view'},h('span',{},'DOS'),h('div',{innerHTML:back}))),
+      h('div',{class:'forge-avatar-legend',innerHTML:legend}),
+      h('div',{class:'forge-avatar-customize'},h('span',{},'PERSONNALISATION'),h('b',{},'Bientôt disponible'),h('small',{},'Style, apparence et équipements de ton personnage')) );
+  }
   function bodyForge(app){
     const settings=readSettings(),ranked=exerciseRanks(app.etat,settings);
     const overallScore=ranked.length?Math.round(ranked.slice(0,5).reduce((n,x)=>n+x.score,0)/Math.min(5,ranked.length)):0;
@@ -76,6 +124,7 @@
         h('div',{class:'forge-body-progress'},h('i',{style:'width:'+overall.progress+'%'})),
         h('div',{class:'forge-body-progress-label'},h('span',{},overall.next?'Progression vers '+overall.next.name:'Rang maximum'),h('b',{},overall.next?Math.max(0,100-overall.lp)+' LP':'MAX')),
         h('p',{class:'discret'},ranked.length?'Calculé à partir de tes cinq meilleurs exercices classés.':'Ajoute ton poids de corps, puis valide des séries de travail pour obtenir tes premiers rangs.')),
+      muscleGraph(ranked),
       card(h('div',{class:'forge-card-head'},h('h2',{},'Tes rangs par exercice'),h('span',{class:'forge-tag'},ranked.length+' CLASSÉ(S)')),
         ranked.length?h('div',{class:'forge-body-exercise-list'},...ranked.map(x=>h('div',{class:'forge-body-exercise'},
           h('div',{class:'forge-body-exercise-icon'},x.rank.icon),
