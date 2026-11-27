@@ -106,9 +106,9 @@ function mount(container, initial){
     setSex(value){sex=value==='f'?'f':'m';scene.remove(avatar);releaseAvatar(avatar);avatar=makeAvatar(sex,ranks);avatar.rotation.y=targetY;scene.add(avatar);},
     setView(value){targetY=value==='back'?Math.PI:0;},
     reset(){targetY=0;avatar.rotation.y=0;},
-    dispose(){if(disposed)return;disposed=true;cancelAnimationFrame(raf);resize.disconnect();canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointermove',pointerMove);canvas.removeEventListener('pointerup',pointerUp);releaseAvatar(avatar);renderer.dispose();activeContainers.delete(container);container.replaceChildren();}
+    dispose(){if(disposed)return;disposed=true;cancelAnimationFrame(raf);resize.disconnect();canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointermove',pointerMove);canvas.removeEventListener('pointerup',pointerUp);releaseAvatar(avatar);renderer.dispose();container.replaceChildren();}
   };
-  container.__forge3d=api;activeContainers.add(container);return api;
+  container.__forge3d=api;return api;
 }
 window.ForgeAvatar3D={mount};
 window.dispatchEvent(new Event('forge-avatar-ready'));
