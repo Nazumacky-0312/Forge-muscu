@@ -2,7 +2,7 @@ name: Deploy Forge Muscu to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, forge-premium-upgrade]
   workflow_dispatch:
 
 permissions:
@@ -80,6 +80,7 @@ jobs:
           path: public
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     needs: build
     environment:
       name: github-pages
