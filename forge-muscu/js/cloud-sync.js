@@ -122,7 +122,9 @@
 
   async function getCloudSession() {
     if (!state.client && !state.loading) await initClient();
-    while (state.loading) await new Promise(resolve => root.setTimeout(resolve, 40));
+    const started = Date.now();
+    while (state.loading && Date.now() - started < 15000) await new Promise(resolve => root.setTimeout(resolve, 40));
+    if (state.loading) return { client: null, session: null, user: null, error: 'Le service cloud met trop de temps à répondre. Réessaie dans un instant.' };
     if (!state.client) return { client: null, session: null, user: null, error: state.error || state.message };
     const { data, error } = await state.client.auth.getSession();
     if (error) throw error;
