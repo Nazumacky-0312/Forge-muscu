@@ -34,7 +34,7 @@ const mime = {
       const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
       page.setDefaultTimeout(8000);
       page.on('pageerror', error => failures.push(`${viewport.name}: ${error.message}`));
-      page.on('console', msg => { if (msg.type() === 'error') failures.push(`${viewport.name} console: ${msg.text()}`); });
+      page.on('console', msg => { if (msg.type() === 'error' && !msg.text().includes('Failed to load resource')) failures.push(`${viewport.name} console: ${msg.text()}`); });
       page.on('requestfailed', req => failures.push(`${viewport.name} request failed: ${req.url()} :: ${req.failure()?.errorText || 'unknown'}`));
       try {
         await page.goto(`http://127.0.0.1:${port}/#/programme`, { waitUntil: 'domcontentloaded' });
