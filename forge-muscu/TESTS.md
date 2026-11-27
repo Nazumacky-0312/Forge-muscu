@@ -30,8 +30,12 @@ Parcours couverts :
 - Workflow : Deploy Forge Muscu to GitHub Pages
 - Dernier run de référence main : succès, commit `9ba36389d6e6e21e302bfcd88f659f592a286c30`
 - Run de référence : https://github.com/Nazumacky-0312/Forge-muscu/actions/runs/45938636091
-- Les runs de la branche de travail sont déclenchés sur les pull requests. Le dernier résultat doit être vérifié avant de déclarer les nouveaux parcours validés.
+- Dernier run de la branche : `45942696341` sur le commit `5a0504330e299a65d9ca46510ac0fcf1f846c34b` — job `build` réussi, job `deploy` ignoré (attendu pour une PR).
 - Les jobs de la branche ne déploient pas sur GitHub Pages ; le déploiement est limité à `main`.
+
+## Dernière exécution
+
+- `45942696341` : préparation du site réussie, médias CC0 ajoutés, smoke tests Playwright mobile et desktop réussis, captures QA produites, artefact Pages construit. Aucun déploiement n'a eu lieu.
 
 ## Tests non encore effectués
 
