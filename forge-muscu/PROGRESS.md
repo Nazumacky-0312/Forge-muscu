@@ -47,15 +47,18 @@ Refonte en cours. L'application de production sur `main` n'a pas été modifiée
 - [x] Client Supabase facultatif intégré : Magic Link, synchronisation manuelle, auto-sync opt-in, gestion explicite des conflits et suppression de la sauvegarde cloud.
 - [x] Cache PWA incrémenté à v23.
 - [x] Tests Playwright étendus : reprise, pagehide, métadonnées, échauffement, pause/reprise et profil hors ligne.
+- [x] Première couche de refonte visuelle globale : palette sombre premium, accent vert Forge, fonds et cartes en profondeur, typographie et boutons harmonisés, formulaires, navigation flottante mobile / intégrée desktop ; feuille dédiée chargée après les styles existants et incluse au cache hors ligne (v24).
 - [x] Finition responsive de l'espace Séance : hiérarchie visuelle, onglets sticky, états actifs/focus, prise en compte de `prefers-reduced-motion` et boutons Modifier maintenus sur une seule ligne et actions Nouvelle séance / Régénérer sans chevauchement sur mobile.
 
 ## En cours / à faire
 
+- [ ] Validation CI de la nouvelle feuille `premium.css` sur mobile et desktop (test ajouté ; attendre le run du commit final).
 - [x] CI verte sur le commit `d6d2259cc9b9e020129056a72fea9ef25a714cf5` (run `45941941328`) : préparation, médias CC0, Playwright mobile + desktop, navigation responsive, bouton Modifier, absence de chevauchement des actions et captures QA ; déploiement ignoré.
 - [ ] Configurer le Site URL et Redirect URL dans Supabase Auth.
 - [ ] Tester réellement Magic Link, premier envoi cloud et restauration.
 - [ ] Tester les conflits avec deux appareils / deux sessions authentifiées.
 - [ ] Connecter l'envoi et la gestion des photos au bucket privé.
+- [ ] Poursuivre la refonte visuelle écran par écran (Accueil, bibliothèque, Coach, suivi, rangs, profil) après inspection des captures du nouveau thème.
 - [ ] Améliorer les filtres et les fiches de la bibliothèque d'exercices.
 - [ ] Vérifier et enrichir les médias 3D exercice par exercice.
 - [ ] Étendre les analyses de progression, le volume musculaire et les périodes.
