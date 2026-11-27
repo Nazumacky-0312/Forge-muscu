@@ -30,24 +30,56 @@ const port = 4174;
     await page.goto('http://127.0.0.1:' + port + '/#/classement/body', { waitUntil: 'domcontentloaded' });
     await page.getByRole('heading', { name: 'Body Forge' }).waitFor();
     await page.locator('.forge-bodygraph-figure').nth(1).waitFor();
-    const mobile = await page.locator('.forge-bodygraph-figure').evaluateAll(nodes => ({
-      count: nodes.length,
-      labels: nodes.map(el => el.getAttribute('aria-label')),
-      widths: nodes.map(el => Math.round(el.getBoundingClientRect().width)),
-      heights: nodes.map(el => Math.round(el.getBoundingClientRect().height)),
-      coloredMuscles: nodes.map(el => el.querySelectorAll('.bf-muscles path,.bf-muscles ellipse').length)
+    const mobile = await page.evaluate(() => {
+      const nodes = [...document.querySelectorAll('.forge-bodygraph-figure')];
+      const pair = document.querySelector('.forge-bodygraph-pair');
+      const stage = document.querySelector('.forge-avatar-3d-stage');
+      const rect = stage?.getBoundingClientRect();
+      return {
+        count: nodes.length,
+        labels: nodes.map(el => el.getAttribute('aria-label')),
+        widths: nodes.map(el => Math.round(el.getBoundingClientRect().width)),
+        heights: nodes.map(el => Math.round(el.getBoundingClientRect().height)),
+        coloredMuscles: nodes.map(el => el.querySelectorAll('.bf-muscles path,.bf-muscles ellipse').length),
+        fallbackVisible: !!pair && getComputedStyle(pair).display !== 'none' && pair.clientWidth > 0,
+        stageVisible: !!stage && getComputedStyle(stage).display !== 'none' && !!rect && rect.width > 0,
+        stageLoaded: stage?.dataset.avatarLoaded === 'true',
+        canvas: !!stage?.querySelector('canvas'),
+        stageWidth: Math.round(rect?.width || 0),
+        stageHeight: Math.round(rect?.height || 0)
+      };
+    });
+    const fallbackValid = mobile.count === 2 && mobile.labels[0].includes('masculin') && mobile.labels[1].includes('masculin') &&
+      mobile.coloredMuscles.every(x => x >= 6);
+    const fallbackVisible = mobile.fallbackVisible && mobile.widths.every(x => x >= 90) && mobile.heights.every(x => x >= 160);
+    const modelVisible = mobile.stageVisible && mobile.stageLoaded && mobile.canvas && mobile.stageWidth >= 220 && mobile.stageHeight >= 320;
+    if (!fallbackValid || (!fallbackVisible && !modelVisible)) {
+      throw new Error('Body Forge doit afficher le modèle 3D chargé ou conserver un bodygraph de secours visible sur mobile : ' + JSON.stringify(mobile));
+    }
+    const integration = await page.evaluate(() => ({
+      module: !!document.querySelector('script[type="module"][src="js/body-forge-avatar-3d.js"]'),
+      attribution: !!document.querySelector('.forge-avatar-attribution')?.textContent.includes('BodyParts3D'),
+      details: !!document.querySelector('.forge-avatar-muscle-details')
     }));
-    if (mobile.count !== 2 || !mobile.labels[0].includes('masculin') || !mobile.labels[1].includes('masculin') ||
-        mobile.widths.some(x => x < 90) || mobile.heights.some(x => x < 160) || mobile.coloredMuscles.some(x => x < 6)) {
-      throw new Error('Bodygraph masculin incomplet ou non visible sur mobile : ' + JSON.stringify(mobile));
+    if (!integration.module || !integration.attribution || !integration.details) {
+      throw new Error('Le module 3D, le panneau musculaire et les crédits doivent être présents : ' + JSON.stringify(integration));
     }
     await page.getByRole('button', { name: 'Femme' }).click();
     const female = await page.locator('.forge-bodygraph-figure').evaluateAll(nodes => nodes.map(el => el.getAttribute('aria-label')));
     if (female.length !== 2 || female.some(x => !x.includes('féminin'))) throw new Error('Le sélecteur Femme ne met pas à jour les deux silhouettes : ' + JSON.stringify(female));
     await page.setViewportSize({ width: 1365, height: 900 });
-    const desktop = await page.locator('.forge-bodygraph-figure').evaluateAll(nodes => nodes.map(el => ({ width: Math.round(el.getBoundingClientRect().width), height: Math.round(el.getBoundingClientRect().height) })));
-    if (desktop.length !== 2 || desktop.some(x => x.width < 150 || x.height < 220)) throw new Error('Le bodygraph ne s’adapte pas au format ordinateur : ' + JSON.stringify(desktop));
-    if (await page.locator('.forge-avatar-3d-canvas').count()) throw new Error('L’ancien avatar 3D est encore affiché.');
+    const desktop = await page.evaluate(() => {
+      const pair = document.querySelector('.forge-bodygraph-pair');
+      const stage = document.querySelector('.forge-avatar-3d-stage');
+      const figures = [...document.querySelectorAll('.forge-bodygraph-figure')].map(el => ({ width: Math.round(el.getBoundingClientRect().width), height: Math.round(el.getBoundingClientRect().height) }));
+      const rect = stage?.getBoundingClientRect();
+      const fallbackVisible = !!pair && getComputedStyle(pair).display !== 'none' && pair.clientWidth > 0;
+      const stageVisible = !!stage && getComputedStyle(stage).display !== 'none' && !!rect && rect.width > 0;
+      return { figures, fallbackVisible, stageVisible, stageWidth: Math.round(rect?.width || 0), stageHeight: Math.round(rect?.height || 0) };
+    });
+    const desktopFallback = desktop.fallbackVisible && desktop.figures.length === 2 && desktop.figures.every(x => x.width >= 150 && x.height >= 220);
+    const desktop3D = desktop.stageVisible && desktop.stageWidth >= 300 && desktop.stageHeight >= 320;
+    if (!desktopFallback && !desktop3D) throw new Error('Body Forge ne s’adapte pas au format ordinateur : ' + JSON.stringify(desktop));
     if (errors.length) throw new Error('Erreurs JavaScript : ' + errors.join(' | '));
     console.log('Body Forge bodygraph OK:', JSON.stringify({ mobile, female, desktop }));
   } finally {
