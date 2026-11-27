@@ -1,0 +1,23 @@
+/* Écrans Bodygraph et nutrition */
+.forge-bodygraph{display:grid;grid-template-columns:minmax(135px,1fr) minmax(130px,1fr);align-items:center;gap:12px}
+.forge-body-side{text-align:center;color:var(--doux);font-size:.68rem;font-weight:900;letter-spacing:.14em}
+.forge-body-side svg{display:block;width:100%;max-height:330px;margin:5px auto}
+.body-base{fill:#26313d;stroke:#718093;stroke-width:1.4}
+.body-muscle{fill:#b8f34a;fill-opacity:.75;stroke:#d7ff78;stroke-width:1}
+.forge-body-legend{display:flex;flex-direction:column;gap:9px}
+.forge-body-legend-row{display:grid;grid-template-columns:8px 1fr auto;align-items:center;gap:7px;font-size:.72rem}
+.forge-body-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.forge-body-legend-row b{color:var(--accent)}
+.forge-measure-form,.nutrition-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.forge-measure-form h2,.forge-measure-form p,.forge-measure-form button,.nutrition-form h2,.nutrition-form button{grid-column:1/-1}
+.forge-measure-history-line{padding:9px 0;border-bottom:1px solid var(--bord);font-size:.76rem;line-height:1.5}
+.nutrition-calories{display:flex;align-items:baseline;gap:9px;margin:12px 0 18px}
+.nutrition-calories strong{font-size:2.5rem;letter-spacing:-.05em}
+.nutrition-calories span{color:var(--doux)}
+.nutrition-progress{margin:13px 0}
+.nutrition-progress-label{display:flex;justify-content:space-between;gap:8px;margin-bottom:6px;font-size:.8rem}
+.nutrition-progress-label b{color:var(--accent)}
+.nutrition-entry{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bord)}
+.nutrition-entry:last-child{border-bottom:0}
+.nutrition-entry small{display:block;color:var(--doux);margin-top:4px;font-size:.72rem}
+@media(max-width:420px){.forge-bodygraph{grid-template-columns:1fr}.forge-body-side svg{max-height:250px}}
