@@ -118,3 +118,5 @@
 .forge-avatar-3d-frame:after{content:'FAIS GLISSER POUR TOURNER';position:absolute;left:0;right:0;bottom:10px;text-align:center;pointer-events:none;color:rgba(207,220,229,.48);font-size:.58rem;font-weight:850;letter-spacing:.16em}
 .forge-avatar-3d-card .forge-avatar-legend{gap:8px 11px}
 @media(max-width:420px){.forge-avatar-controls{align-items:stretch}.forge-avatar-switch{flex:1;justify-content:center}.forge-avatar-choice{flex:1;padding:8px 9px}.forge-avatar-3d-canvas{height:390px;min-height:330px}}
+
+.forge-avatar-load-error{min-height:320px;display:grid;align-content:center;justify-items:center;gap:12px;padding:24px;text-align:center;color:#e8edf1}.forge-avatar-load-error span{max-width:260px;color:#aab4bd;font-size:.82rem;line-height:1.5}.forge-avatar-load-error .btn{min-height:42px;padding:10px 18px}
