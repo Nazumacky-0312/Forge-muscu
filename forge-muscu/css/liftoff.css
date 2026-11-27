@@ -23,3 +23,5 @@
 @media(max-width:420px){.forge-bodygraph{grid-template-columns:1fr}.forge-body-side svg{max-height:250px}}
 
 .forge-week-row{display:grid;grid-template-columns:42px 1fr 26px;gap:10px;align-items:center;margin:12px 0;font-size:.78rem;text-transform:capitalize}.forge-week-row b{color:var(--accent);text-align:right}.forge-streak-number{font-size:2.4rem;letter-spacing:-.05em}.forge-page .forge-stats-grid{margin:14px 0}
+
+.forge-cycle-day{padding:9px 0;border-top:1px solid var(--bord)}.forge-cycle-day h3{margin:5px 0;font-size:.92rem}
