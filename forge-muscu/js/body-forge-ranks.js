@@ -122,12 +122,12 @@
       figures,
       h('div',{class:'forge-avatar-legend',innerHTML:legend}),
       h('p',{class:'forge-avatar-attribution'},'Anatomy: BodyParts3D © The Database Center for Life Science (CC BY 4.0); female organs: Human Reference Atlas 3D Reference Organs, HuBMAP (CC BY 4.0); female body: MakeHuman (CC0). Modified by open-anatomy-3d (github.com/MervinR07/open-anatomy-3d), CC BY 4.0. Illustration pédagogique, non destinée au diagnostic.'));
-    let avatarApi=null;
+    let avatarApi=null,selectedSex=initialSex;
     const ranksForModel={...rankByMuscle,upperarms:Math.max(rankByMuscle.biceps??-1,rankByMuscle.triceps??-1)};
     const mount3D=()=>{
       if(!root.ForgeAvatar3D||avatarApi)return;
       if(!stage.isConnected){root.requestAnimationFrame(mount3D);return;}
-      try{avatarApi=root.ForgeAvatar3D.mount(stage,{sex:initialSex,ranks:ranksForModel});}
+      try{avatarApi=root.ForgeAvatar3D.mount(stage,{sex:selectedSex,ranks:ranksForModel});}
       catch(error){console.warn('Forge Muscu — avatar 3D indisponible :',error);}
     };
     const stageObserver=new MutationObserver(()=>{
@@ -138,8 +138,9 @@
     else root.addEventListener('forge-avatar-ready',mount3D,{once:true});
     section.querySelectorAll('[data-sex]').forEach(button=>button.addEventListener('click',()=>{
       section.querySelectorAll('[data-sex]').forEach(b=>b.classList.toggle('active',b===button));
-      draw(button.dataset.sex);
-      avatarApi?.setSex(button.dataset.sex);
+      selectedSex=button.dataset.sex;
+      draw(selectedSex);
+      avatarApi?.setSex(selectedSex);
     }));
     section.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
       section.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b===button));
