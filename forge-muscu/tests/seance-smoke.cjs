@@ -271,7 +271,7 @@ const mime = {
         });
         await page.waitForURL('**/#/seance');
         await page.locator('.forge-set-details').waitFor();
-        await page.locator('.forge-meta-field select').selectOption('echauffement');
+        await page.locator('.forge-set-details label').filter({ hasText: 'Type de série' }).locator('select').selectOption('echauffement');
         await page.locator('.forge-meta-grid input').nth(0).fill('9.5');
         await page.locator('.forge-meta-grid input').nth(0).press('Tab');
         await page.locator('.forge-meta-grid input').nth(1).fill('1');
