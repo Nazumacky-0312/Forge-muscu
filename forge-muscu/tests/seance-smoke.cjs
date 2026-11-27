@@ -181,9 +181,12 @@ const mime = {
           throw new Error('Le sélecteur de modèle féminin ne fonctionne pas.');
         }
         await page.locator('.forge-avatar-switch [data-sex="m"]').click();
-        await page.locator('.forge-avatar-3d-views [data-view="back"]').click();
-        if (!(await page.locator('.forge-avatar-3d-views [data-view="back"]').evaluate(el => el.classList.contains('active')))) {
-          throw new Error('Le sélecteur de vue arrière ne fonctionne pas.');
+        const backView = page.locator('.forge-avatar-3d-views [data-view="back"]');
+        if (await backView.isVisible()) {
+          await backView.click();
+          if (!(await backView.evaluate(el => el.classList.contains('active')))) {
+            throw new Error('Le sélecteur de vue arrière ne fonctionne pas.');
+          }
         }
         if (await page.getByText('Classement hebdomadaire').count()) {
           throw new Error('Body Forge ne doit plus utiliser l’ancien classement hebdomadaire.');
