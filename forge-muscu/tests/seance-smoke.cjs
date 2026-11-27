@@ -163,7 +163,28 @@ const mime = {
         if (await page.locator('.forge-rank-tabs .forge-seance-tab').count() !== 2) {
           throw new Error('Body Forge et Rangs Forge doivent être les deux seuls onglets du classement.');
         }
-        await page.getByText('Comment gagner des points ?').waitFor();
+        await page.locator('.forge-body-rank-ladder .forge-body-rank-step').nth(8).waitFor();
+        if (await page.getByText('Classement hebdomadaire').count()) {
+          throw new Error('Body Forge ne doit plus utiliser l’ancien classement hebdomadaire.');
+        }
+        await page.evaluate(() => {
+          const app = window.FM.app;
+          const entry = Object.entries(window.FM.EX).find(([, ex]) => /développé couché|bench press/i.test(ex.nom));
+          if (!entry) throw new Error('Aucun exercice de développé couché trouvé pour le test de rang.');
+          localStorage.setItem('forge-body-rank-settings-v1', JSON.stringify({ weight: 70, sex: 'm' }));
+          const [exId] = entry;
+          app.etat.seances.push({
+            id: 'body-rank-qa', nom: 'Test rang Body Forge', debut: Date.now(), fin: Date.now(),
+            exercices: [{ exId, series: [{ kg: 60, reps: 8, fait: true, type: 'travail' }] }]
+          });
+          app.sauver();
+          app.rendre();
+        });
+        await page.locator('.forge-body-exercise').first().waitFor();
+        if (!(await page.locator('.forge-body-exercise-result').first().innerText()).includes('LP')) {
+          throw new Error('Le rang par exercice doit afficher les Lift Points.');
+        }
+        await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-body-forge.png`, fullPage: true });
         await page.goto(`http://127.0.0.1:${port}/#/programme`, { waitUntil: 'domcontentloaded' });
         await page.locator('.forge-seance-panel h2').first().waitFor();
 
