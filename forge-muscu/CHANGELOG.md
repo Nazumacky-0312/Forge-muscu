@@ -38,3 +38,9 @@ La branche reste en brouillon. La connexion e-mail réelle, la synchronisation m
 - Ajout de la feuille au précache PWA et incrément du cache de v23 à v24.
 - Ajout d'une assertion Playwright vérifiant le chargement du thème, la couleur d'accent et le positionnement de la navigation sur mobile et desktop.
 - Cette première couche constitue la base du relooking ; les ajustements visuels détaillés de chaque écran restent à faire après inspection des nouvelles captures.
+
+
+## 27 novembre 2026 — Validation de la couche visuelle globale
+
+- Confirmation du run CI `45942696341` : build du site, médias CC0, tests Playwright mobile (390×844) et desktop (1365×900) réussis.
+- L'artefact Pages est construit et conservé pour QA ; le déploiement reste ignoré sur la branche de travail afin de protéger la production.
