@@ -40,6 +40,18 @@ jobs:
           test -f public/js/view-liftoff.js
           test -f public/css/liftoff.css
 
+      - name: Bundle all CC0 3D exercise illustrations
+        run: |
+          SOURCE_COMMIT=2786aefa4b36a08faeca8114e0d1eb0af3ef6732
+          curl --fail --location --retry 3 "https://github.com/hitmanrepo/open-exercise-illustrations/archive/${SOURCE_COMMIT}.zip" -o /tmp/exercise-illustrations.zip
+          mkdir -p /tmp/exercise-illustrations
+          unzip -q /tmp/exercise-illustrations.zip -d /tmp/exercise-illustrations
+          SOURCE_DIR="/tmp/exercise-illustrations/open-exercise-illustrations-${SOURCE_COMMIT}"
+          mkdir -p public/images/exercises public/credits
+          cp -a "${SOURCE_DIR}/images/." public/images/exercises/
+          cp "${SOURCE_DIR}/LICENSE" public/credits/exercise-illustrations-CC0.txt
+          test -f public/images/exercises/bench-press/start.webp
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
