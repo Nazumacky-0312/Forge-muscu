@@ -25,7 +25,7 @@
   const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
   function collect(state){
     const now=Date.now();
-    const stats=GROUPS.map(group=>({id:group.id,label:group.label,last:0,sets7d:0,sets72:0,highEffort:false}));
+    const stats=GROUPS.map(group=>({id:group.id,muscleLabel:group.label,last:0,sets7d:0,sets72:0,highEffort:false}));
     (state.seances||[]).forEach(session=>{
       const time=Number(session.debut||session.date||0);
       if(!Number.isFinite(time)||time<=0||time>now+5*60*1000)return;
@@ -49,7 +49,7 @@
       });
     });
     return stats.map(stat=>{
-      if(!stat.last)return Object.assign(stat,{hours:null,target:48,readiness:0,remaining:null,state:'empty',label:'Pas encore de données',lastLabel:'Aucune séance enregistrée'});
+      if(!stat.last)return Object.assign(stat,{hours:null,target:48,readiness:0,remaining:null,state:'empty',statusLabel:'Pas encore de données',lastLabel:'Aucune séance enregistrée'});
       const hours=Math.max(0,(now-stat.last)/3600000);
       const target=clamp(48+(stat.sets72>=10?24:stat.sets72>=6?12:0)+(stat.highEffort?12:0),48,84);
       const readiness=clamp(hours/target*100,0,100);
@@ -57,13 +57,13 @@
       const stateName=hours<24?'fresh':hours<target?'recovering':'ready';
       const label=stateName==='fresh'?'Récupération récente':stateName==='recovering'?'En récupération':'Disponible selon l’estimation';
       const lastLabel=hours<1?'Il y a moins d’une heure':hours<24?'Il y a '+Math.floor(hours)+' h':'Il y a '+Math.floor(hours/24)+' j';
-      return Object.assign(stat,{hours,target,readiness,remaining,state:stateName,label,lastLabel});
+      return Object.assign(stat,{hours,target,readiness,remaining,state:stateName,statusLabel:label,lastLabel});
     });
   }
   function muscleCard(stat){
     const card=el('article','forge-recovery-muscle forge-recovery-'+stat.state);
     const head=el('div','forge-recovery-card-head');
-    head.append(el('strong','',stat.label),el('span','forge-recovery-state',stat.label));
+    head.append(el('strong','',stat.muscleLabel),el('span','forge-recovery-state',stat.statusLabel));
     const bar=el('div','forge-recovery-track');
     const fill=el('i','');
     fill.style.width=stat.readiness+'%';
@@ -86,7 +86,7 @@
     const forgotten=stats.filter(stat=>stat.sets7d===0);
     const neglected=el('aside','forge-recovery-neglected');
     if(stats.some(stat=>stat.last)&&forgotten.length){
-      neglected.append(el('strong','','Groupes peu sollicités cette semaine'),el('p','',forgotten.map(stat=>stat.label).join(' · ')));
+      neglected.append(el('strong','','Groupes peu sollicités cette semaine'),el('p','',forgotten.map(stat=>stat.muscleLabel).join(' · ')));
     }
     const note=el('aside','forge-recovery-note');
     note.append(el('strong','','À savoir'),el('p','','Ce calcul est indicatif, pas une mesure physiologique ou médicale. Les groupes sont estimés à partir des noms d’exercices reconnus : un mouvement non reconnu peut ne pas être comptabilisé. Le modèle ne connaît pas ton sommeil, ton stress, tes douleurs ni toute ta fatigue. La récupération varie selon les personnes et les exercices. Ne retravaille pas intensément un muscle douloureux ou insuffisamment récupéré.'));
