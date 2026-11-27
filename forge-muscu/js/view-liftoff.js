@@ -6,8 +6,6 @@
   const texte = (v, max) => typeof v === 'string' ? v.slice(0, max) : '';
   const objet = v => v && typeof v === 'object' && !Array.isArray(v);
   const tableau = v => Array.isArray(v) ? v : [];
-
-  /* Étend la normalisation existante sans casser les anciennes sauvegardes. */
   const normaliserAvant = FM.normaliser;
   FM.normaliser = function (donnees) {
     const e = normaliserAvant(donnees);
@@ -25,7 +23,6 @@
     e.objectifsNutrition = { kcal:Math.round(nombre(o.kcal,10000)), proteines:nombre(o.proteines,1000), glucides:nombre(o.glucides,1500), lipides:nombre(o.lipides,1000) };
     return e;
   };
-
   const mesures = [
     ['poids','Poids (kg)',400], ['taille','Taille (cm)',300], ['poitrine','Tour de poitrine (cm)',300],
     ['epaules','Tour d’épaules (cm)',300], ['tailleCorps','Tour de taille (cm)',250], ['hanches','Tour de hanches (cm)',300],
@@ -45,25 +42,33 @@
     return out;
   };
   const bodygraph = e => {
-    const v = volume(e);
-    const svg = h('svg',{viewBox:'0 0 180 330',role:'img','aria-label':'Silhouette musculaire schématique'});
-    const add=(tag,attrs)=>svg.append(h(tag,attrs));
+    const v = volume(e), max = Math.max(1, ...Object.values(v));
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    for (const [k,val] of Object.entries({ viewBox:'0 0 180 330', role:'img', 'aria-label':'Silhouette musculaire schématique' })) svg.setAttribute(k,val);
+    const add=(tag,attrs)=>{ const el=document.createElementNS(ns,tag); for(const [k,val] of Object.entries(attrs)) el.setAttribute(k,String(val)); svg.append(el); };
     add('circle',{cx:90,cy:22,r:17,class:'body-base'});
     add('path',{d:'M73 43 Q56 48 48 66 L30 122 Q27 132 36 135 Q44 137 48 126 L62 85 L64 145 L56 216 L47 300 Q46 311 56 311 Q65 311 67 300 L83 222 L97 222 L113 300 Q115 311 124 311 Q134 311 132 300 L124 216 L116 145 L118 85 L132 126 Q136 137 145 135 Q153 132 150 122 L132 66 Q124 48 107 43 Z',class:'body-base'});
     const zones=[
-      'M64 54 Q90 47 116 54 L112 94 Q90 106 68 94 Z',
-      'M62 50 Q49 54 46 72 L61 86 L72 70 Z M118 50 Q131 54 134 72 L119 86 L108 70 Z',
-      'M68 97 L112 97 L108 145 L72 145 Z',
-      'M52 78 L36 125 L45 129 L62 87 Z M128 78 L144 125 L135 129 L118 87 Z',
-      'M37 132 L31 183 L42 186 L49 137 Z M143 132 L149 183 L138 186 L131 137 Z',
-      'M65 150 L87 150 L80 214 L60 214 Z M93 150 L115 150 L120 214 L100 214 Z',
-      'M60 218 L79 218 L66 296 L51 296 Z M101 218 L120 218 L129 296 L114 296 Z'
+      ['M64 54 Q90 47 116 54 L112 94 Q90 106 68 94 Z','pectoraux'],
+      ['M62 50 Q49 54 46 72 L61 86 L72 70 Z M118 50 Q131 54 134 72 L119 86 L108 70 Z','epaules'],
+      ['M68 97 L112 97 L108 145 L72 145 Z','abdos'],
+      ['M52 78 L36 125 L45 129 L62 87 Z M128 78 L144 125 L135 129 L118 87 Z','biceps'],
+      ['M37 132 L31 183 L42 186 L49 137 Z M143 132 L149 183 L138 186 L131 137 Z','avantbras'],
+      ['M65 150 L87 150 L80 214 L60 214 Z M93 150 L115 150 L120 214 L100 214 Z','quadriceps'],
+      ['M60 218 L79 218 L66 296 L51 296 Z M101 218 L120 218 L129 296 L114 296 Z','mollets']
     ];
-    zones.forEach(d=>add('path',{d,class:'body-muscle'}));
+    zones.forEach(([d,m])=>add('path',{d,class:'body-muscle','fill-opacity':0.18+0.82*(v[m]||0)/max}));
     const legende=h('div',{class:'forge-body-legend'},...Object.keys(FM.MUSCLES).map(m=>h('div',{class:'forge-body-legend-row'},h('i',{class:'forge-body-dot'}),h('span',{},FM.MUSCLES[m]),h('b',{},String(v[m]||0)))));
     return h('div',{class:'forge-bodygraph'},h('div',{class:'forge-body-side'},'AVANT',svg),legende);
   };
-
+  const accueilAvant = FM.vues.accueil;
+  FM.vues.accueil = function(app) {
+    const vue = accueilAvant(app);
+    vue.append(FM.carte(h('div',{class:'forge-card-head'},h('h2',{},'Suivi nutritionnel'),h('span',{class:'forge-tag'},'MACROS')),
+      h('p',{class:'discret'},'Enregistre tes repas et suis tes calories et macronutriments.'),FM.btn('Ouvrir la nutrition',()=>app.aller('#/nutrition'),'primaire geant')));
+    return vue;
+  };
   FM.vues.corps = function(app) {
     const e=app.etat; e.mesures=e.mesures||[];
     const historique=[...e.mesures].sort((a,b)=>b.date-a.date), derniere=historique[0];
@@ -89,7 +94,6 @@
         FM.btn('Supprimer tout l’historique',()=>FM.confirmer('Supprimer les mesures ?','Cette action ne supprime que les mensurations.','Supprimer',()=>{e.mesures=[];app.sauver();app.rendre();},true),'danger geant')):null,
       h('p',{class:'discret'},'Tes mesures sont conservées sur cet appareil et incluses dans les sauvegardes.'));
   };
-
   const nfield=(label,name,step='1')=>FM.champ(label,h('input',{type:'number',name,min:0,max:10000,step,inputmode:'decimal',placeholder:'0'}));
   const jour=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime();
   FM.vues.nutrition=function(app) {
