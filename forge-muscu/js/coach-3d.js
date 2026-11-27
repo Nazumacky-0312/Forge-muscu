@@ -1,8 +1,9 @@
 /* Démonstrations vidéo réelles : Exercise DB with Videos. */
 (function(){
 'use strict';
-const API='https://exercise-database.zenithfits.com/api/v1/search?q=';
 const cache=new Map();
+let libraryPromise=null;
+function library(){if(!libraryPromise)libraryPromise=fetch(new URL('data/exercise-media.json',document.baseURI)).then(r=>{if(!r.ok)throw Error('Bibliothèque vidéo inaccessible');return r.json();});return libraryPromise;}
 const aliases=[
  [/developpe.*couche|bench press|chest press/,'barbell bench press'],
  [/developpe.*incline/,'incline dumbbell bench press'],
@@ -39,11 +40,16 @@ function score(item,q,name){
 }
 async function find(name){
  if(cache.has(name))return cache.get(name);
- const task=(async()=>{for(const q of queries(name)){try{
-  const r=await fetch(API+encodeURIComponent(q),{headers:{Accept:'application/json'}});if(!r.ok)continue;
-  const items=listFrom(await r.json()),ranked=items.map(x=>({x,s:score(x,q,name)})).sort((a,b)=>b.s-a.s);
-  if(ranked.length&&ranked[0].s>=.55&&ranked[0].x.videos&&(ranked[0].x.videos.male||ranked[0].x.videos.female))return ranked[0].x;
- }catch(_){}}return null;})();
+ const task=(async()=>{
+  try{
+   const items=await library();
+   for(const q of queries(name)){
+    const ranked=items.map(x=>({x,s:score(x,q,name)})).sort((a,b)=>b.s-a.s);
+    if(ranked.length&&ranked[0].s>=.55&&ranked[0].x.videos&&(ranked[0].x.videos.male||ranked[0].x.videos.female))return ranked[0].x;
+   }
+  }catch(_){}
+  return null;
+ })();
  cache.set(name,task);return task;
 }
 function message(t){const p=document.createElement('div');p.className='forge-media-loading';p.textContent=t;return p;}
@@ -52,7 +58,7 @@ function show(el,item){
  video.poster=item.thumbnails&&(item.thumbnails.male||item.thumbnails.female)||'';video.controls=true;video.playsInline=true;video.preload='metadata';video.loop=true;video.muted=true;
  video.setAttribute('aria-label','Démonstration vidéo : '+item.name);
  video.addEventListener('error',()=>el.replaceChildren(message('Cette vidéo est momentanément indisponible.')),{once:true});
- const label=document.createElement('div');label.className='forge-demo-caption';label.textContent='Démonstration : '+item.name;el.replaceChildren(video,label);
+ const label=document.createElement('div');label.className='forge-demo-caption';label.textContent='Démonstration : '+item.name+' · Free Exercise DB';el.replaceChildren(video,label);
 }
 function mount(el){if(el.dataset.mediaReady==='1')return;el.dataset.mediaReady='1';const name=el.dataset.exerciseName||'';
  if(!name){el.replaceChildren(message('Démonstration non renseignée.'));return;}
