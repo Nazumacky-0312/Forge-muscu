@@ -38,7 +38,6 @@ const port = 4174;
     if (male.sex !== 'male' || male.meshes < 15 || male.width < 200 || male.height < 300) {
       throw new Error('Modèle masculin incomplet ou non visible : ' + JSON.stringify(male));
     }
-    await page.screenshot({ path: '/tmp/forge-body-avatar-mobile.png', fullPage: true });
     await page.getByRole('button', { name: 'Femme' }).click();
     await page.waitForFunction(() => document.querySelector('.forge-avatar-3d-canvas')?.dataset.avatarSex === 'female' && document.querySelector('.forge-avatar-3d-canvas')?.dataset.avatarLoaded === 'true', null, { timeout: 90000 });
     const female = await page.locator('.forge-avatar-3d-canvas').evaluate(el => ({ sex: el.dataset.avatarSex, meshes: Number(el.dataset.muscleMeshes) }));
@@ -49,7 +48,6 @@ const port = 4174;
     if (desktop.width < 250 || desktop.height < 300) throw new Error('Le rendu 3D ne s’adapte pas au format ordinateur : ' + JSON.stringify(desktop));
     if (!(await page.locator('.forge-avatar-credit').innerText()).includes('CC BY 4.0')) throw new Error('Le crédit du modèle CC BY 4.0 est absent.');
     if (errors.length) throw new Error('Erreurs JavaScript : ' + errors.join(' | '));
-    await page.screenshot({ path: '/tmp/forge-body-avatar-desktop.png', fullPage: true });
     console.log('Body Forge avatar OK:', JSON.stringify({ male, female, desktop }));
   } finally {
     await browser.close();
