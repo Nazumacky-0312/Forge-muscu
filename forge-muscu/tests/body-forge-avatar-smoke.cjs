@@ -64,7 +64,7 @@ const port = 4174;
     if (!integration.module || !integration.attribution || !integration.details) {
       throw new Error('Le module 3D, le panneau musculaire et les crédits doivent être présents : ' + JSON.stringify(integration));
     }
-    await page.getByRole('button', { name: 'Femme' }).click();
+    await page.getByRole('button', { name: 'Femme' }).evaluate(el => el.click());
     const female = await page.locator('.forge-bodygraph-figure').evaluateAll(nodes => nodes.map(el => el.getAttribute('aria-label')));
     if (female.length !== 2 || female.some(x => !x.includes('féminin'))) throw new Error('Le sélecteur Femme ne met pas à jour les deux silhouettes : ' + JSON.stringify(female));
     await page.setViewportSize({ width: 1365, height: 900 });
