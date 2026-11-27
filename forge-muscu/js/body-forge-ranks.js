@@ -134,7 +134,7 @@
       card(h('div',{class:'forge-card-head'},h('h2',{},'Tes rangs par exercice'),h('span',{class:'forge-tag'},ranked.length+' CLASSÉ(S)')),
         ranked.length?h('div',{class:'forge-body-exercise-list'},...ranked.map(x=>h('div',{class:'forge-body-exercise'},
           h('div',{class:'forge-body-exercise-icon'},x.rank.icon),
-          h('div',{class:'forge-body-exercise-info'},h('strong',{},x.name),h('span',{},x.profile+' · 1RM estimé '+x.oneRm.toFixed(1)+' kg · repère Gold '+x.benchmark.toFixed(1)+' kg'),h('div',{class:'forge-body-mini-track'},h('i',{style:'width:'+x.rank.progress+'%'}))),
+          h('div',{class:'forge-body-exercise-info'},h('strong',{},x.name),h('span',{},x.profile+' · 1RM '+x.oneRm.toFixed(1)+' kg · repère Gold '+x.benchmark.toFixed(1)+' kg · '+Math.round(x.relative*100)+' % du repère'),h('div',{class:'forge-body-mini-track'},h('i',{style:'width:'+x.rank.progress+'%'}))),
           h('div',{class:'forge-body-exercise-result'},h('b',{},x.rank.name),h('strong',{},x.rank.lp+' LP'))))):h('p',{class:'discret'},'Aucun rang pour le moment. Les rangs apparaîtront dès que tu auras enregistré des séries de travail sur les exercices compatibles.')),
       card(h('div',{class:'forge-card-head'},h('h2',{},'Ton profil de force'),h('span',{class:'forge-tag'},'CONFIGURATION')),
         h('p',{class:'discret'},'Le poids de corps et le sexe servent à contextualiser les performances, comme dans Liftoff. Ils restent enregistrés sur cet appareil.'),
@@ -143,7 +143,7 @@
           h('label',{},'Référence de classement',h('select',{name:'sex'},h('option',{value:'',selected:!settings.sex},'Choisir'),h('option',{value:'m',selected:settings.sex==='m'},'Homme'),h('option',{value:'f',selected:settings.sex==='f'},'Femme'))),
           h('button',{class:'btn primaire geant',type:'submit'},'Enregistrer mon profil'))),
       card(h('h2',{},'Les 9 rangs'),h('div',{class:'forge-body-rank-ladder'},...RANKS.map(r=>h('div',{class:'forge-body-rank-step'+(ranked.length&&overall.index===RANKS.indexOf(r)?' current':'')},h('span',{},r.icon),h('b',{},r.name),h('small',{},r.name==='Wood'?'0–199':r.min+'–'+r.max),h('i',{},ranked.length&&overall.index>RANKS.indexOf(r)?'✓':' '))))),
-      h('p',{class:'forge-body-method-note'},'Les rangs Forge utilisent un 1RM estimé avec la formule d’Epley et des coefficients indicatifs propres aux familles d’exercices. Les seuils exacts de Liftoff reposent sur ses données privées : Body Forge possède donc son propre barème, sans prétendre reproduire leur score officiel.'));
+      h('p',{class:'forge-body-method-note'},'Gold correspond à 100 % du repère moyen Forge estimé pour ton poids de corps et ton profil. Les autres rangs évoluent par paliers au-dessus ou en dessous. Ces repères sont des estimations de référence, pas une moyenne mondiale mesurée : les données mondiales complètes ne sont pas publiquement disponibles. Les charges des machines peuvent aussi varier selon les modèles.'));
     const form=page.querySelector('.forge-body-settings');
     form.addEventListener('submit',ev=>{
       ev.preventDefault();const weight=Number(form.elements.weight.value),sex=form.elements.sex.value;
