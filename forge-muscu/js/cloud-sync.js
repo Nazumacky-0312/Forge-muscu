@@ -71,9 +71,10 @@
 
   async function initClient() {
     if (state.client || state.loading) return;
-    if (!root.navigator.onLine) { state.message = 'Hors ligne : Forge continue de fonctionner localement. Le cloud sera disponible au retour du réseau.'; return; }
+    if (!root.navigator.onLine) { state.message = 'Hors ligne : Forge continue de fonctionner localement. Le cloud sera disponible au retour du réseau.'; refresh(); return; }
     state.loading = true;
     state.message = 'Connexion au service de sauvegarde…';
+    refresh();
     try {
       const module = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
       state.client = module.createClient(CONFIG.url, CONFIG.publishableKey, {
