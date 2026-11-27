@@ -149,8 +149,9 @@ F.vues.exercices=function(app){
  const v=listBefore(app);
  const titre=v.querySelector('h1');
  if(titre&&!v.querySelector('.forge-exercises-heading')){
-  const head=h('div',{class:'forge-exercises-heading'},titre,F.btn('Coach Forge ↗',()=>ouvrirPageCoach(null,app),'petit primaire'));
+  const head=h('div',{class:'forge-exercises-heading'});
   titre.replaceWith(head);
+  head.append(titre,F.btn('Coach Forge ↗',()=>ouvrirPageCoach(null,app),'petit primaire'));
  }
  v.querySelectorAll('.liste .ligne').forEach(a=>{
   const id=(a.getAttribute('href')||'').split('/').pop(),ex=F.EX[id];if(!ex)return;
