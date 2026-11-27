@@ -21,3 +21,7 @@
 .forge-avatar-muscle-exercises{display:grid;gap:6px;margin:0;padding:0;list-style:none}
 .forge-avatar-muscle-exercises li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,.07);font-size:.8rem}
 .forge-avatar-muscle-exercises li strong{color:var(--accent,#c5f36b);white-space:nowrap}
+
+/* Laisse un espace sous le header et les onglets sticky lors du défilement vers les contrôles. */
+.forge-avatar-switch .forge-avatar-choice,.forge-avatar-3d-views .forge-avatar-choice{scroll-margin-top:150px}
+.forge-avatar-controls{scroll-margin-top:150px}
