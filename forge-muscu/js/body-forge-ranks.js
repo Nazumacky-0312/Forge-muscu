@@ -80,7 +80,7 @@
   function avatar3D(ranked,settings){
     const rankByMuscle={};
     MUSCLES.forEach(m=>{const score=ranked.filter(x=>m.test.test(x.name)).reduce((n,x)=>Math.max(n,x.score),0);rankByMuscle[m.id]=score?getRank(score).index:-1;});
-    const initialSex=settings.sex==='f'?'f':'m';
+    rankByMuscle.forearms=Math.max(rankByMuscle.biceps??-1,rankByMuscle.triceps??-1);\n    rankByMuscle.obliques=rankByMuscle.abs??-1;\n    rankByMuscle.traps=Math.max(rankByMuscle.shoulders??-1,rankByMuscle.back??-1);\n    const initialSex=settings.sex==='f'?'f':'m';
     const host=h('div',{class:'forge-avatar-3d-canvas','aria-label':'Avatar musculaire 3D interactif'});
     const sexButtons=h('div',{class:'forge-avatar-switch','aria-label':'Choisir le personnage'},
       h('button',{type:'button',class:'forge-avatar-choice'+(initialSex==='m'?' active':''),'data-sex':'m'},'Homme'),
