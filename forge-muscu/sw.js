@@ -1,5 +1,5 @@
 /* Hors ligne. Change VERSION après toute modification d'un fichier. */
-const VERSION = 'forge-muscu-v17';
+const VERSION = 'forge-muscu-v18';
 const FICHIERS = [
   "./",
   "index.html",
@@ -27,6 +27,7 @@ const FICHIERS = [
   "js/view-advanced.js",
   "js/view-pro.js",
   "js/coach.js",
+  "js/view-seance.js",
   "js/coach-3d.js",
   "js/app.js",
   "images/exercises/bench-press/start.webp",
