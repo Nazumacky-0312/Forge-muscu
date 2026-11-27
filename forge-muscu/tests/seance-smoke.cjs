@@ -133,6 +133,25 @@ const mime = {
         await page.getByRole('link', { name: 'Programme' }).click();
         await page.waitForURL('**/#/programme');
         await page.locator('.forge-seance-panel h2').first().waitFor();
+        if (await page.getByRole('button', { name: 'Démarrer cette séance' }).count() !== 3) {
+          throw new Error('Les trois séances du programme doivent proposer un démarrage direct.');
+        }
+        if (await page.locator('.forge-program-exercise-thumb').count() < 5) {
+          throw new Error('Les exercices du programme doivent afficher leurs vignettes 3D disponibles.');
+        }
+        await page.goto(`http://127.0.0.1:${port}/#/accueil`, { waitUntil: 'domcontentloaded' });
+        await page.getByRole('button', { name: 'Commencer ma séance' }).waitFor();
+        await page.getByRole('button', { name: 'Commencer ma séance' }).click();
+        await page.waitForURL('**/#/seance');
+        const started = await page.evaluate(() => !!window.FM.app.etat.active && window.FM.app.etat.active.exercices.length > 0);
+        if (!started) throw new Error('Le bouton principal doit créer et lancer une séance réelle.');
+        await page.evaluate(() => { window.FM.app.etat.active = null; window.FM.app.sauver(); window.FM.app.aller('#/classement'); });
+        await page.waitForURL('**/#/classement');
+        await page.getByRole('heading', { name: 'Rangs Forge' }).waitFor();
+        await page.getByText('RANG ACTUEL').waitFor();
+        await page.getByText(/XP/).first().waitFor();
+        await page.goto(`http://127.0.0.1:${port}/#/programme`, { waitUntil: 'domcontentloaded' });
+        await page.locator('.forge-seance-panel h2').first().waitFor();
 
         /* Initialise une séance locale réaliste pour tester les champs avancés. */
         await page.evaluate(() => {
