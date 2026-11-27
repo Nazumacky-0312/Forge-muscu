@@ -11,3 +11,5 @@
 .forge-avatar-card .forge-avatar-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 12px}
 @media(max-width:420px){.forge-avatar-3d-stage{height:430px;min-height:340px}.forge-avatar-card.is-3d-ready .forge-avatar-3d-views{margin:8px 0}}
 @media(prefers-reduced-motion:reduce){.forge-avatar-3d-stage{scroll-behavior:auto}}
+
+.forge-avatar-attribution{margin:10px 0 0;color:var(--muted,#aab0b8);font-size:.68rem;line-height:1.5;text-align:center;overflow-wrap:anywhere}
