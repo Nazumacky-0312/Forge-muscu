@@ -144,9 +144,37 @@ function mount(container,initial){
     }
   }
   const canvas=renderer.domElement;
-  function pointerDown(e){dragging=true;lastX=e.clientX;canvas.setPointerCapture?.(e.pointerId);}
-  function pointerMove(e){if(!dragging||!avatar)return;const dx=e.clientX-lastX;lastX=e.clientX;targetRotation+=dx*.009;}
-  function pointerUp(){dragging=false;}
+  const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
+  let pointerStartX=0,pointerStartY=0,pointerMoved=false,selectedGroup='';
+  function pointerDown(e){dragging=true;lastX=e.clientX;pointerStartX=e.clientX;pointerStartY=e.clientY;pointerMoved=false;canvas.setPointerCapture?.(e.pointerId);}
+  function pointerMove(e){
+    if(!dragging||!avatar)return;
+    const dx=e.clientX-lastX;lastX=e.clientX;
+    if(Math.abs(e.clientX-pointerStartX)>5||Math.abs(e.clientY-pointerStartY)>5)pointerMoved=true;
+    targetRotation+=dx*.009;
+  }
+  function selectMuscle(e){
+    if(!avatar||pointerMoved)return;
+    const rect=canvas.getBoundingClientRect();
+    pointer.set(((e.clientX-rect.left)/rect.width)*2-1,-((e.clientY-rect.top)/rect.height)*2+1);
+    raycaster.setFromCamera(pointer,camera);
+    const hit=raycaster.intersectObject(avatar,true)[0];
+    if(!hit)return;
+    let owner=hit.object;
+    while(owner&&owner!==avatar&&!Object.prototype.hasOwnProperty.call(MUSCLE_GROUP,owner.name))owner=owner.parent;
+    if(!owner||owner===avatar)return;
+    selectedGroup=MUSCLE_GROUP[owner.name];
+    avatar.traverse(node=>{
+      if(!node.isMesh||!node.material?.emissive)return;
+      let part=node;
+      while(part&&part!==avatar&&!Object.prototype.hasOwnProperty.call(MUSCLE_GROUP,part.name))part=part.parent;
+      const active=part&&part!==avatar&&MUSCLE_GROUP[part.name]===selectedGroup;
+      node.material.emissive.set(active?'#344d24':'#000000');
+      node.material.emissiveIntensity=active?.65:0;
+    });
+    container.dispatchEvent(new CustomEvent('forge-muscle-select',{detail:{muscle:selectedGroup,structure:owner.name}}));
+  }
+  function pointerUp(e){dragging=false;selectMuscle(e);}
   function wheel(e){e.preventDefault();targetDistance=THREE.MathUtils.clamp(targetDistance+Math.sign(e.deltaY)*.12,1.65,4.8);}
   canvas.addEventListener('pointerdown',pointerDown);
   canvas.addEventListener('pointermove',pointerMove);
