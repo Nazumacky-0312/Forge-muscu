@@ -164,6 +164,27 @@ const mime = {
           throw new Error('Body Forge et Rangs Forge doivent être les deux seuls onglets du classement.');
         }
         await page.locator('.forge-body-rank-ladder .forge-body-rank-step').nth(8).waitFor();
+        const avatarIntegration = await page.evaluate(() => ({
+          module: !!document.querySelector('script[type="module"][src="js/body-forge-avatar-3d.js"]'),
+          stylesheet: !!document.querySelector('link[href^="css/body-forge-avatar-3d.css"]')?.sheet,
+          stage: !!document.querySelector('.forge-avatar-3d-stage'),
+          fallback: !!document.querySelector('.forge-bodygraph-pair svg'),
+          views: document.querySelectorAll('.forge-avatar-3d-views [data-view]').length,
+          sexes: document.querySelectorAll('.forge-avatar-switch [data-sex]').length
+        }));
+        if (!avatarIntegration.module || !avatarIntegration.stylesheet || !avatarIntegration.stage ||
+            !avatarIntegration.fallback || avatarIntegration.views !== 2 || avatarIntegration.sexes !== 2) {
+          throw new Error('L’intégration de l’avatar 3D et son fallback doivent être présents : ' + JSON.stringify(avatarIntegration));
+        }
+        await page.locator('.forge-avatar-switch [data-sex="f"]').click();
+        if (!(await page.locator('.forge-avatar-switch [data-sex="f"]').evaluate(el => el.classList.contains('active')))) {
+          throw new Error('Le sélecteur de modèle féminin ne fonctionne pas.');
+        }
+        await page.locator('.forge-avatar-switch [data-sex="m"]').click();
+        await page.locator('.forge-avatar-3d-views [data-view="back"]').click();
+        if (!(await page.locator('.forge-avatar-3d-views [data-view="back"]').evaluate(el => el.classList.contains('active')))) {
+          throw new Error('Le sélecteur de vue arrière ne fonctionne pas.');
+        }
         if (await page.getByText('Classement hebdomadaire').count()) {
           throw new Error('Body Forge ne doit plus utiliser l’ancien classement hebdomadaire.');
         }
