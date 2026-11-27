@@ -65,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: forge-muscu-seance-qa
-          path: /tmp/forge-seance-*.png
+          path: /tmp/forge-seance-*
           if-no-files-found: ignore
           retention-days: 3
 
