@@ -77,9 +77,8 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
 
-      # Sur une PR, le site racine est reconstruit depuis main (production inchangée).
-      # La version candidate est placée sous /preview/ dans l'artefact QA uniquement.
-      # Les PR ne déclenchent jamais un déploiement Pages : seule main peut publier.
+      # Sur une PR, la racine est reconstruite depuis main et la candidate isolée sous /preview/.
+      # Le déploiement PR conserve donc la version main à la racine et publie seulement l'aperçu sous /preview/.
       - name: Build safe PR preview alongside current production
         if: github.event_name == 'pull_request'
         run: |
@@ -117,7 +116,7 @@ jobs:
           path: public
 
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
     needs: build
     environment:
       name: github-pages
