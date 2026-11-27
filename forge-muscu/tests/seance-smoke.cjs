@@ -163,6 +163,8 @@ const mime = {
         if (await page.locator('.forge-rank-tabs .forge-seance-tab').count() !== 2) {
           throw new Error('Body Forge et Rangs Forge doivent être les deux seuls onglets du classement.');
         }
+        const bodyDebug = await page.evaluate(() => ({ marker: window.FORGE_BODY_RANKS_READY, hash: location.hash, view: String(window.FM?.vues?.classement).slice(0, 180), hasApp: !!window.FM?.app, render: typeof window.FM?.app?.rendre, bodyClass: document.querySelector('#vue > div')?.className }));
+        console.log('BODY FORGE DEBUG', JSON.stringify(bodyDebug));
         await page.locator('.forge-body-rank-ladder .forge-body-rank-step').nth(8).waitFor();
         if (await page.getByText('Classement hebdomadaire').count()) {
           throw new Error('Body Forge ne doit plus utiliser l’ancien classement hebdomadaire.');
