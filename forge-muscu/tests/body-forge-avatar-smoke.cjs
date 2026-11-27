@@ -8,7 +8,7 @@ const port = 4174;
 
 (async () => {
   const server = http.createServer((req, res) => {
-    const pathname = decodeURIComponent(new URL(req.url, \`http://127.0.0.1:\${port}\`).pathname);
+    const pathname = decodeURIComponent(new URL(req.url, `http://127.0.0.1:${port}`).pathname);
     const file = path.resolve(root, '.' + pathname);
     if (file !== root && !file.startsWith(root + path.sep)) { res.writeHead(403).end(); return; }
     const target = fs.existsSync(file) && fs.statSync(file).isDirectory() ? path.join(file, 'index.html') : file;
@@ -27,7 +27,7 @@ const port = 4174;
   page.on('pageerror', error => errors.push(error.message));
   try {
     await page.addInitScript(() => localStorage.setItem('forge-body-rank-settings-v1', JSON.stringify({ weight: 70, sex: 'm' })));
-    await page.goto(\`http://127.0.0.1:\${port}/#/classement/body\`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`http://127.0.0.1:${port}/#/classement/body`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('heading', { name: 'Body Forge' }).waitFor();
     await page.locator('.forge-avatar-3d-canvas canvas').waitFor();
     await page.waitForFunction(() => document.querySelector('.forge-avatar-3d-canvas')?.dataset.avatarLoaded === 'true', null, { timeout: 90000 });
