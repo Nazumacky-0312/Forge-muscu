@@ -35,7 +35,7 @@
     catch(_){return{weight:0,sex:''};}
   };
   const saveSettings=x=>{try{root.localStorage.setItem(KEY,JSON.stringify(x));}catch(_){}};
-  const getRank=score=>{let i=0;for(let n=0;n<RANKS.length;n++)if(score>=RANKS[n].min)i=n;const r=RANKS[i],next=RANKS[i+1]||null;return{...r,index:i,next,lp:Math.max(0,Math.min(100,Math.floor(score-r.min))),progress:next?Math.max(0,Math.min(100,(score-r.min)/(next.min-r.min)*100)):100};};
+  const getRank=score=>{let i=0;for(let n=0;n<RANKS.length;n++)if(score>=RANKS[n].min)i=n;const r=RANKS[i],next=RANKS[i+1]||null,lp=i===0?Math.floor(score/2):Math.floor(score-r.min);return{...r,index:i,next,lp:Math.max(0,Math.min(100,lp)),progress:next?Math.max(0,Math.min(100,i===0?score/200*100:(score-r.min)/(next.min-r.min)*100)):100};};
   const classify=name=>PROFILES.find(p=>p.re.test(name))||null;
   const estimate=(kg,reps)=>kg*(1+Math.min(30,reps)/30);
   function exerciseRanks(state,settings){
