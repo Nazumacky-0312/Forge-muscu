@@ -157,7 +157,7 @@
         return;
       }
       if(ownNickname){join.append(h('p',{class:'forge-body-optin'},'✓ Tu participes au classement sous le pseudo '+ownNickname+'.'));return;}
-      const form=h('form',{class:'forge-body-join-form'},h('label',{},'Choisis ton pseudo public',h('input',{type:'text',name:'nickname',minlength:2,maxlength:20,required:true,autocomplete:'nickname',placeholder:'Ex. IronMax'})),h('p',{class:'discret'},'Ton pseudo et tes points hebdomadaires seront visibles par les autres membres. Tu peux quitter le classement en supprimant ta participation depuis cet écran.'));
+      const form=h('form',{class:'forge-body-join-form'},h('label',{},'Choisis ton pseudo public',h('input',{type:'text',name:'nickname',minlength:2,maxlength:20,required:true,autocomplete:'nickname',placeholder:'Ex. IronMax'})),h('p',{class:'discret'},'Ton pseudo et tes points hebdomadaires seront visibles par les autres membres. Aucune adresse e-mail ni donnée personnelle n'est affichée.'));
       const submit=h('button',{type:'submit',class:'btn primaire geant'},'Rejoindre Body Forge');form.append(submit);
       form.addEventListener('submit',async ev=>{
         ev.preventDefault();const field=form.querySelector('input');const nickname=field.value.trim().replace(/\\s+/g,' ');
