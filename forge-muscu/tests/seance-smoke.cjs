@@ -40,6 +40,15 @@ const mime = {
         await page.goto(`http://127.0.0.1:${port}/#/programme`, { waitUntil: 'domcontentloaded' });
         await page.getByRole('heading', { name: 'Séance' }).waitFor();
         await page.locator('.forge-seance-tab').nth(0).waitFor();
+        const visualSystem = await page.evaluate(() => ({
+          stylesheet: !!document.querySelector('link[href="css/premium.css"]')?.sheet,
+          accent: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
+          navPosition: getComputedStyle(document.querySelector('#menu')).position
+        }));
+        if (!visualSystem.stylesheet || visualSystem.accent !== '#c5f36b' ||
+            visualSystem.navPosition !== (viewport.width < 760 ? 'fixed' : 'sticky')) {
+          throw new Error('Le nouveau système visuel Forge Premium ne se charge pas correctement : ' + JSON.stringify(visualSystem));
+        }
         if (await page.locator('#menu a').count() !== 4) throw new Error('La navigation principale ne contient pas exactement 4 rubriques.');
         if (await page.locator('.forge-seance-tab').count() !== 3) throw new Error('Les 3 onglets de Séance ne sont pas présents.');
         const hubLayout = await page.evaluate(() => {
