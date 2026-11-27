@@ -15,8 +15,8 @@ try {
 } catch (primaryError) {
   try { await loadEngine('jsdelivr'); }
   catch (secondaryError) {
-    window.dispatchEvent(new CustomEvent('forge-avatar-error', {detail:'Le moteur 3D ne s’est pas chargé. Vérifie ta connexion puis recharge Body Forge.'}));
-    throw secondaryError || primaryError;
+    console.warn('Forge Muscu — moteur 3D indisponible, le bodygraph de secours reste actif.', secondaryError || primaryError);
+    window.dispatchEvent(new CustomEvent('forge-avatar-error', {detail:'Le moteur 3D ne s’est pas chargé. Le bodygraph de secours reste disponible.'}));
   }
 }
 
