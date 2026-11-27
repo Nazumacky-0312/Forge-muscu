@@ -120,6 +120,7 @@ function mount(container,initial){
   }
   async function changeModel(nextSex){
     const token=++loadingToken;
+    if(!status.isConnected)container.append(status);
     status.style.display='grid';status.textContent='Chargement du modèle anatomique…';
     try{
       const source=await getModel(nextSex,p=>{
