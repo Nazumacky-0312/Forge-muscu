@@ -32,37 +32,47 @@ const mime = {
   try {
     for (const viewport of [{ width: 390, height: 844, name: 'mobile' }, { width: 1365, height: 900, name: 'desktop' }]) {
       const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
+      page.setDefaultTimeout(8000);
       page.on('pageerror', error => failures.push(`${viewport.name}: ${error.message}`));
-      await page.goto(`http://127.0.0.1:${port}/#/programme`, { waitUntil: 'domcontentloaded' });
-      await page.locator('.forge-seance-heading h1').getByText('Séance').waitFor();
-      await page.locator('.forge-seance-tab').nth(0).waitFor();
-      if (await page.locator('#menu a').count() !== 4) throw new Error('La navigation principale ne contient pas exactement 4 rubriques.');
-      if (await page.locator('.forge-seance-tab').count() !== 3) throw new Error('Les 3 onglets de Séance ne sont pas présents.');
-      await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-programme.png`, fullPage: true });
+      page.on('console', msg => { if (msg.type() === 'error') failures.push(`${viewport.name} console: ${msg.text()}`); });
+      try {
+        await page.goto(`http://127.0.0.1:${port}/#/programme`, { waitUntil: 'domcontentloaded' });
+        await page.getByRole('heading', { name: 'Séance' }).waitFor();
+        await page.locator('.forge-seance-tab').nth(0).waitFor();
+        if (await page.locator('#menu a').count() !== 4) throw new Error('La navigation principale ne contient pas exactement 4 rubriques.');
+        if (await page.locator('.forge-seance-tab').count() !== 3) throw new Error('Les 3 onglets de Séance ne sont pas présents.');
+        await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-programme.png`, fullPage: true });
 
-      await page.getByRole('link', { name: 'Exercices' }).click();
-      await page.waitForURL('**/#/exercices');
-      await page.getByPlaceholder('Rechercher un exercice').waitFor();
-      const firstExercise = page.locator('.forge-seance-panel .liste a.ligne').first();
-      await firstExercise.waitFor();
-      const exerciseName = await firstExercise.locator('strong').innerText();
-      await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-exercices.png`, fullPage: true });
-      await firstExercise.click();
-      await page.waitForURL('**/#/exercice/**');
-      await page.getByRole('heading', { name: exerciseName }).waitFor();
-      await page.getByRole('button', { name: '← Retour' }).click();
-      await page.waitForURL('**/#/exercices');
-      await page.getByPlaceholder('Rechercher un exercice').waitFor();
+        await page.getByRole('link', { name: 'Exercices' }).click();
+        await page.waitForURL('**/#/exercices');
+        await page.getByPlaceholder('Rechercher un exercice').waitFor();
+        const firstExercise = page.locator('.forge-seance-panel .liste a.ligne').first();
+        await firstExercise.waitFor();
+        const exerciseName = await firstExercise.locator('strong').innerText();
+        await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-exercices.png`, fullPage: true });
+        await firstExercise.click();
+        await page.waitForURL('**/#/exercice/**');
+        await page.getByRole('heading', { name: exerciseName }).waitFor();
+        await page.getByRole('button', { name: '← Retour' }).click();
+        await page.waitForURL('**/#/exercices');
+        await page.getByPlaceholder('Rechercher un exercice').waitFor();
 
-      await page.getByRole('link', { name: 'Suivi' }).click();
-      await page.waitForURL('**/#/suivi');
-      await page.getByText('Rien à afficher pour l’instant.').waitFor();
-      await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-suivi.png`, fullPage: true });
+        await page.getByRole('link', { name: 'Suivi' }).click();
+        await page.waitForURL('**/#/suivi');
+        await page.getByText('Rien à afficher pour l’instant.').waitFor();
+        await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-suivi.png`, fullPage: true });
 
-      await page.getByRole('link', { name: 'Programme' }).click();
-      await page.waitForURL('**/#/programme');
-      await page.locator('.forge-seance-panel h2').first().waitFor();
-      await page.close();
+        await page.getByRole('link', { name: 'Programme' }).click();
+        await page.waitForURL('**/#/programme');
+        await page.locator('.forge-seance-panel h2').first().waitFor();
+      } catch (error) {
+        const body = await page.locator('body').innerText().catch(() => '[body inaccessible]');
+        console.error(`DIAGNOSTIC ${viewport.name}: ${error.message}\nBODY:\n${body}\nPAGE ERRORS:\n${failures.join('\n')}`);
+        await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-failure.png`, fullPage: true }).catch(() => {});
+        throw error;
+      } finally {
+        await page.close();
+      }
     }
     if (failures.length) throw new Error(failures.join('\n'));
     console.log('Forge Muscu Séance smoke tests: OK (mobile + desktop, Programme/Exercices/Suivi, ouverture fiche et retour).');
@@ -70,4 +80,4 @@ const mime = {
     await browser.close();
     await new Promise(resolve => server.close(resolve));
   }
-})().catch(error => { console.error(error); process.exit(1); });
+})().catch(error => { console.error('SMOKE TEST FAILURE:', error.stack || error); process.exit(1); });
