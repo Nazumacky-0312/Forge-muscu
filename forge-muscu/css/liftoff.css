@@ -33,5 +33,5 @@
 .forge-resume-banner>div{display:flex;flex-direction:column;gap:3px;min-width:0}
 .forge-resume-banner strong{font-size:.84rem}
 .forge-resume-banner span{overflow:hidden;color:var(--doux);font-size:.75rem;text-overflow:ellipsis;white-space:nowrap}
-.forge-resume-banner button{flex:0 0 auto;min-height:42px}
+.forge-resume-banner button{flex:0 0 auto;min-height:44px}
 @media(max-width:420px){.forge-resume-banner{gap:8px;padding:11px}.forge-resume-banner button{padding-inline:12px}}
