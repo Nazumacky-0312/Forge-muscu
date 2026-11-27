@@ -1,6 +1,6 @@
 # Forge Muscu — suivi de la refonte
 
-Dernière mise à jour : 27 novembre 2026
+Dernière mise à jour : 27 novembre 2026 — contrôle après CI
 
 ## État général
 
@@ -52,13 +52,13 @@ Refonte en cours. L'application de production sur `main` n'a pas été modifiée
 
 ## En cours / à faire
 
-- [ ] Validation CI de la nouvelle feuille `premium.css` sur mobile et desktop (test ajouté ; attendre le run du commit final).
+- [x] Validation CI de `premium.css` sur mobile et desktop : run `45942696341`, build et test Playwright réussis ; déploiement volontairement ignoré.
 - [x] CI verte sur le commit `d6d2259cc9b9e020129056a72fea9ef25a714cf5` (run `45941941328`) : préparation, médias CC0, Playwright mobile + desktop, navigation responsive, bouton Modifier, absence de chevauchement des actions et captures QA ; déploiement ignoré.
 - [ ] Configurer le Site URL et Redirect URL dans Supabase Auth.
 - [ ] Tester réellement Magic Link, premier envoi cloud et restauration.
 - [ ] Tester les conflits avec deux appareils / deux sessions authentifiées.
 - [ ] Connecter l'envoi et la gestion des photos au bucket privé.
-- [ ] Poursuivre la refonte visuelle écran par écran (Accueil, bibliothèque, Coach, suivi, rangs, profil) après inspection des captures du nouveau thème.
+- [ ] Poursuivre la refonte visuelle écran par écran (Accueil, bibliothèque, Coach, suivi, rangs, profil) ; le thème global est posé mais les contrôles visuels détaillés de chaque écran restent à faire.
 - [ ] Améliorer les filtres et les fiches de la bibliothèque d'exercices.
 - [ ] Vérifier et enrichir les médias 3D exercice par exercice.
 - [ ] Étendre les analyses de progression, le volume musculaire et les périodes.
@@ -67,6 +67,11 @@ Refonte en cours. L'application de production sur `main` n'a pas été modifiée
 - [ ] Étendre les tests d'import/export, hors-ligne, service worker et mise à jour PWA.
 - [ ] Faire une vérification visuelle manuelle Android et ordinateur.
 - [ ] Fusionner puis publier uniquement après validation complète.
+
+## Dernière vérification CI
+
+- Run `45942696341` sur le commit `5a0504330e299a65d9ca46510ac0fcf1f846c34b` : job `build` réussi, préparation du site, médias CC0, tests Playwright mobile/desktop et artefacts QA générés ; job `deploy` ignoré car la branche n'est pas `main`.
+- La PR #2 est toujours ouverte, brouillon et mergeable. Aucun déploiement de production n'a été déclenché.
 
 ## Limites d'exécution rencontrées
 
