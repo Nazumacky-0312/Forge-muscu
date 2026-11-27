@@ -118,9 +118,11 @@
       if (ev.key !== FM.store.CLE) return;
       const seanceLocale = app.etat && app.etat.active;
       const nouvelEtat = FM.store.charger();
-      if (seanceLocale && nouvelEtat) {
-        nouvelEtat.active = seanceLocale;
-        app.etat = nouvelEtat;
+      if (seanceLocale) {
+        if (nouvelEtat) {
+          nouvelEtat.active = seanceLocale;
+          app.etat = nouvelEtat;
+        }
         FM.toast('Données actualisées depuis une autre fenêtre ; ta séance en cours est conservée.');
       } else {
         app.etat = nouvelEtat;
