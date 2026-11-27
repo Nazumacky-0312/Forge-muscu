@@ -84,6 +84,7 @@ function makeAnatomy(source,ranks){
   const center=bounds.getCenter(new THREE.Vector3());
   model.position.set(-center.x,-bounds.min.y,-center.z);
   model.userData.bodyHeight=size.y;
+  model.userData.muscleCount=muscleCount;
   return model;
 }
 function mount(container,initial){
@@ -108,8 +109,9 @@ function mount(container,initial){
   let sex=initial.sex==='f'?'f':'m',ranks=initial.ranks||{},avatar=null,disposed=false,loadingToken=0,raf=0;
   let targetRotation=0,targetDistance=2.7,dragging=false,lastX=0;
   const status=document.createElement('div');status.className='forge-avatar-model-status';status.textContent='Chargement du modèle anatomique…';container.append(status);
-  function frameModel(model){
+  function frameModel(model,modelSex){
     avatar=model;scene.add(avatar);
+    container.dataset.avatarLoaded='true';container.dataset.avatarSex=modelSex==='f'?'female':'male';container.dataset.muscleMeshes=String(model.userData.muscleCount||0);delete container.dataset.avatarError;
     const h=avatar.userData.bodyHeight||1.7;
     const targetY=h*.51;
     camera.position.set(0,targetY+h*.035,h*1.95);
@@ -128,12 +130,13 @@ function mount(container,initial){
       });
       if(disposed||token!==loadingToken)return;
       if(avatar){scene.remove(avatar);avatar.traverse(n=>{if(n.isMesh&&n.material)n.material.dispose();});}
-      frameModel(makeAnatomy(source,ranks));
+      frameModel(makeAnatomy(source,ranks),nextSex);
       sex=nextSex;
       status.remove();
     }catch(error){
       if(disposed||token!==loadingToken)return;
       console.error('Forge Muscu — modèle anatomique :',error);
+      container.dataset.avatarLoaded='false';container.dataset.avatarError=String(error?.message||error);
       status.style.display='grid';
       status.textContent='Le modèle anatomique n’a pas pu être chargé. Vérifie ta connexion puis appuie sur Réessayer.';
       let retry=status.querySelector('button');
@@ -178,7 +181,7 @@ function mount(container,initial){
       canvas.removeEventListener('pointerup',pointerUp);canvas.removeEventListener('pointercancel',pointerUp);
       canvas.removeEventListener('wheel',wheel);
       if(avatar){scene.remove(avatar);avatar.traverse(n=>{if(n.isMesh&&n.material)n.material.dispose();});}
-      renderer.dispose();container.replaceChildren();
+      renderer.dispose();delete container.dataset.avatarLoaded;delete container.dataset.avatarSex;delete container.dataset.muscleMeshes;container.replaceChildren();
     }
   };
   container.__forge3d=api;return api;
