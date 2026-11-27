@@ -30,6 +30,24 @@ const port = 4174;
     await page.goto('http://127.0.0.1:' + port + '/#/classement/body', { waitUntil: 'domcontentloaded' });
     await page.getByRole('heading', { name: 'Body Forge' }).waitFor();
     await page.locator('.forge-bodygraph-figure').nth(1).waitFor({ state: 'attached' });
+    await page.evaluate(() => {
+      const app = window.FM.app;
+      const entry = Object.entries(window.FM.EX).find(([, ex]) => /développé couché|bench press/i.test(ex.nom));
+      if (!entry) throw new Error('Aucun exercice de développé couché trouvé pour le test Body Forge.');
+      const [exId] = entry;
+      app.etat.seances.push({
+        id: 'body-forge-avatar-qa', nom: 'Test avatar Body Forge', debut: Date.now(), fin: Date.now(),
+        exercices: [{ exId, series: [{ kg: 60, reps: 8, fait: true, type: 'travail' }] }]
+      });
+      app.sauver();
+      app.rendre();
+    });
+    await page.locator('.forge-body-exercise').first().waitFor();
+    await page.locator('.forge-bodygraph-figure').nth(1).waitFor({ state: 'attached' });
+    await page.waitForFunction(() => {
+      const stage = document.querySelector('.forge-avatar-3d-stage');
+      return !!stage && (stage.dataset.avatarLoaded === 'true' || !!stage.dataset.avatarError);
+    }, { timeout: 12000 }).catch(() => {});
     const mobile = await page.evaluate(() => {
       const nodes = [...document.querySelectorAll('.forge-bodygraph-figure')];
       const pair = document.querySelector('.forge-bodygraph-pair');
@@ -41,6 +59,7 @@ const port = 4174;
         widths: nodes.map(el => Math.round(el.getBoundingClientRect().width)),
         heights: nodes.map(el => Math.round(el.getBoundingClientRect().height)),
         coloredMuscles: nodes.map(el => el.querySelectorAll('.bf-muscles path,.bf-muscles ellipse').length),
+        coloredRankMuscles: nodes.map(el => [...el.querySelectorAll('.bf-muscles path')].filter(path => path.getAttribute('fill') !== '#8b929b').length),
         fallbackVisible: !!pair && getComputedStyle(pair).display !== 'none' && pair.clientWidth > 0,
         stageVisible: !!stage && getComputedStyle(stage).display !== 'none' && !!rect && rect.width > 0,
         stageLoaded: stage?.dataset.avatarLoaded === 'true',
@@ -50,7 +69,7 @@ const port = 4174;
       };
     });
     const fallbackValid = mobile.count === 2 && mobile.labels[0].includes('masculin') && mobile.labels[1].includes('masculin') &&
-      mobile.coloredMuscles.every(x => x >= 6);
+      mobile.coloredMuscles.every(x => x >= 6) && mobile.coloredRankMuscles[0] > 0;
     const fallbackVisible = mobile.fallbackVisible && mobile.widths.every(x => x >= 90) && mobile.heights.every(x => x >= 160);
     const modelVisible = mobile.stageVisible && mobile.stageLoaded && mobile.canvas && mobile.stageWidth >= 220 && mobile.stageHeight >= 320;
     if (!fallbackValid || (!fallbackVisible && !modelVisible)) {
@@ -65,6 +84,10 @@ const port = 4174;
       throw new Error('Le module 3D, le panneau musculaire et les crédits doivent être présents : ' + JSON.stringify(integration));
     }
     await page.getByRole('button', { name: 'Femme' }).evaluate(el => el.click());
+    await page.waitForFunction(() => {
+      const stage = document.querySelector('.forge-avatar-3d-stage');
+      return !stage || stage.dataset.avatarSex === 'female' || !!stage.dataset.avatarError;
+    }, { timeout: 12000 }).catch(() => {});
     const female = await page.locator('.forge-bodygraph-figure').evaluateAll(nodes => nodes.map(el => el.getAttribute('aria-label')));
     if (female.length !== 2 || female.some(x => !x.includes('féminin'))) throw new Error('Le sélecteur Femme ne met pas à jour les deux silhouettes : ' + JSON.stringify(female));
     await page.setViewportSize({ width: 1365, height: 900 });
