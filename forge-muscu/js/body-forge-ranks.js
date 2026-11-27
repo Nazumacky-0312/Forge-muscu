@@ -1,9 +1,8 @@
 /* Body Forge — rangs de force par exercice et rang général. */
 (function(root){
   'use strict';
-  root.FORGE_BODY_RANKS_BOOT={fm:!!root.FM,views:!!root.FM?.vues,hash:root.location.hash};
-  const FM=root.FM,h=FM?.h;
-  if(!FM||!FM.vues){root.FORGE_BODY_RANKS_EARLY_RETURN=true;return;}
+  const FM=root.FM,h=FM.h;
+  if(!FM||!FM.vues)return;
   const KEY='forge-body-rank-settings-v1';
   const RANKS=[
     {name:'Wood',min:0,max:199,icon:'🪵'},
@@ -192,5 +191,4 @@
   FM.vues.classement=function(app,sub){return sub==='body'?bodyForge(app):old(app,sub);};
   FM.vues.rangs=FM.vues.classement;
   if(root.FM.app&&typeof root.FM.app.rendre==='function')root.FM.app.rendre();
-  root.FORGE_BODY_RANKS_READY=true;
 })(typeof window!=='undefined'?window:globalThis);
