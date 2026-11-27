@@ -184,4 +184,5 @@
   FM.vues.classement=function(app,sub){return sub==='body'?bodyForge(app):old(app,sub);};
   FM.vues.rangs=FM.vues.classement;
   if(root.FM.app&&typeof root.FM.app.rendre==='function')root.FM.app.rendre();
+  root.FORGE_BODY_RANKS_READY=true;
 })(typeof window!=='undefined'?window:globalThis);
