@@ -35,9 +35,32 @@ const image = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="32" he
         nav: document.querySelector('#menu a[data-vue="progression"]')?.textContent.trim(),
         cards: [...document.querySelectorAll('.forge-progression-card')].map(card => card.getAttribute('href'))
       }));
-      const expectedRoutes = ['#/classement','#/suivi/progres','#/suivi/records','#/suivi/historique','#/profil','#/nutrition'];
-      if (hub.nav !== 'Progression' || expectedRoutes.some(route => !hub.cards.includes(route)) || hub.cards.length !== 6) {
+      const expectedRoutes = ['#/classement','#/suivi/progres','#/suivi/records','#/suivi/historique','#/profil','#/recuperation','#/nutrition'];
+      if (hub.nav !== 'Progression' || expectedRoutes.some(route => !hub.cards.includes(route)) || hub.cards.length !== 7) {
         throw new Error('Hub Progression incomplet sur ' + viewport.name + ' : ' + JSON.stringify(hub));
+      }
+      await page.evaluate(() => {
+        const app = window.FM.app;
+        const bench = Object.entries(window.FM.EX).find(([, ex]) => /développé couché|bench press/i.test(ex.nom));
+        const squat = Object.entries(window.FM.EX).find(([, ex]) => /squat/i.test(ex.nom));
+        if (!bench || !squat) throw new Error('Exercices de test introuvables pour la récupération.');
+        const time = Date.now() - 12 * 60 * 60 * 1000;
+        app.etat.seances.push({
+          id: 'recovery-qa-session', nom: 'Test récupération', debut: time, fin: time,
+          exercices: [
+            { exId: bench[0], series: [{ kg: 60, reps: 8, fait: true, type: 'travail' }] },
+            { exId: squat[0], series: [{ kg: 80, reps: 8, fait: true, type: 'travail' }] }
+          ]
+        });
+        app.sauver();
+        app.aller('#/recuperation');
+      });
+      await page.locator('.forge-recovery-page').waitFor();
+      const recovery = await page.locator('.forge-recovery-muscle').evaluateAll(cards => cards.map(card => card.textContent));
+      if (!recovery.some(text => text.includes('Pectoraux') && text.includes('Récupération récente')) ||
+          !recovery.some(text => text.includes('Quadriceps')) ||
+          !await page.locator('.forge-recovery-note').textContent().then(text => text.includes('pas une mesure physiologique'))) {
+        throw new Error('Estimation de récupération incomplète sur ' + viewport.name + ' : ' + JSON.stringify(recovery));
       }
       await page.goto('http://127.0.0.1:' + port + '/#/suivi/progres', { waitUntil: 'domcontentloaded' });
       await page.locator('.forge-progress-photos').waitFor();
