@@ -257,6 +257,16 @@ const mime = {
           throw new Error('Le rappel de reprise ne montre pas la séance active.');
         }
 
+        /* Charge toutes les vignettes du programme avant de simuler la coupure réseau :
+           les images sont volontairement lazy-loadées dans l'application. */
+        await page.locator('.forge-program-exercise-thumb img').evaluateAll(images => {
+          images.forEach(image => { image.loading = 'eager'; });
+        });
+        await page.waitForFunction(() => {
+          const images = [...document.querySelectorAll('.forge-program-exercise-thumb img')];
+          return images.length === 36 && images.every(image => image.complete && image.naturalWidth > 0);
+        }, null, { timeout: 20000 });
+
         /* Le profil et le mode local restent accessibles hors ligne, même avec le cloud configuré. */
         await page.context().setOffline(true);
         await page.evaluate(() => window.FM.app.aller('#/profil'));
