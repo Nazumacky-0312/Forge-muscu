@@ -77,3 +77,7 @@
 @media(max-width:520px){.forge-seance-hub{padding:10px 10px 24px}.forge-seance-heading{margin-bottom:13px;border-radius:17px}.forge-seance-tabs{top:5px;margin-bottom:14px;gap:3px;padding:4px}.forge-seance-tab{min-height:44px;padding:8px 5px;font-size:.78rem}}
 @media(prefers-reduced-motion:reduce){.forge-seance-panel{animation:none}.forge-seance-tab{transition:none}}
 
+
+/* Les actions de séance ne doivent pas casser les libellés sur petit écran. */
+.forge-seance-panel button{white-space:nowrap}
+.forge-seance-panel button.btn{min-width:82px}
