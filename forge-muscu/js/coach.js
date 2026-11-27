@@ -7,8 +7,8 @@ w.FORGE_COACH_KEY='sb_publishable_tHLViJ0JO41Phe24lPCL_g_XepTcbeQ';
 let exerciceActif=null;
 const motion={pouss_h:'push',pouss_inc:'push',pouss_v:'up',tir_h:'row',tir_v:'pull',squat:'squat',fente:'lunge',hanche:'hinge',ischios:'curl',mollets:'calf',marteau:'curl',triceps:'tri',elev_lat:'raise',arriere:'raise',ecarte:'fly',dips:'dip',gainage:'plank',abd_bas:'leg',abd_flex:'crunch',obliques:'twist',avb_flex:'curl',avb_ext:'curl',shrug:'shrug',portage:'walk'};
 F.animationExercice=function(ex,mini){
- const type=motion[ex.pattern]||'curl';
- return h('div',{class:'forge3d'+(mini?' mini':''),'data-3d':'1','data-pattern':type,role:'img','aria-label':'Démonstration 3D animée : '+ex.nom});
+ return h('div',{class:'forge-exercise-media'+(mini?' mini':''),'data-3d':'1','data-exercise-name':ex.nom,role:'group','aria-label':'Démonstration vidéo : '+ex.nom},
+   h('div',{class:'forge-media-loading'},'Recherche de la démonstration…'));
 };
 function ouvrirPageCoach(ex,app){exerciceActif=ex||null;if(app&&typeof app.aller==='function')app.aller('#/coach');}
 F.ouvrirCoach=ouvrirPageCoach;
