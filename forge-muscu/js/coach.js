@@ -100,7 +100,7 @@ function slugImageExercice(n){
  for(const [re,slug] of rules)if(re.test(n))return slug;
  return null;
 }
-F.slugImageExercice=slugImageExercice;
+F.slugImageExercice=function(n){return slugImageExercice(norm(n));};
 function monterDemo(el){
  if(el.dataset.demoReady==='1')return;
  el.dataset.demoReady='1';
