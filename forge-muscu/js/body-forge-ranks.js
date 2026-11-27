@@ -107,7 +107,7 @@
         h('strong',{},'Avatar 3D indisponible'),
         h('span',{},message||'Le moteur 3D ne s’est pas chargé. Vérifie ta connexion puis réessaie.'),
         h('button',{type:'button',class:'btn primaire'},'Réessayer'));
-      panel.querySelector('button').addEventListener('click',()=>{attempts=0;host.replaceChildren();init();});
+      panel.querySelector('button').addEventListener('click',()=>root.location.reload());
       host.replaceChildren(panel);
     };
     const init=()=>{
