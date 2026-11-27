@@ -49,6 +49,7 @@ Refonte en cours. L'application de production sur `main` n'a pas été modifiée
 - [x] Tests Playwright étendus : reprise, pagehide, métadonnées, échauffement, pause/reprise et profil hors ligne.
 - [x] Première couche de refonte visuelle globale : palette sombre premium, accent vert Forge, fonds et cartes en profondeur, typographie et boutons harmonisés, formulaires, navigation flottante mobile / intégrée desktop ; feuille dédiée chargée après les styles existants et incluse au cache hors ligne (v24).
 - [x] Finition responsive de l'espace Séance : hiérarchie visuelle, onglets sticky, états actifs/focus, prise en compte de `prefers-reduced-motion` et boutons Modifier maintenus sur une seule ligne et actions Nouvelle séance / Régénérer sans chevauchement sur mobile.
+- [x] Deuxième passe visuelle transversale : cartes et lignes de bibliothèque, tableaux, dialogues, formulaires, états désactivés, zones tactiles et prise en compte globale de la réduction des animations ; cache PWA incrémenté à v25.
 
 ## En cours / à faire
 
