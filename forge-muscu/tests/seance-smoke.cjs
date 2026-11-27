@@ -151,6 +151,16 @@ const mime = {
         await page.getByRole('heading', { name: 'Rangs Forge' }).waitFor();
         await page.getByText('RANG ACTUEL').waitFor();
         await page.getByText(/XP/).first().waitFor();
+        const sonDesactive = await page.evaluate(() => window.FM.app.etat.reglages.son === false);
+        if (!sonDesactive || await page.locator('#repos [data-a="son"]').isVisible()) {
+          throw new Error('Le minuteur doit rester totalement silencieux.');
+        }
+        await page.goto(`http://127.0.0.1:${port}/#/classement/body`, { waitUntil: 'domcontentloaded' });
+        await page.getByRole('heading', { name: 'Body Forge' }).waitFor();
+        if (await page.locator('.forge-rank-tabs .forge-seance-tab').count() !== 2) {
+          throw new Error('Body Forge et Rangs Forge doivent être les deux seuls onglets du classement.');
+        }
+        await page.getByText('Comment gagner des points ?').waitFor();
         await page.goto(`http://127.0.0.1:${port}/#/programme`, { waitUntil: 'domcontentloaded' });
         await page.locator('.forge-seance-panel h2').first().waitFor();
 
