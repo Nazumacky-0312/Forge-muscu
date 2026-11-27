@@ -92,6 +92,13 @@ const mime = {
         await page.getByPlaceholder('Rechercher un exercice').waitFor();
         const firstExercise = page.locator('.forge-seance-panel .liste a.ligne').first();
         await firstExercise.waitFor();
+        const libraryStyle = await firstExercise.evaluate(row => {
+          const style = getComputedStyle(row);
+          return { radius: style.borderRadius, border: style.borderTopWidth, background: style.backgroundColor };
+        });
+        if (libraryStyle.radius !== '14px' || libraryStyle.border === '0px') {
+          throw new Error('Les lignes de la bibliothèque ne reçoivent pas le style premium partagé : ' + JSON.stringify(libraryStyle));
+        }
         const exerciseName = await firstExercise.locator('strong').innerText();
         await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-exercices.png`, fullPage: true });
         await firstExercise.click();
