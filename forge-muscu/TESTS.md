@@ -15,6 +15,8 @@ Parcours couverts :
 - vérification du style responsive de la navigation Séance : position sticky, trois colonnes, onglet actif et absence de débordement horizontal sur mobile et desktop ;
 - vérification que le bouton « Modifier » reste sur une seule ligne et que son libellé tient dans sa zone sur mobile et desktop ;
 - vérification que les boutons « Nouvelle séance » et « Régénérer le programme » ne se chevauchent pas ;
+- création d'un superset puis d'un circuit dans une séance, alternance automatique des séries, et conservation des structures après rechargement ;
+- glisser-déposer des exercices dans un programme et duplication d'une séance modèle, avec conservation après rechargement ;
 - recherche, ouverture d'une fiche exercice et retour ;
 - affichage de l'état vide du suivi ;
 - rappel de reprise d'une séance active ;
@@ -32,6 +34,10 @@ Parcours couverts :
 - Run de référence : https://github.com/Nazumacky-0312/Forge-muscu/actions/runs/45938636091
 - Dernier run de la branche : `45942696341` sur le commit `5a0504330e299a65d9ca46510ac0fcf1f846c34b` — job `build` réussi, job `deploy` ignoré (attendu pour une PR).
 - Les jobs de la branche ne déploient pas sur GitHub Pages ; le déploiement est limité à `main`.
+
+## Structures d'entraînement
+
+`tests/workout-structures-smoke.cjs` vérifie les supersets/circuits, l'alternance automatique, la persistance locale des groupes, le glisser-déposer de l'éditeur de programme et la duplication d'une séance sur les viewports mobile et ordinateur. Le workflow GitHub Actions exécute ce scénario avec les autres suites.
 
 ## Dernière exécution
 

@@ -140,3 +140,15 @@ Les sections historiques ci-dessus décrivent un état antérieur. L'état véri
 ### Règle de reprise
 
 Continuer depuis la branche `forge-avatar-3d-integration`. Ne pas fusionner les anciennes branches PR #2, #3 ou #4 sans nouvelle comparaison. Ne pas annoncer la publication tant que le déploiement `main` et le site public n'ont pas été vérifiés.
+
+
+---
+
+## Mise à jour du 28 novembre 2026 — enchaînements et édition des programmes
+
+- Supersets de deux exercices et circuits de deux exercices ou plus ajoutés aux séances actives.
+- L'alternance automatique sélectionne le membre du groupe qui a le moins de séries validées ; la progression et l'ordre restent conservés après rechargement.
+- L'éditeur du programme permet maintenant le glisser-déposer et la duplication d'une séance modèle. Les boutons Monter / Descendre restent disponibles.
+- Les groupes d'entraînement sont validés par `tests/workout-structures-smoke.cjs` sur mobile et ordinateur ; le workflow Pages inclut cette suite.
+- Cache hors ligne incrémenté à v34 pour les nouveaux fichiers.
+- **À confirmer avant livraison** : exécution des quatre suites historiques après cette tranche, résultat CI sur la branche candidate, puis déploiement et vérification de la version publiée.
