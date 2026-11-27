@@ -106,6 +106,45 @@ const mime = {
         const warmupVolume = await page.evaluate(() => window.FM.stats([{ kg: 20, reps: 10, fait: true, type: 'echauffement' }]).volume);
         if (warmupVolume !== 0) throw new Error('Les séries d’échauffement sont comptées dans le volume de travail.');
 
+        /* Distance et temps sous tension sont des champs réels, persistés avec la série. */
+        await page.locator('.forge-meta-field select').selectOption('distance');
+        await page.locator('.forge-set-details input[type=number]').nth(2).fill('1250');
+        await page.locator('.forge-set-details input[type=number]').nth(2).press('Tab');
+        await page.evaluate(() => window.FM.app.sauver());
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.locator('.forge-set-details').waitFor();
+        let distance = await page.evaluate(() => window.FM.app.etat.active.exercices[0].series[0].distance);
+        if (distance !== 1250) throw new Error('La distance n’est pas conservée après rechargement.');
+
+        await page.locator('.forge-meta-field select').selectOption('tension');
+        await page.locator('.forge-set-details input[type=number]').nth(2).fill('35');
+        await page.locator('.forge-set-details input[type=number]').nth(2).press('Tab');
+        await page.evaluate(() => window.FM.app.sauver());
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.locator('.forge-set-details').waitFor();
+        const duration = await page.evaluate(() => window.FM.app.etat.active.exercices[0].series[0].duration);
+        if (duration !== 35) throw new Error('Le temps sous tension n’est pas conservé après rechargement.');
+
+        /* Les métadonnées restent visibles dans l'historique après la fin de séance. */
+        await page.evaluate(() => {
+          const app = window.FM.app;
+          const exId = app.etat.active.exercices[0].exId;
+          app.etat.seances.push({
+            id: 'qa-history', nom: 'Historique QA', debut: Date.now() - 3600000, fin: Date.now() - 1800000,
+            note: 'Bilan de test',
+            exercices: [{ exId, ressenti: 'correct', douleur: false, note: 'Note historique QA',
+              series: [{ kg: 20, reps: 10, fait: true, type: 'echauffement', rpe: 9.5, rir: 1 }] }]
+          });
+          app.sauver();
+          app.aller('#/detail/qa-history');
+        });
+        await page.waitForURL('**/#/detail/qa-history');
+        await page.locator('.forge-set-summary').waitFor();
+        const detailText = await page.locator('body').innerText();
+        if (!detailText.includes('RPE 9.5') || !detailText.includes('RIR 1') || !detailText.includes('Note historique QA')) {
+          throw new Error('Les métadonnées de série ne sont pas visibles dans le détail historique.');
+        }
+
         /* Pause et reprise du minuteur, y compris après un rechargement. */
         const pauseButton = page.locator('[data-forge-pause]');
         await pauseButton.waitFor();
