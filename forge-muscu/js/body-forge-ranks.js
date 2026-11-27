@@ -137,6 +137,13 @@
       }
     };
     root.addEventListener('forge-avatar-error',event=>showLoadError(String(event.detail||'')),{once:true});
+    if(!root.ForgeAvatar3D&&!root.document.querySelector('[data-forge-avatar-module]')){
+      const moduleScript=root.document.createElement('script');
+      moduleScript.type='module';moduleScript.src='js/body-forge-avatar-3d.js?v=20261127j';
+      moduleScript.dataset.forgeAvatarModule='true';
+      moduleScript.onerror=()=>root.dispatchEvent(new CustomEvent('forge-avatar-error',{detail:'Le module 3D ne peut pas être téléchargé.'}));
+      root.document.head.append(moduleScript);
+    }
     root.requestAnimationFrame(init);
     return section;
   }
