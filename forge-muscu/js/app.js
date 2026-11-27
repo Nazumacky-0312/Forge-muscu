@@ -113,14 +113,18 @@
     window.addEventListener('pagehide', sauvegarderAvantSortie);
     window.addEventListener('beforeunload', sauvegarderAvantSortie);
 
-    /* Autre onglet ouvert : ne jamais remplacer en mémoire une séance en cours. */
+    /* Autre onglet ouvert : actualiser le reste des données sans perdre la séance active locale. */
     window.addEventListener('storage', ev => {
       if (ev.key !== FM.store.CLE) return;
-      if (app.etat && app.etat.active) {
-        FM.toast('Une autre fenêtre a modifié Forge. Ta séance en cours est conservée ici.');
-        return;
+      const seanceLocale = app.etat && app.etat.active;
+      const nouvelEtat = FM.store.charger();
+      if (seanceLocale && nouvelEtat) {
+        nouvelEtat.active = seanceLocale;
+        app.etat = nouvelEtat;
+        FM.toast('Données actualisées depuis une autre fenêtre ; ta séance en cours est conservée.');
+      } else {
+        app.etat = nouvelEtat;
       }
-      app.etat = FM.store.charger();
       app.rendre();
     });
     window.addEventListener('beforeinstallprompt', ev => { ev.preventDefault(); app.invite = ev; if (location.hash === '#/profil') app.rendre(); });
