@@ -29,3 +29,12 @@ La branche reste en brouillon. La connexion e-mail réelle, la synchronisation m
 - Inspection des captures Playwright : correction du retour à la ligne du bouton « Modifier » en mobile, sans forcer les autres boutons à déborder.
 - Les actions « Nouvelle séance » et « Régénérer le programme » conservent leur espace et ne se chevauchent plus.
 - Validation CI réussie sur mobile et desktop (runs `45941596067`, `45941761861` et `45941941328`, derniers commits `b0eed459`, `2852879f` et `d6d2259`).
+
+
+## 27 novembre 2026 — Première couche du nouveau design Forge
+
+- Ajout de `css/premium.css`, une feuille de style globale chargée après les styles existants pour harmoniser les couleurs, la profondeur des cartes, la typographie, les boutons, les formulaires et les composants de suivi.
+- Palette sombre graphite avec accent vert Forge, fonds atmosphériques, cartes plus lisibles et navigation mobile flottante ; navigation desktop replacée dans le flux.
+- Ajout de la feuille au précache PWA et incrément du cache de v23 à v24.
+- Ajout d'une assertion Playwright vérifiant le chargement du thème, la couleur d'accent et le positionnement de la navigation sur mobile et desktop.
+- Cette première couche constitue la base du relooking ; les ajustements visuels détaillés de chaque écran restent à faire après inspection des nouvelles captures.
