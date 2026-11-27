@@ -100,7 +100,7 @@
       h('div',{class:'forge-avatar-controls'},sexButtons,viewButtons),
       h('div',{class:'forge-avatar-3d-frame'},host),
       h('div',{class:'forge-avatar-legend',innerHTML:legend}),
-      h('small',{class:'forge-avatar-credit'},'Anatomie : BodyParts3D © DBCLS (CC BY 4.0) ; organes féminins : HuBMAP (CC BY 4.0) ; corps féminin : MakeHuman (CC0). Modifié par ',h('a',{href:'https://github.com/MervinR07/open-anatomy-3d',target:'_blank',rel:'noopener'},'Open Anatomy 3D'),' · CC BY 4.0.')));
+      h('small',{class:'forge-avatar-credit'},'Anatomie : BodyParts3D © DBCLS (CC BY 4.0) ; organes féminins : HuBMAP (CC BY 4.0) ; corps féminin : MakeHuman (CC0). Modifié par ',h('a',{href:'https://github.com/MervinR07/open-anatomy-3d',target:'_blank',rel:'noopener'},'Open Anatomy 3D'),' · CC BY 4.0.'));
     let attempts=0, mounted=false;
     const showLoadError=message=>{
       if(mounted||!host.isConnected)return;
