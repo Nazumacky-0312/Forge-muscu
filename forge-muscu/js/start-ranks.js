@@ -160,7 +160,7 @@
       const form=h('form',{class:'forge-body-join-form'},h('label',{},'Choisis ton pseudo public',h('input',{type:'text',name:'nickname',minlength:2,maxlength:20,required:true,autocomplete:'nickname',placeholder:'Ex. IronMax'})),h('p',{class:'discret'},'Ton pseudo et tes points hebdomadaires seront visibles par les autres membres. Aucune adresse e-mail ni donnée personnelle n'est affichée.'));
       const submit=h('button',{type:'submit',class:'btn primaire geant'},'Rejoindre Body Forge');form.append(submit);
       form.addEventListener('submit',async ev=>{
-        ev.preventDefault();const field=form.querySelector('input');const nickname=field.value.trim().replace(/\\s+/g,' ');
+        ev.preventDefault();const field=form.querySelector('input');const nickname=field.value.trim().replace(/\s+/g,' ');
         if(nickname.length<2||nickname.length>20||nickname.includes('@')){status.textContent='Choisis un pseudo de 2 à 20 caractères, sans adresse e-mail.';return;}
         submit.disabled=true;status.textContent='Inscription au classement…';
         const saved=await enregistrer(nickname);
