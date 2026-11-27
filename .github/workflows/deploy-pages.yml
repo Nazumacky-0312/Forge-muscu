@@ -62,6 +62,9 @@ jobs:
       - name: Test Séance on mobile and desktop
         run: FORGE_SITE=public node forge-muscu/tests/seance-smoke.cjs
 
+      - name: Test Body Forge anatomical avatar on mobile and desktop
+        run: FORGE_SITE=public node forge-muscu/tests/body-forge-avatar-smoke.cjs
+
       - name: Save browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
