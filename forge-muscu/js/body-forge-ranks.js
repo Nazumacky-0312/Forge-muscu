@@ -120,7 +120,8 @@
       stage,
       viewControls,
       figures,
-      h('div',{class:'forge-avatar-legend',innerHTML:legend}));
+      h('div',{class:'forge-avatar-legend',innerHTML:legend}),
+      h('p',{class:'forge-avatar-attribution'},'Anatomy: BodyParts3D © The Database Center for Life Science (CC BY 4.0); female organs: Human Reference Atlas 3D Reference Organs, HuBMAP (CC BY 4.0); female body: MakeHuman (CC0). Modified by open-anatomy-3d (github.com/MervinR07/open-anatomy-3d), CC BY 4.0. Illustration pédagogique, non destinée au diagnostic.'));
     let avatarApi=null;
     const ranksForModel={...rankByMuscle,upperarms:Math.max(rankByMuscle.biceps??-1,rankByMuscle.triceps??-1)};
     const mount3D=()=>{
