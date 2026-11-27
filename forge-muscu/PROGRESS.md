@@ -67,7 +67,8 @@ Refonte en cours. L'application de production sur `main` n'a pas été modifiée
 - [ ] Relier plus profondément le Coach Forge aux données réelles sans supprimer son moteur local.
 - [ ] Améliorer les vues de suivi physique, calendrier, nutrition et trophées.
 - [ ] Étendre les tests d'import/export, hors-ligne, service worker et mise à jour PWA.
-- [ ] Rejouer la CI après les derniers changements de workflow, de fallback média et de cache PWA (aucune nouvelle exécution n'a été déclenchée par le connecteur).
+- [x] Rejouer la CI après les derniers changements : run 45944514105, tests Playwright mobile/desktop réussis, prévisualisation intégrée à l'artefact Pages construite avec succès. Déploiement Pages volontairement réservé à main.
+- [ ] Rendre la prévisualisation accessible en URL publique indépendante (l'artefact de build seul n'est pas une URL de site).
 - [ ] Faire une vérification visuelle manuelle Android et ordinateur.
 - [ ] Fusionner puis publier uniquement après validation complète.
 
