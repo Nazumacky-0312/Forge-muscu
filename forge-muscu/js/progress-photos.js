@@ -161,27 +161,27 @@
       .limit(100);
     if(result.error)throw result.error;
     const current=await getPhotos();
+    let downloadedForOffline=0;
     for(const remote of (result.data||[])){
       const existing=current.find(photo=>photo.id===remote.id);
-      if(existing){
-        existing.cloudPath=remote.path;
-        existing.cloudUserId=cloud.user.id;
-        existing.date=remote.taken_at;
-        existing.pose=remote.pose;
-        existing.note=remote.note||'';
-        await putPhoto(existing);
-      }else{
-        await putPhoto({
-          id:remote.id,
-          date:remote.taken_at,
-          pose:remote.pose,
-          note:remote.note||'',
-          blob:null,
-          cloudPath:remote.path,
-          cloudUserId:cloud.user.id,
-          createdAt:remote.created_at
-        });
+      let blob=existing&&existing.blob?existing.blob:null;
+      if(!blob&&downloadedForOffline<10){
+        try{
+          const downloaded=await cloud.client.storage.from(BUCKET).download(remote.path);
+          if(!downloaded.error&&downloaded.data){blob=downloaded.data;downloadedForOffline++;}
+        }catch(_){}
       }
+      await putPhoto({
+        ...(existing||{}),
+        id:remote.id,
+        date:remote.taken_at,
+        pose:remote.pose,
+        note:remote.note||'',
+        blob,
+        cloudPath:remote.path,
+        cloudUserId:cloud.user.id,
+        createdAt:(existing&&existing.createdAt)||remote.created_at
+      });
     }
     status.textContent=(result.data||[]).length+' photo(s) dans ton espace privé. Les fichiers de cet appareil sont conservés localement.';
     if(render)await render(cloud);
