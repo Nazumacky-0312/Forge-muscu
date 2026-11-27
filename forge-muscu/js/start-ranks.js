@@ -38,16 +38,31 @@
     return vue;
   };
 
-  const programmeAvant=FM.vues.programme;
-  FM.vues.programme=function(app){
-    const vue=programmeAvant(app);
-    app.etat.programme.jours.forEach(jour=>{
-      if(!jour.items.length)return;
-      const bloc=[...vue.querySelectorAll('.carte')].find(c=>c.querySelector('h2')?.textContent.trim()===jour.nom);
-      if(!bloc)return;
-      const bouton=FM.btn('Démarrer cette séance',()=>app.demarrerSeance(jour),'primaire geant forge-program-start');
+  /* La page Séance regroupe les vues avant que ce module soit chargé :
+     on enrichit donc le hub final, pas la vue programme isolée. */
+  const seanceHubAvant=FM.vues.seanceHub;
+  FM.vues.seanceHub=function(app,actif,sousOnglet){
+    const vue=seanceHubAvant(app,actif,sousOnglet);
+    if(actif!=='programme')return vue;
+    const jours=(app.etat.programme&&app.etat.programme.jours)||[];
+    vue.querySelectorAll('.forge-seance-panel .carte').forEach(bloc=>{
+      const nom=bloc.querySelector('h2')?.textContent.trim();
+      const jour=jours.find(j=>j.nom===nom);
       const entete=bloc.querySelector('.entete');
-      if(entete)entete.after(bouton);else bloc.prepend(bouton);
+      if(jour&&jour.items&&jour.items.length&&entete&&!bloc.querySelector('.forge-program-start')){
+        entete.after(FM.btn('Démarrer cette séance',()=>app.demarrerSeance(jour),'primaire geant forge-program-start'));
+      }
+      bloc.querySelectorAll('ul.apercu li').forEach(ligne=>{
+        const lien=ligne.querySelector('a[href*="#/exercice/"]');
+        if(!lien||ligne.querySelector('.forge-program-exercise-thumb'))return;
+        const id=(lien.getAttribute('href')||'').split('/').pop();
+        const exercice=FM.EX&&FM.EX[id];
+        if(!exercice||!FM.slugImageExercice||!FM.slugImageExercice(exercice.nom))return;
+        const vignette=FM.animationExercice(exercice,true);
+        vignette.classList.add('forge-program-exercise-thumb');
+        ligne.classList.add('forge-program-exercise-row');
+        ligne.insertBefore(vignette,lien);
+      });
     });
     return vue;
   };
