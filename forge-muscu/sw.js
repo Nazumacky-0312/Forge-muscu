@@ -1,5 +1,5 @@
 /* Hors ligne. Change VERSION après toute modification d'un fichier. */
-const VERSION = 'forge-muscu-v16';
+const VERSION = 'forge-muscu-v17';
 const FICHIERS = ['./', 'index.html', 'manifest.webmanifest', 'css/styles.css', 'css/liftoff.css', 'css/coach.css', 'css/navigation.css', 
   ...['data', 'program', 'progression', 'store', 'timer', 'ui', 'charts', 'view-home', 'view-program', 'view-exercises', 'view-session', 'view-track', 'view-cardio', 'view-profile', 'view-forge', 'view-liftoff', 'view-advanced', 'view-pro', 'coach', 'coach-3d', 'app'].map(f => `js/${f}.js`),
   ...['bench-press-start.webp','bench-press-end.webp','squat-start.webp','squat-end.webp','deadlift-start.webp','deadlift-end.webp','lat-pulldown-start.webp','lat-pulldown-end.webp','seated-cable-row-start.webp','seated-cable-row-end.webp','lateral-raises-start.webp','lateral-raises-end.webp','barbell-curl-start.webp','barbell-curl-end.webp','cable-crunch-start.webp','cable-crunch-end.webp','dumbbell-chest-press-start.webp','dumbbell-chest-press-end.webp','pull-up-start.webp','pull-up-end.webp','leg-press-start.webp','leg-press-end.webp','dumbbell-row-start.webp','dumbbell-row-end.webp','cable-crossover-start.webp','cable-crossover-end.webp','dumbbell-fly-start.webp','dumbbell-fly-end.webp','push-up-start.webp','push-up-end.webp','crunches-start.webp','crunches-end.webp','plank-hold.webp','dumbbell-romanian-deadlift-start.webp','dumbbell-romanian-deadlift-end.webp','cable-curl-start.webp','cable-curl-end.webp'].map(f => `images/exercises/${f}`),
@@ -20,7 +20,7 @@ self.addEventListener('fetch', e => {
   e.respondWith(caches.open(VERSION).then(async c => {
     const cache = await c.match(e.request, { ignoreSearch: true });
     if (cache) return cache;
-    try { return await fetch(e.request); } catch (err) {
+    try { const response = await fetch(e.request); if (response && response.ok) c.put(e.request, response.clone()).catch(() => {}); return response; } catch (err) {
       if (e.request.mode === 'navigate') return c.match('index.html');
       throw err;
     }
