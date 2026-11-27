@@ -1,5 +1,5 @@
 /* Hors ligne. Change VERSION après toute modification d'un fichier. */
-const VERSION = 'forge-muscu-v25';
+const VERSION = 'forge-muscu-v26';
 const FICHIERS = [
   "./","index.html","manifest.webmanifest","css/styles.css","css/liftoff.css","css/coach.css","css/navigation.css","css/premium.css",
   "js/data.js","js/program.js","js/progression.js","js/store.js","js/timer.js","js/ui.js","js/charts.js",
