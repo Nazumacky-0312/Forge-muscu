@@ -124,7 +124,8 @@
     let avatarApi=null;
     const ranksForModel={...rankByMuscle,upperarms:Math.max(rankByMuscle.biceps??-1,rankByMuscle.triceps??-1)};
     const mount3D=()=>{
-      if(!root.ForgeAvatar3D||avatarApi||!stage.isConnected)return;
+      if(!root.ForgeAvatar3D||avatarApi)return;
+      if(!stage.isConnected){root.requestAnimationFrame(mount3D);return;}
       try{avatarApi=root.ForgeAvatar3D.mount(stage,{sex:initialSex,ranks:ranksForModel});}
       catch(error){console.warn('Forge Muscu — avatar 3D indisponible :',error);}
     };
