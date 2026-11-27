@@ -18,6 +18,7 @@
   const autoKey = userId => 'forge-muscu:cloud-auto:' + userId;
   const safeGet = key => { try { return root.localStorage.getItem(key); } catch (_) { return null; } };
   const safeSet = (key, value) => { try { root.localStorage.setItem(key, value); return true; } catch (_) { return false; } };
+  const safeRemove = key => { try { root.localStorage.removeItem(key); } catch (_) { /* stockage local indisponible */ } };
   const getRevision = () => {
     if (!state.user) return null;
     const value = safeGet(revisionKey(state.user.id));
@@ -222,7 +223,7 @@
       const current = await state.client.from('forge_user_state').delete().eq('user_id', state.user.id);
       if (current.error) throw current.error;
       state.remote = null;
-      safeSet(revisionKey(state.user.id), '');
+      safeRemove(revisionKey(state.user.id));
       setAuto(false);
       state.message = 'Sauvegarde cloud supprimée. Les données de cet appareil n’ont pas été modifiées.';
     } catch (error) {
@@ -291,15 +292,19 @@
     }
 
     box.append(element('p', '', 'Connecté : ' + (state.user.email || 'compte Supabase')));
-    if (state.remote && getRevision() !== state.remote.revision) {
+    const conflict = (state.remote && getRevision() !== state.remote.revision) || (!state.remote && getRevision() !== null);
+    if (conflict) {
       box.append(element('p', 'alerte', 'La version cloud (' + state.remote.revision + ') et la version locale (' + (getRevision() === null ? 'non synchronisée' : getRevision()) + ') diffèrent.'));
-      const restore = element('button', 'btn geant', 'Restaurer la version cloud');
-      restore.type = 'button';
-      restore.addEventListener('click', () => FM.confirmer('Restaurer la sauvegarde cloud ?', 'Les données locales de cet appareil seront remplacées par cette version. Elles ne seront pas supprimées du cloud.', 'Restaurer', () => restoreCloud(app), true));
-      const replace = element('button', 'btn geant', 'Remplacer le cloud par cet appareil');
+      if (state.remote) {
+        const restore = element('button', 'btn geant', 'Restaurer la version cloud');
+        restore.type = 'button';
+        restore.addEventListener('click', () => FM.confirmer('Restaurer la sauvegarde cloud ?', 'Les données locales de cet appareil seront remplacées par cette version. Elles ne seront pas supprimées du cloud.', 'Restaurer', () => restoreCloud(app), true));
+        box.append(restore);
+      }
+      const replace = element('button', 'btn geant', state.remote ? 'Remplacer le cloud par cet appareil' : 'Créer une nouvelle sauvegarde cloud');
       replace.type = 'button';
-      replace.addEventListener('click', () => FM.confirmer('Remplacer la sauvegarde cloud ?', 'La version cloud actuelle sera remplacée par les données locales de cet appareil. Cette action est volontaire et sera enregistrée comme une nouvelle révision.', 'Remplacer le cloud', () => overwriteCloud(app), true));
-      box.append(restore, replace);
+      replace.addEventListener('click', () => FM.confirmer(state.remote ? 'Remplacer la sauvegarde cloud ?' : 'Créer une nouvelle sauvegarde cloud ?', 'Les données locales de cet appareil deviendront la nouvelle version cloud. Cette action est volontaire et sera enregistrée comme une nouvelle révision.', state.remote ? 'Remplacer le cloud' : 'Créer la sauvegarde', () => overwriteCloud(app), true));
+      box.append(replace);
     } else {
       const sync = element('button', 'btn primaire geant', state.busy ? 'Synchronisation…' : 'Synchroniser maintenant');
       sync.type = 'button';
@@ -312,7 +317,7 @@
     const auto = element('input');
     auto.type = 'checkbox';
     auto.checked = autoEnabled();
-    auto.disabled = state.busy || (!!state.remote && getRevision() !== state.remote.revision);
+    auto.disabled = state.busy || conflict;
     auto.addEventListener('change', async () => {
       if (!auto.checked) { setAuto(false); state.message = 'Sauvegarde automatique désactivée.'; refresh(); return; }
       const ok = await syncNow(app, false);
