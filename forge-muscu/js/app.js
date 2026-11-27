@@ -21,6 +21,27 @@
       ? FM.vues.seanceHub(app, vue, reste.join('/'))
       : FM.vues[vue](app, reste.join('/'));
     main.replaceChildren(contenu);
+
+    /* Une séance active reste accessible depuis toutes les rubriques. */
+    if (app.etat && app.etat.active && vue !== 'seance') {
+      const reprise = document.createElement('section');
+      reprise.className = 'forge-resume-banner';
+      reprise.setAttribute('aria-label', 'Séance en cours');
+      const texte = document.createElement('div');
+      const titre = document.createElement('strong');
+      titre.textContent = 'Séance en cours';
+      const detail = document.createElement('span');
+      detail.textContent = app.etat.active.nom || 'Reprendre là où tu en étais';
+      texte.append(titre, detail);
+      const bouton = document.createElement('button');
+      bouton.type = 'button';
+      bouton.className = 'btn primaire';
+      bouton.textContent = 'Reprendre';
+      bouton.addEventListener('click', () => app.aller('#/seance'));
+      reprise.append(texte, bouton);
+      main.prepend(reprise);
+    }
+
     routeCourante = location.hash;
     window.scrollTo(0, meme ? y : 0);
     const onglet = { programme: 'programme', exercices: 'programme', suivi: 'programme', exercice: 'programme', detail: 'programme', bilan: 'programme', seance: 'accueil' }[vue] || vue;
@@ -82,12 +103,37 @@
     const actions = { moins: () => FM.timer.ajuster(-15), plus: () => FM.timer.ajuster(15), passer: () => FM.timer.arreter(), son: () => { FM.timer.armer(); app.rafraichirRepos(); } };
     barre.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', actions[b.dataset.a]));
     window.addEventListener('hashchange', () => { document.querySelectorAll('dialog').forEach(d => d.remove()); app.rendre(); });
-    /* Autre onglet ouvert : on recharge les données pour ne pas les écraser. */
-    window.addEventListener('storage', ev => { if (ev.key === FM.store.CLE) { app.etat = FM.store.charger(); app.rendre(); } });
+
+    /* Dernière chance de sauvegarde avant fermeture, veille ou changement d'application. */
+    const sauvegarderAvantSortie = () => {
+      if (!app.etat) return;
+      try { app.sauver(); }
+      catch (error) { console.error('Forge : sauvegarde de sécurité impossible', error); }
+    };
+    window.addEventListener('pagehide', sauvegarderAvantSortie);
+    window.addEventListener('beforeunload', sauvegarderAvantSortie);
+
+    /* Autre onglet ouvert : actualiser le reste des données sans perdre la séance active locale. */
+    window.addEventListener('storage', ev => {
+      if (ev.key !== FM.store.CLE) return;
+      const seanceLocale = app.etat && app.etat.active;
+      const nouvelEtat = FM.store.charger();
+      if (seanceLocale) {
+        if (nouvelEtat) {
+          nouvelEtat.active = seanceLocale;
+          app.etat = nouvelEtat;
+        }
+        FM.toast('Données actualisées depuis une autre fenêtre ; ta séance en cours est conservée.');
+      } else {
+        app.etat = nouvelEtat;
+      }
+      app.rendre();
+    });
     window.addEventListener('beforeinstallprompt', ev => { ev.preventDefault(); app.invite = ev; if (location.hash === '#/profil') app.rendre(); });
     window.addEventListener('appinstalled', () => { app.invite = null; FM.toast('Application installée.'); });
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && app.etat.active && location.hash === '#/seance') FM.ecran(app.etat.reglages.ecranAllume);
+      if (document.hidden) sauvegarderAvantSortie();
+      else if (app.etat.active && location.hash === '#/seance') FM.ecran(app.etat.reglages.ecranAllume);
     });
     app.rendre();
     app.sauver();
@@ -111,7 +157,14 @@
     }).catch(() => {});
     navigator.serviceWorker.ready.then(() => { app.horsLigne = true; if (location.hash === '#/profil') app.rendre(); });
     let recharge = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => { if (dejaControlee && !recharge) { recharge = true; location.reload(); } });
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (dejaControlee && !recharge) {
+        recharge = true;
+        /* Flush avant le rechargement provoqué par une mise à jour PWA. */
+        try { app.sauver(); } catch (error) { console.error('Forge : sauvegarde avant mise à jour impossible', error); }
+        location.reload();
+      }
+    });
   }
 
   demarrer();

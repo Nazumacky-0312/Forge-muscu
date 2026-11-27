@@ -27,3 +27,56 @@
 .forge-cycle-day{padding:9px 0;border-top:1px solid var(--bord)}.forge-cycle-day h3{margin:5px 0;font-size:.92rem}
 
 .forge-cycle-day{padding:9px 0;border-top:1px solid var(--bord)}.forge-cycle-day h3{margin:5px 0;font-size:.92rem}
+
+/* Reprise persistante de la séance active */
+.forge-resume-banner{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 16px;padding:13px 15px;border:1px solid var(--bord);border-left:3px solid var(--accent);border-radius:14px;background:var(--carte, #141a21)}
+.forge-resume-banner>div{display:flex;flex-direction:column;gap:3px;min-width:0}
+.forge-resume-banner strong{font-size:.84rem}
+.forge-resume-banner span{overflow:hidden;color:var(--doux);font-size:.75rem;text-overflow:ellipsis;white-space:nowrap}
+.forge-resume-banner button{flex:0 0 auto;min-height:44px}
+@media(max-width:420px){.forge-resume-banner{gap:8px;padding:11px}.forge-resume-banner button{padding-inline:12px}}
+
+
+/* Détails de série : RPE/RIR, type et note d'exercice */
+.forge-set-details{margin:14px 0;padding:14px;background:var(--surface);border:1px solid var(--bord);border-radius:var(--rayon)}
+.forge-set-details h3{margin:0 0 4px}
+.forge-meta-help{margin:4px 0 12px;color:var(--doux);font-size:.76rem}
+.forge-meta-field{display:flex;flex-direction:column;gap:6px;margin:9px 0;color:var(--doux);font-size:.78rem;font-weight:700}
+.forge-meta-input{width:100%;min-height:44px;padding:9px 11px;background:var(--fond);color:var(--texte);border:1px solid var(--bord);border-radius:10px;font:inherit}
+.forge-meta-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.forge-set-summary{display:block;margin:3px 0 0;color:var(--accent);font-size:.7rem}
+#repos.repos-pause{border-color:var(--alerte)}
+#repos.repos-pause .titre{color:var(--alerte)}
+@media(max-width:360px){.forge-meta-grid{grid-template-columns:1fr}}
+
+
+/* Sauvegarde cloud facultative */
+.forge-cloud-card{border-color:var(--bord)}
+.forge-cloud-status{padding:10px 12px;border-left:3px solid var(--accent);border-radius:8px;background:var(--surface2);font-size:.84rem}
+.forge-cloud-auto{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:.82rem}
+.forge-cloud-auto input{width:24px;height:24px;min-height:0;accent-color:var(--accent)}
+.forge-cloud-card .btn{width:100%;margin:6px 0}
+.forge-cloud-card .btn.danger{color:var(--danger)}
+
+.forge-meta-history-note{margin:8px 0;color:var(--doux);font-size:.8rem;line-height:1.45}
+
+/* Espace Séance — hiérarchie visuelle et navigation responsive */
+.forge-seance-hub{width:min(100%,1080px);margin:0 auto;padding:clamp(12px,2.4vw,24px) clamp(10px,2vw,18px) 28px}
+.forge-seance-heading{position:relative;margin:0 0 18px;padding:clamp(18px,3vw,28px);overflow:hidden;border:1px solid var(--bord);border-radius:20px;background:linear-gradient(125deg,var(--surface2),var(--carte,#141a21) 72%);isolation:isolate}
+.forge-seance-heading:after{content:"";position:absolute;z-index:-1;width:210px;height:210px;right:-78px;top:-112px;border:1px solid color-mix(in srgb,var(--accent) 32%,transparent);border-radius:50%;box-shadow:0 0 0 24px color-mix(in srgb,var(--accent) 5%,transparent),0 0 0 48px color-mix(in srgb,var(--accent) 3%,transparent)}
+.forge-seance-kicker{margin:0 0 8px;color:var(--accent);font-size:.68rem;font-weight:900;letter-spacing:.16em}
+.forge-seance-heading h1{margin:0;font-size:clamp(1.8rem,5vw,2.55rem);line-height:1.04;letter-spacing:-.055em}
+.forge-seance-heading>.discret{max-width:48ch;margin:9px 0 0;font-size:.88rem;line-height:1.5}
+.forge-seance-tabs{position:sticky;top:8px;z-index:8;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:0 0 18px;padding:5px;border:1px solid var(--bord);border-radius:15px;background:color-mix(in srgb,var(--fond) 90%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.forge-seance-tab{display:flex;align-items:center;justify-content:center;min-height:46px;padding:9px 12px;border:1px solid transparent;border-radius:11px;color:var(--doux);font-size:.84rem;font-weight:800;text-align:center;text-decoration:none;transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease}
+.forge-seance-tab:hover{color:var(--texte);background:var(--surface)}
+.forge-seance-tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.forge-seance-tab.active{border-color:color-mix(in srgb,var(--accent) 34%,var(--bord));background:color-mix(in srgb,var(--accent) 12%,var(--surface));color:var(--accent);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--accent) 12%,transparent)}
+.forge-seance-panel{min-width:0;animation:forge-seance-enter .22s ease-out both}
+@keyframes forge-seance-enter{from{opacity:.55;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:520px){.forge-seance-hub{padding:10px 10px 24px}.forge-seance-heading{margin-bottom:13px;border-radius:17px}.forge-seance-tabs{top:5px;margin-bottom:14px;gap:3px;padding:4px}.forge-seance-tab{min-height:44px;padding:8px 5px;font-size:.78rem}}
+@media(prefers-reduced-motion:reduce){.forge-seance-panel{animation:none}.forge-seance-tab{transition:none}}
+
+
+/* Le bouton Modifier garde une largeur stable ; les autres actions peuvent revenir à la ligne. */
+.forge-seance-panel .forge-edit-program-button{white-space:nowrap;min-width:82px}
