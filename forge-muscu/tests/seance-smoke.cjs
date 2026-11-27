@@ -93,6 +93,7 @@ const mime = {
         await page.locator('.forge-set-details textarea').fill('Tempo contrôlé, bonne amplitude.');
         await page.locator('.forge-set-details textarea').press('Tab');
         await page.evaluate(() => window.FM.app.sauver());
+        await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-session-details.png`, fullPage: true });
         await page.reload({ waitUntil: 'domcontentloaded' });
         await page.locator('.forge-set-details').waitFor();
         const metadata = await page.evaluate(() => {
