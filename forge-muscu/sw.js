@@ -29,9 +29,6 @@ const FICHIERS = [
   "js/coach.js",
   "js/coach-3d.js",
   "js/app.js",
-  "icons/icon-192.png",
-  "icons/icon-512.png",
-  "icons/maskable-512.png",
   "images/exercises/bench-press/start.webp",
   "images/exercises/bench-press/end.webp",
   "images/exercises/incline-bench-press/start.webp",
@@ -64,7 +61,6 @@ const FICHIERS = [
   "images/exercises/crunches/end.webp",
   "images/exercises/push-up/start.webp",
   "images/exercises/push-up/end.webp",
-  "images/exercises/plank/hold.webp",
   "images/exercises/cable-curl/start.webp",
   "images/exercises/cable-curl/end.webp",
   "images/exercises/dumbbell-shoulder-press/start.webp",
@@ -80,7 +76,11 @@ const FICHIERS = [
   "images/exercises/hammer-curls/start.webp",
   "images/exercises/hammer-curls/end.webp",
   "images/exercises/overhead-press/start.webp",
-  "images/exercises/overhead-press/end.webp"
+  "images/exercises/overhead-press/end.webp",
+  "images/exercises/plank/hold.webp",
+  "icons/icon-192.png",
+  "icons/icon-512.png",
+  "icons/maskable-512.png"
 ];
 
 self.addEventListener('install', e => {
