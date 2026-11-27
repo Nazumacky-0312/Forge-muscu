@@ -79,11 +79,19 @@ function slugImageExercice(n){
   [/souleve.*terre.*halter|romanian deadlift|souleve roumain/,'dumbbell-romanian-deadlift'],
   [/souleve.*terre|deadlift/,'deadlift'],
   [/tirage vertical|lat pulldown|tirage poitrine/,'lat-pulldown'],
-  [/tirage horizontal|rowing poulie|seated cable row/,'seated-cable-row'],
+  [/tirage horizontal|rowing.*poulie|seated cable row/,'seated-cable-row'],
   [/rowing.*halter|dumbbell row/,'dumbbell-row'],
+  [/developpe.*epaules.*halter|dumbbell shoulder press|shoulder press.*dumbbell/,'dumbbell-shoulder-press'],
+  [/developpe militaire|overhead press|military press/,'overhead-press'],
+  [/face.?pull|tirage.*visage/,'face-pulls'],
+  [/curl.*marteau|hammer curl/,'hammer-curls'],
+  [/curl.*poulie|cable curl/,'cable-curl'],
+  [/curl.*barre|barbell curl/,'barbell-curl'],
+  [/extension.*jambe|leg extension/,'leg-extension'],
+  [/flexion.*jambe|leg curl/,'leg-curl'],
+  [/mollet|calf raise/,'calf-raises'],
   [/traction|pull.?up/,'pull-up'],
   [/elevation laterale|lateral raise/,'lateral-raises'],
-  [/curl.*barre|barbell curl/,'barbell-curl'],
   [/crunch.*poulie|cable crunch/,'cable-crunch'],
   [/crunch|releve.*buste/,'crunches'],
   [/gainage|planche|plank/,'plank'],
@@ -92,6 +100,7 @@ function slugImageExercice(n){
  for(const [re,slug] of rules)if(re.test(n))return slug;
  return null;
 }
+F.slugImageExercice=slugImageExercice;
 function monterDemo(el){
  if(el.dataset.demoReady==='1')return;
  el.dataset.demoReady='1';
