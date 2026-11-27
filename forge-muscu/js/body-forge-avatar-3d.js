@@ -98,16 +98,17 @@ function mount(container, initial){
   canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
   canvas.style.touchAction='pan-y';
   function animate(){if(disposed)return;raf=requestAnimationFrame(animate);avatar.rotation.y+=(targetY-avatar.rotation.y)*.08;renderer.render(scene,camera);}
+  function releaseAvatar(group){group.traverse(node=>{if(node.geometry)node.geometry.dispose();if(node.material){if(Array.isArray(node.material))node.material.forEach(x=>x.dispose());else node.material.dispose();}});}
   animate();
   const resize=new ResizeObserver(()=>{if(disposed)return;const w=Math.max(220,container.clientWidth||300),h=Math.max(320,container.clientHeight||410);camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);});
   resize.observe(container);
   const api={
-    setSex(value){sex=value==='f'?'f':'m';scene.remove(avatar);avatar=makeAvatar(sex,ranks);avatar.rotation.y=targetY;scene.add(avatar);},
+    setSex(value){sex=value==='f'?'f':'m';scene.remove(avatar);releaseAvatar(avatar);avatar=makeAvatar(sex,ranks);avatar.rotation.y=targetY;scene.add(avatar);},
     setView(value){targetY=value==='back'?Math.PI:0;},
     reset(){targetY=0;avatar.rotation.y=0;},
-    dispose(){disposed=true;cancelAnimationFrame(raf);resize.disconnect();canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointermove',pointerMove);canvas.removeEventListener('pointerup',pointerUp);renderer.dispose();container.replaceChildren();}
+    dispose(){if(disposed)return;disposed=true;cancelAnimationFrame(raf);resize.disconnect();canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointermove',pointerMove);canvas.removeEventListener('pointerup',pointerUp);releaseAvatar(avatar);renderer.dispose();activeContainers.delete(container);container.replaceChildren();}
   };
-  container.__forge3d=api;return api;
+  container.__forge3d=api;activeContainers.add(container);return api;
 }
 window.ForgeAvatar3D={mount};
 window.dispatchEvent(new Event('forge-avatar-ready'));
