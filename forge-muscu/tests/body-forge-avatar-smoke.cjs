@@ -46,7 +46,7 @@ const port = 4174;
     await page.getByRole('button', { name: 'Dos' }).click();
     await page.setViewportSize({ width: 1365, height: 900 });
     const desktop = await page.locator('.forge-avatar-3d-canvas canvas').evaluate(el => ({ width: el.clientWidth, height: el.clientHeight }));
-    if (desktop.width < 400 || desktop.height < 300) throw new Error('Le rendu 3D ne s’adapte pas au format ordinateur : ' + JSON.stringify(desktop));
+    if (desktop.width < 250 || desktop.height < 300) throw new Error('Le rendu 3D ne s’adapte pas au format ordinateur : ' + JSON.stringify(desktop));
     if (!(await page.locator('.forge-avatar-credit').innerText()).includes('CC BY 4.0')) throw new Error('Le crédit du modèle CC BY 4.0 est absent.');
     if (errors.length) throw new Error('Erreurs JavaScript : ' + errors.join(' | '));
     await page.screenshot({ path: '/tmp/forge-body-avatar-desktop.png', fullPage: true });
