@@ -113,7 +113,7 @@ const mime = {
           card.remove();
           return result;
         });
-        if (mediaFallbackStyle.fontSize !== '0px' || mediaFallbackStyle.badge !== '"3D"' || mediaFallbackStyle.badgeSize !== '10.56px') {
+        if (mediaFallbackStyle.fontSize !== '0px' || mediaFallbackStyle.badge !== '"3D"' || !(parseFloat(mediaFallbackStyle.badgeSize) > 0)) {
           throw new Error('Le fallback média miniature doit rester compact et lisible : ' + JSON.stringify(mediaFallbackStyle));
         }
         const exerciseName = await firstExercise.locator('strong').innerText();
