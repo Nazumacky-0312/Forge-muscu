@@ -38,6 +38,10 @@
     });
 
     const contenu = vues[actif](app, sousOnglet || '');
+    /* Repère explicitement les boutons d'édition pour leur appliquer un style mobile dédié. */
+    contenu.querySelectorAll('button').forEach((button) => {
+      if (button.textContent.trim() === 'Modifier') button.classList.add('forge-edit-program-button');
+    });
     const panneau = h('section', { class: 'forge-seance-panel' }, contenu);
     racine.append(entete, navigation, panneau);
     return racine;
