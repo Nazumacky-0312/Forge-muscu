@@ -42,9 +42,11 @@
         const rpe = optionalNumber(old.rpe, 5, 10, 0.5);
         const rir = optionalNumber(old.rir, 0, 5, 1);
         const distance = optionalNumber(old.distance, 0, 100000, 0.1);
+        const duration = optionalNumber(old.duration, 0, 3600, 1);
         if (rpe !== null) set.rpe = rpe;
         if (rir !== null) set.rir = rir;
         if (distance !== null) set.distance = distance;
+        if (duration !== null) set.duration = duration;
       });
     });
     return destination;
@@ -74,6 +76,25 @@
       .map(passage => Object.assign({}, passage, { series: passage.series.filter(s => s.type !== 'echauffement') }))
       .filter(passage => passage.series.length > 0);
   };
+
+  /* Les vues d'analyse et les défis ne doivent pas compter les échauffements comme du volume de travail. */
+  function sansEchauffement(app) {
+    const etat = app.etat;
+    const seances = etat.seances.map(s => Object.assign({}, s, {
+      exercices: s.exercices.map(x => Object.assign({}, x, {
+        series: x.series.filter(y => y.type !== 'echauffement')
+      }))
+    }));
+    return Object.assign({}, app, { etat: Object.assign({}, etat, { seances }) });
+  }
+  if (typeof FM.vues.defis === 'function') {
+    const defisOriginal = FM.vues.defis;
+    FM.vues.defis = app => defisOriginal(sansEchauffement(app));
+  }
+  if (typeof FM.vues.pro === 'function') {
+    const proOriginal = FM.vues.pro;
+    FM.vues.pro = (app, sub) => proOriginal(sub === 'analyses' ? sansEchauffement(app) : app, sub);
+  }
 
   /* Une RPE très élevée ou un RIR nul/1 bloque une hausse de charge automatique. */
   const proposerOriginal = FM.proposer;
@@ -148,6 +169,7 @@
       if (value === 'travail') delete set.type;
       else set.type = value;
       app.sauver();
+      app.rendre();
     }));
     const effort = element('div', 'forge-meta-grid');
     effort.append(champNombre('RPE (5 à 10)', set.rpe, 5, 10, 0.5, value => {
@@ -161,6 +183,16 @@
       app.sauver();
     }));
     panel.append(effort);
+    if (set.type === 'distance') panel.append(champNombre('Distance (m)', set.distance, 0, 100000, 0.1, value => {
+      const n = optionalNumber(value, 0, 100000, 0.1);
+      if (n === null) delete set.distance; else set.distance = n;
+      app.sauver();
+    }));
+    if (set.type === 'tension') panel.append(champNombre('Temps sous tension (secondes)', set.duration, 0, 3600, 1, value => {
+      const n = optionalNumber(value, 0, 3600, 1);
+      if (n === null) delete set.duration; else set.duration = n;
+      app.sauver();
+    }));
     const noteLabel = element('label', 'forge-meta-field', 'Note sur cet exercice');
     const note = element('textarea', 'forge-meta-input');
     note.rows = 2;
@@ -190,6 +222,36 @@
     });
     return view;
   };
+
+  /* Les détails d'une séance terminée affichent aussi les métadonnées avancées. */
+  if (typeof FM.vues.detail === 'function') {
+    const detailOriginal = FM.vues.detail;
+    FM.vues.detail = function (app, id) {
+      const view = detailOriginal(app, id);
+      const session = app.etat.seances.find(s => s.id === id);
+      if (!session) return view;
+      const entries = session.exercices.filter(x => x.series.length);
+      const lists = view.querySelectorAll('ol');
+      entries.forEach((entry, index) => {
+        const list = lists[index];
+        if (!list) return;
+        const lines = list.querySelectorAll('li');
+        entry.series.forEach((set, setIndex) => {
+          const line = lines[setIndex];
+          if (!line) return;
+          const parts = [];
+          if (set.type && TYPES[set.type] && set.type !== 'travail') parts.push(TYPES[set.type]);
+          if (Number.isFinite(set.rpe)) parts.push('RPE ' + set.rpe);
+          if (Number.isFinite(set.rir)) parts.push('RIR ' + set.rir);
+          if (Number.isFinite(set.distance)) parts.push(set.distance + ' m');
+          if (Number.isFinite(set.duration)) parts.push(set.duration + ' s sous tension');
+          if (parts.length) line.append(element('small', 'forge-set-summary', parts.join(' · ')));
+        });
+        if (entry.note) list.after(element('p', 'forge-meta-history-note', 'Note : ' + entry.note));
+      });
+      return view;
+    };
+  }
 
   /* Pause/reprise du repos : la date de fin reste la référence, même après veille ou rechargement. */
   const timer = FM.timer;
