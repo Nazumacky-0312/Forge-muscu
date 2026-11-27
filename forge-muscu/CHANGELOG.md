@@ -26,4 +26,4 @@ La branche reste en brouillon. La connexion e-mail réelle, la synchronisation m
 - Navigation Programme / Exercices / Suivi mise en évidence, sticky et adaptée aux petits écrans.
 - États actif, survol et focus clavier clarifiés ; animations désactivées si l'utilisateur préfère réduire les mouvements.
 - Ajout d'assertions Playwright sur la navigation responsive, l'onglet actif et les débordements horizontaux.
-- Validation CI du nouveau parcours en attente.
+- Validation CI réussie sur mobile et desktop (run `45941596067`, commit `b0eed459`).
