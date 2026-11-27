@@ -83,13 +83,20 @@
     header.append(el('p','discret','Une estimation par groupe musculaire, basée sur tes séries validées et le temps écoulé depuis tes dernières séances.'));
     const grid=el('div','forge-recovery-grid');
     stats.forEach(stat=>grid.append(muscleCard(stat)));
+    const forgotten=stats.filter(stat=>stat.sets7d===0);
+    const neglected=el('aside','forge-recovery-neglected');
+    if(stats.some(stat=>stat.last)&&forgotten.length){
+      neglected.append(el('strong','','Groupes peu sollicités cette semaine'),el('p','',forgotten.map(stat=>stat.label).join(' · ')));
+    }
     const note=el('aside','forge-recovery-note');
     note.append(el('strong','','À savoir'),el('p','','Ce calcul est indicatif, pas une mesure physiologique ou médicale. Il ne connaît pas ton sommeil, ton stress, tes douleurs ni toute ta fatigue. La récupération varie selon les personnes et les exercices. Ne retravaille pas intensément un muscle douloureux ou insuffisamment récupéré.'));
     const links=el('div','forge-recovery-links');
     const programme=el('a','btn primaire','Voir mon programme');programme.href='#/programme';
     const statsLink=el('a','btn','Voir mes statistiques');statsLink.href='#/suivi/progres';
     links.append(programme,statsLink);
-    page.append(header,grid,note,links);
+    page.append(header,grid);
+    if(stats.some(stat=>stat.last)&&forgotten.length)page.append(neglected);
+    page.append(note,links);
     return page;
   };
 })(window);
