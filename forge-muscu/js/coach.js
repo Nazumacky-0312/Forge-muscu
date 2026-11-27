@@ -68,23 +68,59 @@ async function envoyer(messages,input,send,ex){
 F.animationExercice=function(ex,mini){
  return h('div',{class:'forge-exercise-media'+(mini?' mini':''),'data-forge-demo':'1','data-exercise-name':ex.nom,role:'group','aria-label':'Démonstration animée : '+ex.nom});
 };
+function slugImageExercice(n){
+ const rules=[
+  [/presse.*(cuisse|jambe)|leg press/,'leg-press'],
+  [/squat/,'squat'],
+  [/developpe.*(couche|incline).*halter|dumbbell chest press/,'dumbbell-chest-press'],
+  [/developpe.*couche|bench press|chest press barre/,'bench-press'],
+  [/ecarte.*poulie|crossover|vis.?a.?vis|cable fly/,'cable-crossover'],
+  [/ecarte.*halter|dumbbell fly/,'dumbbell-fly'],
+  [/souleve.*terre.*halter|romanian deadlift|souleve roumain/,'dumbbell-romanian-deadlift'],
+  [/souleve.*terre|deadlift/,'deadlift'],
+  [/tirage vertical|lat pulldown|tirage poitrine/,'lat-pulldown'],
+  [/tirage horizontal|rowing poulie|seated cable row/,'seated-cable-row'],
+  [/rowing.*halter|dumbbell row/,'dumbbell-row'],
+  [/traction|pull.?up/,'pull-up'],
+  [/elevation laterale|lateral raise/,'lateral-raises'],
+  [/curl.*barre|barbell curl/,'barbell-curl'],
+  [/curl.*poulie|cable curl/,'cable-curl'],
+  [/crunch.*poulie|cable crunch/,'cable-crunch'],
+  [/crunch|releve.*buste/,'crunches'],
+  [/gainage|planche|plank/,'plank'],
+  [/pompe|push.?up/,'push-up']
+ ];
+ for(const [re,slug] of rules)if(re.test(n))return slug;
+ return null;
+}
 function monterDemo(el){
- if(el.dataset.demoReady==='1')return;el.dataset.demoReady='1';
- const name=el.dataset.exerciseName||'',n=norm(name);
- let kind='curl',label='Mouvement contrôlé',start='Départ',end='Fin';
- if(/squat|presse.*cuisse|leg press|fente|lunge/.test(n)){kind='squat';label='Flexion puis extension';start='Debout';end='Descends en contrôle';}
- else if(/developpe|bench press|pompe|push.?up|dips|chest press/.test(n)){kind='press';label='Poussée contrôlée';start='Position basse';end='Pousse sans verrouiller brutalement';}
- else if(/tirage|rowing|row|traction|pulldown|pull.?up/.test(n)){kind='pull';label='Tire les coudes vers le bas';start='Bras étendus';end='Coudes vers les côtes';}
- else if(/elevation|oiseau|lateral raise|rear delt|shoulder press/.test(n)){kind='raise';label='Élévation sans élan';start='Bras relâchés';end='Monte à hauteur confortable';}
- else if(/crunch|abdo|releve.*jambe|leg raise|gainage|plank/.test(n)){kind='core';label='Gainage et contrôle du bassin';start='Position stable';end='Contracte sans tirer sur la nuque';}
- else if(/souleve.*terre|deadlift|hip thrust|extension.*hanche|hyperextension/.test(n)){kind='hinge';label='Charnière de hanche';start='Hanches en arrière';end='Redresse-toi en poussant les hanches';}
- const svg='<svg class="forge-demo-svg '+kind+'" viewBox="0 0 320 170" role="img" aria-label="Schéma animé du mouvement '+kind+'"><defs><linearGradient id="forgeGlow" x1="0" x2="1"><stop stop-color="#b8f34a"/><stop offset="1" stop-color="#76b82d"/></linearGradient></defs><path d="M18 145H302" stroke="#64717d" stroke-width="2" stroke-linecap="round"/><circle cx="160" cy="145" r="3" fill="#b8f34a"/><g class="demo-person"><circle class="demo-head" cx="160" cy="35" r="12"/><path class="demo-body" d="M160 49L160 91" /><path class="demo-arm demo-arm-left" d="M160 58L128 83L112 104"/><path class="demo-arm demo-arm-right" d="M160 58L192 83L208 104"/><path class="demo-leg demo-leg-left" d="M160 91L140 118L130 144"/><path class="demo-leg demo-leg-right" d="M160 91L180 118L190 144"/></g><g class="demo-gear"><path d="M104 108H216" stroke="url(#forgeGlow)" stroke-width="5" stroke-linecap="round"/><rect x="96" y="98" width="8" height="20" rx="3" fill="#b8f34a"/><rect x="216" y="98" width="8" height="20" rx="3" fill="#b8f34a"/><path d="M160 18V8M155 13L160 8L165 13" fill="none" stroke="#b8f34a" stroke-width="2" stroke-linecap="round"/></g><circle class="demo-joint" cx="160" cy="91" r="4"/><path class="demo-path" d="M246 112V54M240 62L246 54L252 62" fill="none" stroke="#b8f34a" stroke-width="2" stroke-dasharray="3 4"/></svg>';
+ if(el.dataset.demoReady==='1')return;
+ el.dataset.demoReady='1';
+ const name=el.dataset.exerciseName||'',slug=slugImageExercice(norm(name));
+ if(!slug){
+  el.classList.add('forge-media-missing');
+  const msg=document.createElement('div');msg.className='forge-media-fallback';
+  msg.textContent='Illustration 3D bientôt disponible pour cet exercice.';
+  el.replaceChildren(msg);return;
+ }
+ const frames=document.createElement('div');frames.className='forge-3d-frames';
+ const mini=el.classList.contains('mini');
+ const frameNames=slug==='plank'?['hold']:['start','end'];
+ for(const frame of frameNames){
+  const img=document.createElement('img');
+  img.className='forge-3d-frame '+(frame==='start'?'frame-start':frame==='end'?'frame-end':'frame-hold');
+  img.src='images/exercises/'+slug+'-'+frame+'.webp';
+  img.alt=name+' — '+(frame==='start'?'position de départ':frame==='end'?'position finale':'position de gainage');
+  img.decoding='async';img.loading=mini?'lazy':'eager';
+  img.onerror=()=>{img.remove();if(!frames.querySelector('img')){const msg=document.createElement('div');msg.className='forge-media-fallback';msg.textContent='Image momentanément indisponible.';el.replaceChildren(msg);}};
+  frames.append(img);
+ }
  const title=document.createElement('div');title.className='forge-demo-title';title.textContent=name;
- const sub=document.createElement('div');sub.className='forge-demo-subtitle';sub.textContent=label;
+ const sub=document.createElement('div');sub.className='forge-demo-subtitle';sub.textContent=slug==='plank'?'Position de maintien':'Départ ↔ position finale';
  const phases=document.createElement('div');phases.className='forge-demo-phases';
- const a=document.createElement('span');a.textContent=start;const b=document.createElement('span');b.textContent=end;phases.append(a,b);
- const note=document.createElement('p');note.className='forge-demo-note';note.textContent='Animation schématique 2D • démonstration intégrée, sans API ni connexion';
- el.innerHTML=svg;el.append(title,sub,phases,note);
+ if(slug!=='plank'){const a=document.createElement('span');a.textContent='Départ';const b=document.createElement('span');b.textContent='Fin du mouvement';phases.append(a,b);}
+ const note=document.createElement('p');note.className='forge-demo-note';note.textContent='Illustration 3D indicative • garde une exécution contrôlée et sans douleur.';
+ el.replaceChildren(frames,title,sub,phases,note);
 }
 function ouvrirPageCoachDepuisEx(ex,app){ouvrirPageCoach(ex,app);}
 F.vues.coach=function(app){
@@ -121,7 +157,7 @@ const detailBefore=F.vues.exercice;
 F.vues.exercice=function(app,id){
  const v=detailBefore(app,id),ex=F.EX[id];if(!ex)return v;
  const t=v.querySelector('h1');
- if(t)t.after(F.carte(h('div',{class:'exercise-demo'},F.animationExercice(ex,false),h('p',{class:'discret'},'Démonstration animée du mouvement.'))),F.btn('Demander au coach',()=>ouvrirPageCoach(ex,app),'primaire geant'));
+ if(t)t.after(F.carte(h('div',{class:'exercise-demo'},F.animationExercice(ex,false),h('p',{class:'discret'},'Illustration 3D du mouvement.'))),F.btn('Demander au coach',()=>ouvrirPageCoach(ex,app),'primaire geant'));
  return v;
 };
 const sessionBefore=F.vues.seance;
