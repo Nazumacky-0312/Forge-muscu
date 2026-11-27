@@ -5,7 +5,7 @@ const { chromium } = require('playwright');
 
 const root = path.resolve(process.env.FORGE_SITE || 'public');
 const port = 4176;
-const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j0aUAAAAASUVORK5CYII=', 'base64');
+const image = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect width="32" height="32" fill="#5f9bd2"/><circle cx="16" cy="16" r="8" fill="#ffffff"/></svg>');
 
 (async () => {
   const server = http.createServer((req, res) => {
@@ -44,9 +44,9 @@ const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR
       await page.locator('.forge-progress-photo-field select').selectOption('profil');
       await page.locator('.forge-progress-photo-field input[type="text"]').fill('Test de progression local');
       await page.locator('.forge-progress-photo-file input[type="file"]').setInputFiles({
-        name: 'forge-progress-test.png',
-        mimeType: 'image/png',
-        buffer: png
+        name: 'forge-progress-test.svg',
+        mimeType: 'image/svg+xml',
+        buffer: image
       });
       await page.locator('.forge-progress-photo-form').evaluate(form => form.requestSubmit());
       try {
