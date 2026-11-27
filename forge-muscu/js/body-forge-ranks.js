@@ -97,12 +97,13 @@
       part('glutes','M86 181 Q99 175 108 185 L108 222 Q93 226 84 207Z')+part('glutes','M112 185 Q121 175 134 181 L136 207 Q127 226 112 222Z')+
       part('hamstrings','M87 222 Q99 219 108 225 L103 280 L87 279 L82 253Z')+part('hamstrings','M112 225 Q121 219 133 222 L138 253 L133 279 L117 280Z')+
       part('calves','M84 282 L101 277 L96 350 L82 351Z')+part('calves','M119 277 L136 282 L138 351 L124 350Z')+'</svg>';
+    const svgWrap=markup=>{const el=h('div',{class:'forge-avatar-svg-wrap'});el.innerHTML=markup;return el;};
     const legend=RANKS.map((r,i)=>'<span class="forge-avatar-legend-item"><i style="background:'+RANK_COLORS[i]+'"></i>'+r.name+'</span>').join('');
     const trained=MUSCLES.filter(m=>scoreFor(m)>0).length;
     return h('section',{class:'carte forge-avatar-card'},
       h('div',{class:'forge-card-head'},h('div',{},h('span',{class:'surtitre'},'BODYGRAPH'),h('h2',{},'Ton personnage')) ,h('span',{class:'forge-tag'},trained+'/'+MUSCLES.length+' GROUPES')),
       h('p',{class:'discret'},'Chaque zone prend la couleur du rang obtenu sur les exercices qui la sollicitent.'),
-      h('div',{class:'forge-avatar-views'},h('div',{class:'forge-avatar-view'},h('span',{},'FACE'),h('div',{innerHTML:front})),h('div',{class:'forge-avatar-view'},h('span',{},'DOS'),h('div',{innerHTML:back}))),
+      h('div',{class:'forge-avatar-views'},h('div',{class:'forge-avatar-view'},h('span',{},'FACE'),svgWrap(front)),h('div',{class:'forge-avatar-view'},h('span',{},'DOS'),svgWrap(back))),
       h('div',{class:'forge-avatar-legend',innerHTML:legend}),
       h('div',{class:'forge-avatar-customize'},h('span',{},'PERSONNALISATION'),h('b',{},'Bientôt disponible'),h('small',{},'Style, apparence et équipements de ton personnage')) );
   }
