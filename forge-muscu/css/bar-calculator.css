@@ -1,0 +1,24 @@
+.forge-bar-calculator{display:grid;gap:16px;padding-bottom:24px}
+.forge-bar-header{display:grid;gap:7px}
+.forge-bar-header h1{margin:0;font-size:clamp(1.7rem,4vw,2.2rem)}
+.forge-bar-header p{margin:0}
+.forge-bar-form{display:grid;gap:13px;padding:15px;border:1px solid var(--bord,rgba(255,255,255,.1));border-radius:15px;background:var(--surface2,rgba(255,255,255,.025))}
+.forge-bar-field{display:grid;gap:6px;color:var(--muted,#aab0b8);font-size:.82rem}
+.forge-bar-field input,.forge-bar-field select{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--bord,rgba(255,255,255,.12));border-radius:10px;background:var(--surface,#171e27);color:var(--text,#f2f4f7);font:inherit}
+.forge-bar-plates{display:flex;flex-wrap:wrap;gap:8px;border:0;padding:0;margin:0}
+.forge-bar-plates legend{width:100%;margin-bottom:3px;color:var(--muted,#aab0b8);font-size:.82rem}
+.forge-bar-plate{display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--bord,rgba(255,255,255,.12));border-radius:9px;background:var(--surface,#171e27);font-size:.8rem}
+.forge-bar-plate input{accent-color:var(--accent,#c5f36b)}
+.forge-bar-form>.btn{min-height:46px;width:100%}
+.forge-bar-result{display:grid;gap:7px;padding:16px;border:1px solid var(--bord,rgba(255,255,255,.1));border-radius:15px;background:var(--surface2,rgba(255,255,255,.025))}
+.forge-bar-result-title{font-size:1.05rem}
+.forge-bar-result-label{margin:0;color:var(--muted,#aab0b8);font-size:.78rem}
+.forge-bar-result-plates{margin:0;font-size:1.15rem;font-weight:700;overflow-wrap:anywhere}
+.forge-bar-success{color:var(--accent,#c5f36b)}
+.forge-bar-warning,.forge-bar-error{color:#e4bd4c;font-size:.8rem}
+.forge-bar-note{margin:0;color:var(--muted,#aab0b8);font-size:.78rem;line-height:1.5}
+.forge-bar-home-link{display:grid;gap:4px;margin-top:12px;padding:13px 15px;border:1px solid var(--bord,rgba(255,255,255,.1));border-radius:13px;background:var(--surface2,rgba(255,255,255,.025));color:var(--text,#f2f4f7);text-decoration:none}
+.forge-bar-home-link span{font-size:.76rem;color:var(--muted,#aab0b8)}
+.forge-meta-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.forge-meta-actions .btn{flex:1 1 160px;text-align:center}
+@media(min-width:700px){.forge-bar-form{grid-template-columns:repeat(2,minmax(0,1fr))}.forge-bar-plates,.forge-bar-form>.btn{grid-column:1/-1}}

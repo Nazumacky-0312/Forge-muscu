@@ -15,8 +15,8 @@ try {
 } catch (primaryError) {
   try { await loadEngine('jsdelivr'); }
   catch (secondaryError) {
-    window.dispatchEvent(new CustomEvent('forge-avatar-error', {detail:'Le moteur 3D ne s’est pas chargé. Vérifie ta connexion puis recharge Body Forge.'}));
-    throw secondaryError || primaryError;
+    console.warn('Forge Muscu — moteur 3D indisponible, le bodygraph de secours reste actif.', secondaryError || primaryError);
+    window.dispatchEvent(new CustomEvent('forge-avatar-error', {detail:'Le moteur 3D ne s’est pas chargé. Le bodygraph de secours reste disponible.'}));
   }
 }
 
@@ -144,14 +144,43 @@ function mount(container,initial){
     }
   }
   const canvas=renderer.domElement;
-  function pointerDown(e){dragging=true;lastX=e.clientX;canvas.setPointerCapture?.(e.pointerId);}
-  function pointerMove(e){if(!dragging||!avatar)return;const dx=e.clientX-lastX;lastX=e.clientX;targetRotation+=dx*.009;}
-  function pointerUp(){dragging=false;}
+  const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
+  let pointerStartX=0,pointerStartY=0,pointerMoved=false,selectedGroup='';
+  function pointerDown(e){dragging=true;lastX=e.clientX;pointerStartX=e.clientX;pointerStartY=e.clientY;pointerMoved=false;canvas.setPointerCapture?.(e.pointerId);}
+  function pointerMove(e){
+    if(!dragging||!avatar)return;
+    const dx=e.clientX-lastX;lastX=e.clientX;
+    if(Math.abs(e.clientX-pointerStartX)>5||Math.abs(e.clientY-pointerStartY)>5)pointerMoved=true;
+    targetRotation+=dx*.009;
+  }
+  function selectMuscle(e){
+    if(!avatar||pointerMoved)return;
+    const rect=canvas.getBoundingClientRect();
+    pointer.set(((e.clientX-rect.left)/rect.width)*2-1,-((e.clientY-rect.top)/rect.height)*2+1);
+    raycaster.setFromCamera(pointer,camera);
+    const hit=raycaster.intersectObject(avatar,true)[0];
+    if(!hit)return;
+    let owner=hit.object;
+    while(owner&&owner!==avatar&&!Object.prototype.hasOwnProperty.call(MUSCLE_GROUP,owner.name))owner=owner.parent;
+    if(!owner||owner===avatar)return;
+    selectedGroup=MUSCLE_GROUP[owner.name];
+    avatar.traverse(node=>{
+      if(!node.isMesh||!node.material?.emissive)return;
+      let part=node;
+      while(part&&part!==avatar&&!Object.prototype.hasOwnProperty.call(MUSCLE_GROUP,part.name))part=part.parent;
+      const active=part&&part!==avatar&&MUSCLE_GROUP[part.name]===selectedGroup;
+      node.material.emissive.set(active?'#344d24':'#000000');
+      node.material.emissiveIntensity=active ? .65 : 0;
+    });
+    container.dispatchEvent(new CustomEvent('forge-muscle-select',{detail:{muscle:selectedGroup,structure:owner.name}}));
+  }
+  function pointerUp(e){dragging=false;selectMuscle(e);}
+  function pointerCancel(){dragging=false;pointerMoved=true;}
   function wheel(e){e.preventDefault();targetDistance=THREE.MathUtils.clamp(targetDistance+Math.sign(e.deltaY)*.12,1.65,4.8);}
   canvas.addEventListener('pointerdown',pointerDown);
   canvas.addEventListener('pointermove',pointerMove);
   canvas.addEventListener('pointerup',pointerUp);
-  canvas.addEventListener('pointercancel',pointerUp);
+  canvas.addEventListener('pointercancel',pointerCancel);
   canvas.addEventListener('wheel',wheel,{passive:false});
   canvas.style.touchAction='pan-y';
   function animate(){
@@ -178,7 +207,7 @@ function mount(container,initial){
     dispose(){
       if(disposed)return;disposed=true;loadingToken++;cancelAnimationFrame(raf);resize.disconnect();
       canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointermove',pointerMove);
-      canvas.removeEventListener('pointerup',pointerUp);canvas.removeEventListener('pointercancel',pointerUp);
+      canvas.removeEventListener('pointerup',pointerUp);canvas.removeEventListener('pointercancel',pointerCancel);
       canvas.removeEventListener('wheel',wheel);
       if(avatar){scene.remove(avatar);avatar.traverse(n=>{if(n.isMesh&&n.material)n.material.dispose();});}
       renderer.dispose();delete container.dataset.avatarLoaded;delete container.dataset.avatarSex;delete container.dataset.muscleMeshes;container.replaceChildren();

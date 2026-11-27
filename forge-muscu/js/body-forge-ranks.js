@@ -107,18 +107,77 @@
     const figures=h('div',{class:'forge-bodygraph-pair'});
     const draw=sex=>{figures.innerHTML='<div class="forge-bodygraph-person">'+figure('front',sex)+'<span>AVANT</span></div><div class="forge-bodygraph-person">'+figure('back',sex)+'<span>ARRIÈRE</span></div>';};
     draw(initialSex);
+    const stage=h('div',{class:'forge-avatar-3d-stage','aria-label':'Avatar musculaire 3D interactif'});
+    const muscleDetails=h('div',{class:'forge-avatar-muscle-details','aria-live':'polite'},
+      h('span',{class:'surtitre'},'ANALYSE MUSCULAIRE'),
+      h('h3',{},'Sélectionne un muscle'),
+      h('p',{class:'discret'},'Quand le modèle 3D est chargé, touche un groupe musculaire pour afficher ses performances enregistrées.'));
+    const viewControls=h('div',{class:'forge-avatar-3d-views','aria-label':'Orientation de l’avatar'},
+      h('button',{type:'button',class:'forge-avatar-choice active','data-view':'front'},'Vue de face'),
+      h('button',{type:'button',class:'forge-avatar-choice','data-view':'back'},'Vue de dos'));
     const legend=RANKS.map((r,i)=>'<span class="forge-avatar-legend-item"><i style="background:'+RANK_COLORS[i]+'"></i>'+r.name+'</span>').join('');
     const section=h('section',{class:'carte forge-avatar-card forge-bodygraph-card forge-bodygraph-depth'},
       h('div',{class:'forge-card-head'},h('div',{},h('span',{class:'surtitre'},'BODYGRAPH'),h('h2',{},'Tes muscles')),
-        h('span',{class:'forge-tag'},'RELIEF MUSCULAIRE')),
-      h('p',{class:'discret'},'Une silhouette plus détaillée, avec des volumes et des contours pour mieux distinguer chaque groupe musculaire.'), 
+        h('span',{class:'forge-tag'},'AVATAR 3D')),
+      h('p',{class:'discret'},'Fais glisser le modèle pour le faire pivoter. Utilise les vues avant et arrière pour observer les groupes musculaires colorés selon tes rangs.'),
       h('div',{class:'forge-avatar-controls'},initialButtons),
+      stage,
+      viewControls,
+      muscleDetails,
       figures,
-      h('div',{class:'forge-avatar-legend',innerHTML:legend}));
+      h('div',{class:'forge-avatar-legend',innerHTML:legend}),
+      h('p',{class:'forge-avatar-attribution'},'Anatomy: BodyParts3D © The Database Center for Life Science (CC BY 4.0); female organs: Human Reference Atlas 3D Reference Organs, HuBMAP (CC BY 4.0); female body: MakeHuman (CC0). Modified by open-anatomy-3d (github.com/MervinR07/open-anatomy-3d), CC BY 4.0. Illustration pédagogique, non destinée au diagnostic.'));
+    let avatarApi=null,selectedSex=initialSex,mountScheduled=false;
+    const ranksForModel={...rankByMuscle,upperarms:Math.max(rankByMuscle.biceps??-1,rankByMuscle.triceps??-1)};
+    const mount3D=()=>{
+      if(!root.ForgeAvatar3D||avatarApi)return;
+      if(!stage.isConnected){
+        if(!mountScheduled){
+          mountScheduled=true;
+          root.requestAnimationFrame(()=>{mountScheduled=false;if(stage.isConnected)mount3D();});
+        }
+        return;
+      }
+      try{avatarApi=root.ForgeAvatar3D.mount(stage,{sex:selectedSex,ranks:ranksForModel});}
+      catch(error){console.warn('Forge Muscu — avatar 3D indisponible :',error);}
+    };
+    const stageObserver=new MutationObserver(()=>{
+      if(stage.dataset.avatarLoaded==='true')section.classList.add('is-3d-ready');
+    });
+    stageObserver.observe(stage,{attributes:true,attributeFilter:['data-avatar-loaded']});
+    if(root.ForgeAvatar3D)mount3D();
+    else root.addEventListener('forge-avatar-ready',mount3D,{once:true});
     section.querySelectorAll('[data-sex]').forEach(button=>button.addEventListener('click',()=>{
       section.querySelectorAll('[data-sex]').forEach(b=>b.classList.toggle('active',b===button));
-      draw(button.dataset.sex);
+      selectedSex=button.dataset.sex;
+      draw(selectedSex);
+      avatarApi?.setSex(selectedSex);
     }));
+    section.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
+      section.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b===button));
+      avatarApi?.setView(button.dataset.view);
+    }));
+    stage.addEventListener('forge-muscle-select',event=>{
+      const group=event.detail?.muscle||'';
+      const labels={chest:'Pectoraux',shoulders:'Épaules',biceps:'Biceps',triceps:'Triceps',back:'Dos',abs:'Abdominaux',quads:'Quadriceps',hamstrings:'Ischio-jambiers',glutes:'Fessiers',calves:'Mollets',forearms:'Avant-bras',traps:'Trapèzes',upperarms:'Bras'};
+      const related=group==='upperarms'?MUSCLES.filter(m=>m.id==='biceps'||m.id==='triceps'):MUSCLES.filter(m=>m.id===group);
+      const entries=ranked.filter(x=>related.some(m=>m.test.test(x.name)));
+      const best=entries[0],label=labels[group]||'Muscle sélectionné';
+      muscleDetails.replaceChildren(
+        h('div',{class:'forge-avatar-muscle-detail-head'},
+          h('div',{},h('span',{class:'surtitre'},'GROUPE SÉLECTIONNÉ'),h('h3',{},label)),
+          h('strong',{},best?best.rank.name:'Non classé')),
+        h('p',{class:'discret'},best?'Meilleure performance : '+best.name+' · 1RM estimé '+best.oneRm.toFixed(1)+' kg · '+best.score+'/1000 points.':'Aucune performance classée n’est encore enregistrée pour ce groupe. Continue à enregistrer tes séries de travail pour le suivre.'),
+        entries.length?h('ul',{class:'forge-avatar-muscle-exercises'},...entries.slice(0,3).map(x=>h('li',{},h('span',{},x.name),h('strong',{},x.rank.name+' · '+x.oneRm.toFixed(1)+' kg')))):h('p',{class:'discret'},'Les muscles sollicités indirectement ne sont pas assimilés à des performances directes.'));
+    });
+    const cleanupObserver=new MutationObserver(()=>{
+      if(!section.isConnected){
+        avatarApi?.dispose();
+        stageObserver.disconnect();
+        cleanupObserver.disconnect();
+      }
+    });
+    cleanupObserver.observe(root.document.body,{childList:true,subtree:true});
     return section;
   }
   function bodyForge(app){

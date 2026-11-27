@@ -1,0 +1,18 @@
+.forge-progression-hub{display:grid;gap:18px;padding-bottom:24px}
+.forge-progression-header{display:grid;gap:7px}
+.forge-progression-header h1{margin:0;font-size:clamp(1.7rem,4vw,2.2rem)}
+.forge-progression-header p{margin:0}
+.forge-progression-grid{display:grid;grid-template-columns:1fr;gap:11px}
+.forge-progression-card{display:flex;align-items:center;gap:13px;min-width:0;min-height:94px;padding:14px;border:1px solid var(--bord,rgba(255,255,255,.1));border-radius:15px;background:var(--surface2,rgba(255,255,255,.025));color:var(--text,#f2f4f7);text-decoration:none;transition:border-color .18s ease,transform .18s ease,background .18s ease}
+.forge-progression-card:hover{border-color:var(--accent,#c5f36b);background:rgba(197,243,107,.045);transform:translateY(-1px)}
+.forge-progression-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:12px;background:rgba(197,243,107,.1);color:var(--accent,#c5f36b)}
+.forge-progression-icon svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.forge-progression-card-copy{display:grid;gap:5px;min-width:0;flex:1}
+.forge-progression-card-copy strong{font-size:.92rem;line-height:1.25}
+.forge-progression-card-copy small{color:var(--muted,#aab0b8);font-size:.76rem;line-height:1.4}
+.forge-progression-arrow{flex:0 0 auto;color:var(--accent,#c5f36b);font-size:1.2rem}
+.forge-progression-note{display:flex;flex-wrap:wrap;gap:5px 9px;padding:13px 15px;border:1px solid var(--bord,rgba(255,255,255,.1));border-radius:13px;background:var(--surface2,rgba(255,255,255,.025));font-size:.8rem}
+.forge-progression-note strong{color:var(--accent,#c5f36b)}
+.forge-progression-note span{color:var(--muted,#aab0b8)}
+@media(min-width:640px){.forge-progression-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1080px){.forge-progression-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}

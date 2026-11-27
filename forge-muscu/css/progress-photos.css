@@ -1,0 +1,26 @@
+/* Photos de progression : galerie privée, stockage local-first. */
+.forge-progress-photos{margin-top:16px;display:grid;gap:14px}
+.forge-progress-photos h2{margin:0}
+.forge-progress-photo-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:14px;border:1px solid var(--bord,rgba(255,255,255,.1));border-radius:14px;background:var(--surface2,rgba(255,255,255,.025))}
+.forge-progress-photo-field{display:grid;gap:6px;min-width:0;font-size:.8rem;color:var(--muted,#aab0b8)}
+.forge-progress-photo-field input,.forge-progress-photo-field select{width:100%;min-width:0;min-height:42px;padding:9px 10px;border:1px solid var(--bord,rgba(255,255,255,.12));border-radius:9px;background:var(--surface,#171e27);color:var(--text,#f2f4f7);font:inherit}
+.forge-progress-photo-file{grid-column:1/-1;display:grid;gap:8px;padding:12px;border:1px dashed var(--bord,rgba(255,255,255,.2));border-radius:10px;font-size:.84rem}
+.forge-progress-photo-file input{width:100%;min-width:0;color:var(--text,#f2f4f7)}
+.forge-progress-photo-form>.btn{grid-column:1/-1;width:100%;min-height:44px}
+.forge-progress-photos-status{margin:0;padding:10px 12px;border-left:3px solid var(--accent,#c5f36b);border-radius:8px;background:var(--surface2,rgba(255,255,255,.035));font-size:.82rem;line-height:1.5}
+.forge-progress-photos-toolbar{display:flex;flex-wrap:wrap;gap:8px}
+.forge-progress-photos-toolbar .btn{flex:1 1 180px;text-align:center}
+.forge-progress-photos-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.forge-progress-photo{min-width:0;overflow:hidden;border:1px solid var(--bord,rgba(255,255,255,.1));border-radius:13px;background:var(--surface2,rgba(255,255,255,.025))}
+.forge-progress-photo-image{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;background:#111820}
+.forge-progress-photo-info{display:grid;gap:4px;padding:10px 10px 4px}
+.forge-progress-photo-info strong{font-size:.88rem}
+.forge-progress-photo-info span,.forge-progress-photo-info p{margin:0;font-size:.76rem;color:var(--muted,#aab0b8);overflow-wrap:anywhere}
+.forge-progress-photo-info small{font-size:.68rem}
+.forge-progress-photo-synced{color:var(--accent,#c5f36b)}
+.forge-progress-photo-local{color:var(--muted,#aab0b8)}
+.forge-progress-photo-actions{display:flex;gap:7px;padding:8px 10px 10px}
+.forge-progress-photo-actions .btn{flex:1;min-width:0;text-align:center;padding-inline:7px;font-size:.72rem}
+.forge-progress-photos-empty{grid-column:1/-1;margin:0;padding:20px;text-align:center;color:var(--muted,#aab0b8);border:1px dashed var(--bord,rgba(255,255,255,.15));border-radius:12px;font-size:.84rem}
+@media(min-width:760px){.forge-progress-photos-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:430px){.forge-progress-photo-form{grid-template-columns:1fr}.forge-progress-photo-field,.forge-progress-photo-file,.forge-progress-photo-form>.btn{grid-column:1}.forge-progress-photos-grid{gap:8px}.forge-progress-photo-info{padding:8px 8px 4px}.forge-progress-photo-actions{padding:7px 8px 8px;gap:5px}}

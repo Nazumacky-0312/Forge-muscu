@@ -43,10 +43,14 @@
         const rir = optionalNumber(old.rir, 0, 5, 1);
         const distance = optionalNumber(old.distance, 0, 100000, 0.1);
         const duration = optionalNumber(old.duration, 0, 3600, 1);
+        const tempo = typeof old.tempo === 'string' && /^[0-9]{1,2}-[0-9]{1,2}-[0-9]{1,2}-[0-9]{1,2}$/.test(old.tempo.trim()) ? old.tempo.trim() : null;
+        const side = ['gauche', 'droite', 'alterne'].includes(old.side) ? old.side : null;
         if (rpe !== null) set.rpe = rpe;
         if (rir !== null) set.rir = rir;
         if (distance !== null) set.distance = distance;
         if (duration !== null) set.duration = duration;
+        if (tempo !== null) set.tempo = tempo;
+        if (side !== null) set.side = side;
       });
     });
     return destination;
@@ -151,12 +155,35 @@
     label.append(input);
     return label;
   }
+  function champTexte(labelText, value, placeholder, onChange) {
+    const label = element('label', 'forge-meta-field', labelText);
+    const input = element('input', 'forge-meta-input');
+    input.type = 'text';
+    input.maxLength = 15;
+    input.autocomplete = 'off';
+    input.placeholder = placeholder;
+    input.title = 'Format : 3-1-1-0 (descente-pause-montée-pause)';
+    input.pattern = '[0-9]{1,2}-[0-9]{1,2}-[0-9]{1,2}-[0-9]{1,2}';
+    input.value = value || '';
+    input.addEventListener('change', () => {
+      const next = input.value.trim();
+      if (next && !/^[0-9]{1,2}-[0-9]{1,2}-[0-9]{1,2}-[0-9]{1,2}$/.test(next)) {
+        input.setCustomValidity('Format attendu : 3-1-1-0.');
+        input.reportValidity();
+        return;
+      }
+      input.setCustomValidity('');
+      onChange(next);
+    });
+    label.append(input);
+    return label;
+  }
 
   const seanceOriginale = FM.vues.seance;
   FM.vues.seance = function (app) {
     const view = seanceOriginale(app);
     const active = app.etat && app.etat.active;
-    if (!active || !active.echauffement || !active.exercices.length) return view;
+    if (!active || !Array.isArray(active.exercices) || !active.exercices.length) return view;
     const entry = active.exercices[active.index];
     if (!entry || !entry.series.length) return view;
     const unfinished = entry.series.findIndex(s => !s.fait);
@@ -183,6 +210,17 @@
       app.sauver();
     }));
     panel.append(effort);
+    const execution = element('div', 'forge-meta-grid');
+    execution.append(champTexte('Tempo (descente-pause-montée-pause)', set.tempo || '', '3-1-1-0', value => {
+      if (!value) delete set.tempo; else set.tempo = value;
+      app.sauver();
+    }));
+    execution.append(champSelect('Côté', set.side || '', [['', 'Non applicable'], ['gauche', 'Gauche'], ['droite', 'Droite'], ['alterne', 'Alterné']], value => {
+      if (!value) delete set.side; else set.side = value;
+      app.sauver();
+    }));
+    panel.append(execution);
+    panel.append(element('p', 'forge-meta-help', 'Pour suivre chaque côté indépendamment, enregistre une série distincte pour le côté gauche et le côté droit.'));
     if (set.type === 'distance') panel.append(champNombre('Distance (m)', set.distance, 0, 100000, 0.1, value => {
       const n = optionalNumber(value, 0, 100000, 0.1);
       if (n === null) delete set.distance; else set.distance = n;
@@ -202,6 +240,11 @@
     note.addEventListener('change', () => { entry.note = note.value.slice(0, 500); app.sauver(); });
     noteLabel.append(note);
     panel.append(noteLabel);
+    const tools = element('div', 'forge-meta-actions');
+    const barLink = element('a', 'btn petit', 'Calculateur de barre');
+    barLink.href = '#/pro/barre';
+    tools.append(barLink);
+    panel.append(tools);
     const activeSet = view.querySelector('.serie.active');
     if (activeSet) activeSet.after(panel);
     else view.append(panel);
@@ -217,6 +260,8 @@
       if (s.type && TYPES[s.type] && s.type !== 'travail') parts.push(TYPES[s.type]);
       if (Number.isFinite(s.rpe)) parts.push('RPE ' + s.rpe);
       if (Number.isFinite(s.rir)) parts.push('RIR ' + s.rir);
+      if (s.tempo) parts.push('Tempo ' + s.tempo);
+      if (s.side) parts.push(({ gauche: 'Gauche', droite: 'Droite', alterne: 'Alterné' })[s.side]);
       if (parts.length) summary.textContent = parts.join(' · ');
       if (parts.length) line.append(summary);
     });
@@ -243,6 +288,8 @@
           if (set.type && TYPES[set.type] && set.type !== 'travail') parts.push(TYPES[set.type]);
           if (Number.isFinite(set.rpe)) parts.push('RPE ' + set.rpe);
           if (Number.isFinite(set.rir)) parts.push('RIR ' + set.rir);
+          if (set.tempo) parts.push('Tempo ' + set.tempo);
+          if (set.side) parts.push(({ gauche: 'Gauche', droite: 'Droite', alterne: 'Alterné' })[set.side]);
           if (Number.isFinite(set.distance)) parts.push(set.distance + ' m');
           if (Number.isFinite(set.duration)) parts.push(set.duration + ' s sous tension');
           if (parts.length) line.append(element('small', 'forge-set-summary', parts.join(' · ')));

@@ -1,0 +1,31 @@
+.forge-recovery-page{display:grid;gap:17px;padding-bottom:24px}
+.forge-recovery-header{display:grid;gap:7px}
+.forge-recovery-header h1{margin:0;font-size:clamp(1.7rem,4vw,2.2rem)}
+.forge-recovery-header p{margin:0}
+.forge-recovery-grid{display:grid;grid-template-columns:1fr;gap:11px}
+.forge-recovery-muscle{display:grid;gap:10px;padding:14px;border:1px solid var(--bord,rgba(255,255,255,.1));border-radius:14px;background:var(--surface2,rgba(255,255,255,.025));min-width:0}
+.forge-recovery-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:9px}
+.forge-recovery-card-head strong{font-size:.92rem}
+.forge-recovery-state{font-size:.72rem;font-weight:650;text-align:right}
+.forge-recovery-track{height:8px;overflow:hidden;border-radius:20px;background:rgba(255,255,255,.09)}
+.forge-recovery-track i{display:block;height:100%;border-radius:inherit;background:var(--accent,#c5f36b);transition:width .25s ease}
+.forge-recovery-fresh .forge-recovery-state{color:#f07855}
+.forge-recovery-fresh .forge-recovery-track i{background:#f07855}
+.forge-recovery-recovering .forge-recovery-state{color:#e4bd4c}
+.forge-recovery-recovering .forge-recovery-track i{background:#e4bd4c}
+.forge-recovery-ready .forge-recovery-state{color:var(--accent,#c5f36b)}
+.forge-recovery-empty .forge-recovery-state{color:var(--muted,#aab0b8)}
+.forge-recovery-details{display:flex;flex-wrap:wrap;justify-content:space-between;gap:5px 12px;color:var(--muted,#aab0b8);font-size:.74rem}
+.forge-recovery-estimate{margin:0;font-size:.78rem;line-height:1.45}
+.forge-recovery-warning{color:#e4bd4c;font-size:.72rem;line-height:1.4}
+.forge-recovery-note{padding:14px;border:1px solid var(--bord,rgba(255,255,255,.1));border-radius:13px;background:var(--surface2,rgba(255,255,255,.025))}
+.forge-recovery-note strong{color:var(--accent,#c5f36b)}
+.forge-recovery-note p{margin:6px 0 0;color:var(--muted,#aab0b8);font-size:.8rem;line-height:1.55}
+.forge-recovery-links{display:flex;flex-wrap:wrap;gap:8px}
+.forge-recovery-links .btn{flex:1 1 180px;text-align:center}
+@media(min-width:700px){.forge-recovery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1100px){.forge-recovery-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+.forge-recovery-neglected{padding:13px 15px;border:1px solid rgba(228,189,76,.28);border-radius:12px;background:rgba(228,189,76,.06)}
+.forge-recovery-neglected strong{color:#e4bd4c;font-size:.84rem}
+.forge-recovery-neglected p{margin:5px 0 0;color:var(--muted,#aab0b8);font-size:.78rem;line-height:1.5}

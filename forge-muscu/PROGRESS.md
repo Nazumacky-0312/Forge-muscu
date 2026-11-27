@@ -95,3 +95,48 @@ Refonte en cours. L'application de production sur `main` n'a pas été modifiée
 ## Règle de reprise
 
 Lire ce fichier avant toute reprise. Ne pas considérer les éléments non cochés comme terminés. Ne pas fusionner la PR avant les tests complets et la configuration Auth.
+
+
+---
+
+## Mise à jour du 27 novembre 2026 — reprise effective
+
+Les sections historiques ci-dessus décrivent un état antérieur. L'état vérifié aujourd'hui est le suivant.
+
+### État du code de référence
+
+- La branche `main` contient déjà le tableau de bord, les modules de séance, le suivi, le coach, la nutrition, la synchronisation cloud et les rangs de base.
+- Les branches historiques `forge-home-dashboard` et `forge-premium-upgrade` contiennent plusieurs fichiers déjà identiques à `main`. La branche `forge-intuitive-workout-ranks` contient une ancienne version de certains modules : ne pas la fusionner telle quelle.
+- Le travail nouveau est isolé sur `forge-avatar-3d-integration`, PR #5. Ne pas confondre une prévisualisation de PR avec la production.
+
+### Modifications de la branche PR #5
+
+- Body Forge : modèles anatomiques 3D masculin/féminin, rotation, vues avant/arrière, sélection des groupes musculaires, rang et performances disponibles, bodygraph SVG de secours, crédits de licence.
+- Photos de progression : galerie locale-first, compression, IndexedDB, téléchargement, suppression et synchronisation facultative vers le bucket privé Supabase.
+- Progression : nouvelle destination principale regroupant rangs, Body Forge, statistiques/photos, records, historique, mensurations, récupération musculaire et nutrition.
+- Récupération : estimation locale par groupe musculaire, séries validées, effort récent, volume 72 h / 7 jours et groupes peu sollicités ; les limites du modèle sont affichées.
+- Séance : tempo par série, suivi gauche/droite/alterné, conservation après rechargement et calculateur de disques accessible pendant l'entraînement. Les types échauffement/dégressif, RPE/RIR et notes restent disponibles.
+- PWA : cache v32 avec les nouveaux modules et feuilles de style.
+- Supabase : table `forge_progress_photos` créée avec RLS ; migration appliquée en version `20261127121314`. Le bucket `forge-progress-photos` reste privé et limité au dossier de l'utilisateur.
+
+### Validation
+
+- Les suites Playwright Séance, Body Forge et Photos/Progression/Récupération ont réussi sur mobile et ordinateur.
+- Séance vérifie aussi la conservation du tempo et du côté après rechargement, le sélecteur de type de série et le calculateur de barre.
+- Photos vérifie l'ajout local, IndexedDB après rechargement, le mode hors ligne et la suppression.
+- Dernière CI complète : run #322, succès complet. Le déploiement Pages utilise l'environnement distinct `github-pages-preview` et publie la candidate sous `/preview/` en conservant la racine issue de `main`.
+- URL de prévisualisation publiée : `https://nazumacky-0312.github.io/Forge-muscu/preview/`. La production à la racine n'a pas été remplacée.
+- L'inspection visuelle finale par navigateur automatisé n'a pas pu être faite dans cette session (crédits du navigateur de test épuisés) ; le succès du déploiement et des tests CI est confirmé.
+
+### Limites externes restantes
+
+- La configuration Supabase Auth `Site URL` / `Redirect URLs` n'est pas modifiable via les actions Supabase disponibles. Site URL attendu : `https://nazumacky-0312.github.io/Forge-muscu/` ; autoriser aussi `https://nazumacky-0312.github.io/Forge-muscu/preview/` pour les essais depuis l'aperçu.
+- La synchronisation réelle des photos entre deux comptes/appareils n'a pas été testée avec un compte utilisateur authentifié.
+- Les enchaînements Superset/Circuit avec alternance automatique des séries, le glisser-déposer des exercices, les classements entre amis et Health Connect restent à développer.
+- Les favoris alimentaires dédiés ne sont pas encore ajoutés ; la recherche Open Food Facts et le scanner quand BarcodeDetector est disponible existent déjà.
+- L'advisor Supabase signale que la protection contre les mots de passe compromis est désactivée. À activer dans le Dashboard si l'authentification par mot de passe est utilisée.
+- La vérification visuelle sur un vrai téléphone Android, la configuration Auth externe et la publication en production restent à effectuer après validation finale.
+
+### Règle de reprise
+
+Continuer depuis la branche `forge-avatar-3d-integration`. Ne pas fusionner les anciennes branches PR #2, #3 ou #4 sans nouvelle comparaison. Ne pas annoncer la publication tant que le déploiement `main` et le site public n'ont pas été vérifiés.

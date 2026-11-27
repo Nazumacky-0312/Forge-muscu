@@ -1,0 +1,10 @@
+.forge-nutrition-favorites{display:grid;gap:10px;margin:12px 0;padding:14px;border:1px solid var(--bord,rgba(255,255,255,.1));border-radius:14px;background:var(--surface2,rgba(255,255,255,.025))}
+.forge-nutrition-favorites-head{font-size:.92rem;font-weight:750}
+.forge-nutrition-favorites-empty,.forge-nutrition-favorites-foot{margin:0;color:var(--muted,#aab0b8);font-size:.76rem;line-height:1.45}
+.forge-nutrition-favorite-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--bord,rgba(255,255,255,.08))}
+.forge-nutrition-favorite-info{display:grid;gap:4px;min-width:0}
+.forge-nutrition-favorite-info strong{font-size:.84rem;overflow-wrap:anywhere}
+.forge-nutrition-favorite-info small{color:var(--muted,#aab0b8);font-size:.72rem}
+.forge-nutrition-favorite-actions{display:flex;flex-wrap:wrap;gap:6px;flex:0 0 auto}
+.forge-nutrition-favorite-actions .btn,.forge-nutrition-favorite-toggle{font-size:.72rem}
+@media(max-width:480px){.forge-nutrition-favorite-item{align-items:flex-start;flex-direction:column}.forge-nutrition-favorite-actions{width:100%}.forge-nutrition-favorite-actions .btn{flex:1}}

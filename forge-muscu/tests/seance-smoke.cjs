@@ -38,7 +38,13 @@ const mime = {
         route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
       page.on('pageerror', error => failures.push(`${viewport.name}: ${error.message}`));
       page.on('console', msg => { if (msg.type() === 'error' && !msg.text().includes('Failed to load resource')) failures.push(`${viewport.name} console: ${msg.text()}`); });
-      page.on('requestfailed', req => failures.push(`${viewport.name} request failed: ${req.url()} :: ${req.failure()?.errorText || 'unknown'}`));
+      page.on('requestfailed', req => {
+        const url = req.url();
+        const failure = req.failure()?.errorText || 'unknown';
+        const optionalAvatarAsset = /(?:cdn\.jsdelivr\.net\/npm\/three@0\.160\.0|esm\.sh\/three@0\.160\.0|open-anatomy-3d@0\.1\.0)/i.test(url);
+        const expectedImageAbort = failure.includes('ERR_ABORTED') && /\/images\/exercises\//i.test(url);
+        if (!optionalAvatarAsset && !expectedImageAbort) failures.push(`${viewport.name} request failed: ${url} :: ${failure}`);
+      });
       try {
         await page.goto(`http://127.0.0.1:${port}/#/programme`, { waitUntil: 'domcontentloaded' });
         await page.getByRole('heading', { name: 'Séance' }).waitFor();
@@ -149,6 +155,39 @@ const mime = {
         await page.waitForURL('**/#/seance');
         const started = await page.evaluate(() => !!window.FM.app.etat.active && window.FM.app.etat.active.exercices.length > 0);
         if (!started) throw new Error('Le bouton principal doit créer et lancer une séance réelle.');
+        await page.locator('.forge-set-details').waitFor();
+        const tempoInput = page.locator('.forge-set-details label').filter({ hasText: 'Tempo' }).locator('input');
+        const sideSelect = page.locator('.forge-set-details label').filter({ hasText: 'Côté' }).locator('select');
+        await tempoInput.fill('3-1-1-0');
+        await tempoInput.dispatchEvent('change');
+        await sideSelect.selectOption('gauche');
+        await page.evaluate(() => window.FM.app.sauver());
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.waitForURL('**/#/seance');
+        await page.locator('.forge-set-details').waitFor();
+        const persistedSet = await page.evaluate(() => {
+          const active = window.FM.app.etat.active;
+          const entry = active.exercices[active.index];
+          const set = entry.series.find(item => !item.fait) || entry.series[entry.series.length - 1];
+          return { tempo: set.tempo, side: set.side };
+        });
+        if (persistedSet.tempo !== '3-1-1-0' || persistedSet.side !== 'gauche') {
+          throw new Error('Le tempo et le suivi gauche/droite ne sont pas conservés après rechargement : ' + JSON.stringify(persistedSet));
+        }
+        await page.getByRole('link', { name: 'Calculateur de barre' }).click();
+        await page.waitForURL('**/#/pro/barre');
+        await page.getByRole('heading', { name: 'Calculateur de barre' }).waitFor();
+        await page.locator('.forge-bar-field input').fill('100');
+        await page.getByRole('button', { name: 'Calculer les disques' }).click();
+        const barResult = await page.locator('.forge-bar-result').textContent();
+        if (!barResult.includes('100 kg') || !barResult.includes('25 kg') || !barResult.includes('15 kg')) {
+          throw new Error('Le calculateur de barre ne trouve pas la bonne combinaison : ' + barResult);
+        }
+        await page.locator('.forge-bar-field input').fill('15');
+        await page.getByRole('button', { name: 'Calculer les disques' }).click();
+        if (!(await page.locator('.forge-bar-result').textContent()).includes('supérieure ou égale')) {
+          throw new Error('Le calculateur doit refuser une charge inférieure au poids de la barre.');
+        }
         await page.evaluate(() => { window.FM.app.etat.active = null; window.FM.app.sauver(); window.FM.app.aller('#/classement'); });
         await page.waitForURL('**/#/classement');
         await page.getByRole('heading', { name: 'Rangs Forge' }).waitFor();
@@ -164,6 +203,32 @@ const mime = {
           throw new Error('Body Forge et Rangs Forge doivent être les deux seuls onglets du classement.');
         }
         await page.locator('.forge-body-rank-ladder .forge-body-rank-step').nth(8).waitFor();
+        const avatarIntegration = await page.evaluate(() => ({
+          module: !!document.querySelector('script[type="module"][src="js/body-forge-avatar-3d.js"]'),
+          stylesheet: !!document.querySelector('link[href^="css/body-forge-avatar-3d.css"]')?.sheet,
+          stage: !!document.querySelector('.forge-avatar-3d-stage'),
+          muscleDetails: !!document.querySelector('.forge-avatar-muscle-details'),
+          fallback: !!document.querySelector('.forge-bodygraph-pair svg'),
+          attribution: document.querySelector('.forge-avatar-attribution')?.textContent.includes('BodyParts3D') && document.querySelector('.forge-avatar-attribution')?.textContent.includes('CC BY 4.0'),
+          views: document.querySelectorAll('.forge-avatar-3d-views [data-view]').length,
+          sexes: document.querySelectorAll('.forge-avatar-switch [data-sex]').length
+        }));
+        if (!avatarIntegration.module || !avatarIntegration.stylesheet || !avatarIntegration.stage || !avatarIntegration.muscleDetails ||
+            !avatarIntegration.fallback || !avatarIntegration.attribution || avatarIntegration.views !== 2 || avatarIntegration.sexes !== 2) {
+          throw new Error('L’intégration de l’avatar 3D et son fallback doivent être présents : ' + JSON.stringify(avatarIntegration));
+        }
+        await page.locator('.forge-avatar-switch [data-sex="f"]').evaluate(el => el.click());
+        if (!(await page.locator('.forge-avatar-switch [data-sex="f"]').evaluate(el => el.classList.contains('active')))) {
+          throw new Error('Le sélecteur de modèle féminin ne fonctionne pas.');
+        }
+        await page.locator('.forge-avatar-switch [data-sex="m"]').evaluate(el => el.click());
+        const backView = page.locator('.forge-avatar-3d-views [data-view="back"]');
+        if (await backView.isVisible()) {
+          await backView.evaluate(el => el.click());
+          if (!(await backView.evaluate(el => el.classList.contains('active')))) {
+            throw new Error('Le sélecteur de vue arrière ne fonctionne pas.');
+          }
+        }
         if (await page.getByText('Classement hebdomadaire').count()) {
           throw new Error('Body Forge ne doit plus utiliser l’ancien classement hebdomadaire.');
         }
@@ -206,7 +271,7 @@ const mime = {
         });
         await page.waitForURL('**/#/seance');
         await page.locator('.forge-set-details').waitFor();
-        await page.locator('.forge-meta-field select').selectOption('echauffement');
+        await page.locator('.forge-set-details label').filter({ hasText: 'Type de série' }).locator('select').selectOption('echauffement');
         await page.locator('.forge-meta-grid input').nth(0).fill('9.5');
         await page.locator('.forge-meta-grid input').nth(0).press('Tab');
         await page.locator('.forge-meta-grid input').nth(1).fill('1');
@@ -228,7 +293,7 @@ const mime = {
         if (warmupVolume !== 0) throw new Error('Les séries d’échauffement sont comptées dans le volume de travail.');
 
         /* Distance et temps sous tension sont des champs réels, persistés avec la série. */
-        await page.locator('.forge-meta-field select').selectOption('distance');
+        await page.locator('.forge-set-details label').filter({ hasText: 'Type de série' }).locator('select').selectOption('distance');
         await page.locator('.forge-set-details input[type=number]').nth(2).fill('1250');
         await page.locator('.forge-set-details input[type=number]').nth(2).press('Tab');
         await page.evaluate(() => window.FM.app.sauver());
@@ -237,7 +302,7 @@ const mime = {
         let distance = await page.evaluate(() => window.FM.app.etat.active.exercices[0].series[0].distance);
         if (distance !== 1250) throw new Error('La distance n’est pas conservée après rechargement.');
 
-        await page.locator('.forge-meta-field select').selectOption('tension');
+        await page.locator('.forge-set-details label').filter({ hasText: 'Type de série' }).locator('select').selectOption('tension');
         await page.locator('.forge-set-details input[type=number]').nth(2).fill('35');
         await page.locator('.forge-set-details input[type=number]').nth(2).press('Tab');
         await page.evaluate(() => window.FM.app.sauver());

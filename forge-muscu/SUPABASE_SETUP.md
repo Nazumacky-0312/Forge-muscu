@@ -76,9 +76,19 @@ Ensuite, dans Forge, ouvrir Profil > Sauvegarde cloud, activer le service, saisi
 - Les suppressions cloud ne suppriment pas les données locales de l'appareil.
 - Les payloads doivent être migrés par `schema_version` avant d'être utilisés par une version plus récente.
 
-## Photos de progression
+## Photos de progression — opérationnelles en local
 
-Le bucket privé est créé et protégé par RLS. L'interface d'envoi, de liste et de suppression des photos n'est pas encore reliée au bucket. Ne pas considérer la sauvegarde des photos comme opérationnelle.
+- Bucket Storage : `forge-progress-photos`, privé, limite 15 Mo par fichier, types JPEG/PNG/WebP.
+- Table : `public.forge_progress_photos`.
+- Migration appliquée : `20261127121314_forge_progress_photos.sql`.
+- RLS : lecture, insertion et suppression limitées à `auth.uid() = user_id`.
+- Les chemins Storage commencent par l'UUID du propriétaire, puis la date et l'identifiant de la photo.
+- Forge enregistre d'abord les photos dans IndexedDB, les compresse à 1600 px maximum et peut ensuite les synchroniser dans le bucket privé.
+- Les dix photos distantes les plus récentes sont téléchargées localement lors d'une synchronisation pour rester consultables hors ligne.
+- Les URL signées utilisées pour les photos distantes expirent après 15 minutes.
+- Les photos ne sont pas incluses dans l'export JSON des séances ; chaque photo locale peut être téléchargée individuellement.
+
+La sauvegarde locale, la galerie, la suppression locale et le mode hors ligne sont couverts par des tests Playwright mobile/ordinateur. La synchronisation réelle entre comptes/appareils nécessite une authentification e-mail configurée et un compte de test.
 
 ## Vérification effectuée
 
@@ -88,7 +98,15 @@ Après application :
 - la RPC existe ;
 - le bucket privé existe ;
 - les politiques DELETE propres à l'utilisateur existent ;
-- les advisors de sécurité ne signalent aucun problème ;
+- l'advisor de sécurité ne signale qu'un avertissement : la protection contre les mots de passe compromis est désactivée. Cela ne bloque pas le Magic Link, mais il est recommandé de l'activer si l'authentification par mot de passe est utilisée ;
 - l'advisor performance signale uniquement l'index récent non encore utilisé, ce qui est normal tant qu'aucune donnée de synchronisation n'a été écrite.
 
 La connexion réelle par e-mail et la synchronisation entre deux appareils restent à tester avec un compte utilisateur après configuration de l'URL de redirection.
+
+## URLs d'authentification attendues
+
+- Site URL Supabase : `https://nazumacky-0312.github.io/Forge-muscu/`.
+- Redirect URLs à autoriser : `https://nazumacky-0312.github.io/Forge-muscu/` et `https://nazumacky-0312.github.io/Forge-muscu/preview/`.
+- L'application construit `emailRedirectTo` depuis l'URL courante ; la seconde adresse est donc nécessaire pour tester l'authentification depuis la prévisualisation.
+
+La configuration Auth du projet n'est pas exposée par les actions Supabase disponibles dans cette session.
