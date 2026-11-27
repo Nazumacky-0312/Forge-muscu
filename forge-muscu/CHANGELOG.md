@@ -26,5 +26,6 @@ La branche reste en brouillon. La connexion e-mail réelle, la synchronisation m
 - Navigation Programme / Exercices / Suivi mise en évidence, sticky et adaptée aux petits écrans.
 - États actif, survol et focus clavier clarifiés ; animations désactivées si l'utilisateur préfère réduire les mouvements.
 - Ajout d'assertions Playwright sur la navigation responsive, l'onglet actif, les débordements horizontaux et les libellés de boutons sur une seule ligne.
-- Inspection des captures Playwright : correction d'un retour à la ligne indésirable sur le bouton « Modifier » en mobile.
-- Validation CI réussie sur mobile et desktop (runs `45941596067` et `45941761861`, commits `b0eed459` et `2852879f`).
+- Inspection des captures Playwright : correction du retour à la ligne du bouton « Modifier » en mobile, sans forcer les autres boutons à déborder.
+- Les actions « Nouvelle séance » et « Régénérer le programme » conservent leur espace et ne se chevauchent plus.
+- Validation CI réussie sur mobile et desktop (runs `45941596067`, `45941761861` et `45941941328`, derniers commits `b0eed459`, `2852879f` et `d6d2259`).
