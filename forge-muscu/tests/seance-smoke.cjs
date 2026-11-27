@@ -16,7 +16,7 @@ const mime = {
   const server = http.createServer((req, res) => {
     const pathname = decodeURIComponent(new URL(req.url, `http://127.0.0.1:${port}`).pathname);
     const file = path.resolve(root, '.' + pathname);
-    if (!file.startsWith(root + path.sep) && file !== path.join(root, 'index.html')) {
+    if (file !== root && !file.startsWith(root + path.sep)) {
       res.writeHead(403).end(); return;
     }
     const target = fs.existsSync(file) && fs.statSync(file).isDirectory() ? path.join(file, 'index.html') : file;
