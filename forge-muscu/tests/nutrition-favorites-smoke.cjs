@@ -34,10 +34,12 @@ const port = 4177;
       // Fixture réseau déterministe : le test ne dépend ni d'Open Food Facts,
       // ni d'un éventuel service worker déjà installé dans le navigateur.
       await page.addInitScript(() => {
+        window.__forgeNutritionMockCalls = [];
         const nativeFetch = window.fetch.bind(window);
         window.fetch = async (input, init) => {
           const url = typeof input === 'string' ? input : input && input.url;
           if (url && url.startsWith('https://world.openfoodfacts.org/')) {
+            window.__forgeNutritionMockCalls.push(url);
             return new Response(JSON.stringify({
               products: [{
                 product_name: 'Forge Protein Bar',
@@ -58,7 +60,16 @@ const port = 4177;
       await page.locator('input[type="search"]').waitFor();
       await page.locator('input[type="search"]').fill('protein bar');
       await page.getByRole('button', { name: 'Rechercher' }).click();
-      await page.getByRole('heading', { name: 'Forge Protein Bar' }).waitFor();
+      try {
+        await page.getByRole('heading', { name: 'Forge Protein Bar' }).waitFor();
+      } catch (error) {
+        const diagnostic = await page.evaluate(() => ({
+          mockCalls: window.__forgeNutritionMockCalls || [],
+          bodyText: document.body.innerText.slice(-2500),
+          fetchType: String(window.fetch).slice(0, 300)
+        }));
+        throw new Error('Résultat alimentaire absent sur ' + viewport.name + ' : ' + JSON.stringify(diagnostic) + ' ; ' + error.message);
+      }
       const toggle = page.locator('.forge-nutrition-favorite-toggle');
       await toggle.waitFor();
       await toggle.click();
