@@ -1,5 +1,14 @@
 # Changelog Forge Muscu
 
+## 28 novembre 2026 — Enchaînements et édition rapide des programmes
+
+- Ajout des supersets (deux exercices) et circuits (deux exercices ou plus) pendant une séance.
+- Les séries alternent automatiquement entre les exercices du groupe ; l'état et l'ordre restent sauvegardés après rechargement.
+- Ajout du glisser-déposer des exercices dans l'éditeur de programme, avec des contrôles de déplacement accessibles en complément.
+- Ajout de la duplication d'une séance modèle pour construire un programme plus vite.
+- Ajout de tests Playwright mobile et ordinateur pour vérifier ces parcours réels ; cache PWA incrémenté à v34.
+- La validation de ces changements et leur publication restent en attente du résultat complet des contrôles.
+
 ## 27 novembre 2026 — Première tranche de la refonte premium
 
 - Création d'une branche de sauvegarde et de la branche `forge-premium-upgrade`, avec PR brouillon #2.

@@ -62,6 +62,9 @@ jobs:
       - name: Test Séance on mobile and desktop
         run: FORGE_SITE=public node forge-muscu/tests/seance-smoke.cjs
 
+      - name: Test supersets, circuits and program editing on mobile and desktop
+        run: FORGE_SITE=public node forge-muscu/tests/workout-structures-smoke.cjs
+
       - name: Test Body Forge anatomical avatar on mobile and desktop
         run: FORGE_SITE=public node forge-muscu/tests/body-forge-avatar-smoke.cjs
       - name: Test local-first progress photo tracking on mobile and desktop

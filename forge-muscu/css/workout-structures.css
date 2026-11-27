@@ -1,0 +1,15 @@
+.forge-workout-structure{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:12px 0;padding:12px 14px;border:1px solid rgba(197,243,107,.22);border-radius:14px;background:rgba(197,243,107,.055)}
+.forge-workout-structure-copy{display:grid;gap:3px;flex:1 1 220px;min-width:0}
+.forge-workout-structure-copy strong{font-size:.9rem;color:var(--accent,#c5f36b)}
+.forge-workout-structure-copy span{font-size:.76rem;color:var(--muted,#aab0b8);line-height:1.45}
+.forge-session-reorder{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.forge-structure-options{display:grid;gap:8px;max-height:min(60vh,520px);overflow:auto}
+.forge-structure-option{display:flex;align-items:center;gap:11px;min-height:46px;padding:9px 11px;border:1px solid var(--bord,rgba(255,255,255,.1));border-radius:10px;background:var(--surface2,rgba(255,255,255,.025));font-size:.88rem}
+.forge-structure-option input{width:20px;height:20px;accent-color:var(--accent,#c5f36b);flex:0 0 auto}
+.forge-drag-source{opacity:.42}
+.forge-drop-target{outline:2px dashed var(--accent,#c5f36b);outline-offset:3px}
+.bloc[draggable=true]{cursor:grab}
+.forge-drag-handle{display:inline-grid;place-items:center;width:30px;min-height:30px;margin-right:5px;padding:0;border-radius:8px;color:var(--muted,#aab0b8);cursor:grab;touch-action:none;user-select:none}
+.forge-drag-handle:active{cursor:grabbing;background:rgba(197,243,107,.12);color:var(--accent,#c5f36b)}
+@media(max-width:520px){.forge-workout-structure{align-items:flex-start}.forge-workout-structure>.btn{min-height:42px}.forge-session-reorder>.btn{flex:1 1 140px}}
+@media(prefers-reduced-motion:reduce){.forge-drop-target{scroll-behavior:auto}}
