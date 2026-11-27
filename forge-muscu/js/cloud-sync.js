@@ -295,7 +295,7 @@
     box.append(element('p', '', 'Connecté : ' + (state.user.email || 'compte Supabase')));
     const conflict = (state.remote && getRevision() !== state.remote.revision) || (!state.remote && getRevision() !== null);
     if (conflict) {
-      box.append(element('p', 'alerte', 'La version cloud (' + state.remote.revision + ') et la version locale (' + (getRevision() === null ? 'non synchronisée' : getRevision()) + ') diffèrent.'));
+      box.append(element('p', 'alerte', state.remote ? ('La version cloud (' + state.remote.revision + ') et la version locale (' + (getRevision() === null ? 'non synchronisée' : getRevision()) + ') diffèrent.') : 'La sauvegarde cloud est absente alors que cet appareil possède une ancienne révision locale. Tu peux créer une nouvelle sauvegarde cloud à partir de cet appareil.'));
       if (state.remote) {
         const restore = element('button', 'btn geant', 'Restaurer la version cloud');
         restore.type = 'button';
