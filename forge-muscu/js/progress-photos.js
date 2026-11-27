@@ -257,7 +257,7 @@
   function buildSection(){
     const section=node('section','carte forge-progress-photos');
     section.append(node('p','surtitre','SUIVI VISUEL'),node('h2','','Photos de progression'));
-    section.append(node('p','discret','Compare ton évolution dans le temps. Les photos restent privées : elles sont conservées sur cet appareil et peuvent être synchronisées dans ton espace Supabase personnel.'));
+    section.append(node('p','discret','Compare ton évolution dans le temps. Les photos restent privées : elles sont conservées sur cet appareil et peuvent être synchronisées dans ton espace Supabase personnel. Elles ne sont pas incluses dans l’export JSON des séances ; tu peux télécharger chaque photo individuellement.'));
     const status=node('p','forge-progress-photos-status','Les photos seront enregistrées localement. La synchronisation cloud est facultative.');
     status.setAttribute('role','status');
     status.setAttribute('aria-live','polite');
