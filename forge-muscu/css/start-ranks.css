@@ -136,3 +136,14 @@
 .forge-bodygraph-card .forge-avatar-legend{justify-content:center;gap:8px 12px;padding:8px 2px 2px}
 .forge-bodygraph-card .forge-avatar-legend-item{font-size:.66rem}
 @media(max-width:370px){.forge-bodygraph-pair{gap:4px;padding-inline:3px}.forge-bodygraph-figure{max-height:290px}.forge-bodygraph-card .forge-avatar-legend{gap:7px 9px}}
+
+/* Bodygraph équilibré : relief doux, volumes et détails musculaires */
+.forge-bodygraph-depth .forge-bodygraph-pair{background:radial-gradient(ellipse at 50% 24%,#2c3b49 0%,#19242f 55%,#111820 100%);border-color:rgba(255,255,255,.11);box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 12px 28px rgba(0,0,0,.18)}
+.forge-bodygraph-depth .forge-bodygraph-person{padding:7px 5px 9px;border-radius:13px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(0,0,0,.08))}
+.forge-bodygraph-depth .forge-bodygraph-figure{max-height:360px;filter:drop-shadow(0 8px 7px rgba(0,0,0,.25))}
+.forge-bodygraph-depth .forge-bodygraph-figure .bf-base{fill:url(#skinfrontm);stroke:#71808e;stroke-width:1.55;stroke-linejoin:round}
+.forge-bodygraph-depth .forge-bodygraph-figure .bf-muscles{stroke:#17212b;stroke-width:1.45;stroke-linejoin:round;stroke-linecap:round}
+.forge-bodygraph-depth .forge-bodygraph-figure .bf-contours{fill:none;stroke:rgba(25,36,47,.5);stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round}
+.forge-bodygraph-depth .forge-bodygraph-figure .bf-highlight{pointer-events:none;stroke:rgba(255,255,255,.14);stroke-width:.7}
+.forge-bodygraph-depth .forge-bodygraph-person>span{padding:5px 10px;border-radius:20px;background:rgba(255,255,255,.055);color:#c4ced8}
+@media(max-width:370px){.forge-bodygraph-depth .forge-bodygraph-pair{gap:5px;padding:10px 3px}.forge-bodygraph-depth .forge-bodygraph-figure{max-height:310px}}
