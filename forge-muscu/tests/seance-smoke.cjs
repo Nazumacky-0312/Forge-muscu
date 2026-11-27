@@ -155,6 +155,39 @@ const mime = {
         await page.waitForURL('**/#/seance');
         const started = await page.evaluate(() => !!window.FM.app.etat.active && window.FM.app.etat.active.exercices.length > 0);
         if (!started) throw new Error('Le bouton principal doit créer et lancer une séance réelle.');
+        await page.locator('.forge-set-details').waitFor();
+        const tempoInput = page.locator('.forge-set-details label').filter({ hasText: 'Tempo' }).locator('input');
+        const sideSelect = page.locator('.forge-set-details label').filter({ hasText: 'Côté' }).locator('select');
+        await tempoInput.fill('3-1-1-0');
+        await tempoInput.dispatchEvent('change');
+        await sideSelect.selectOption('gauche');
+        await page.evaluate(() => window.FM.app.sauver());
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.waitForURL('**/#/seance');
+        await page.locator('.forge-set-details').waitFor();
+        const persistedSet = await page.evaluate(() => {
+          const active = window.FM.app.etat.active;
+          const entry = active.exercices[active.index];
+          const set = entry.series.find(item => !item.fait) || entry.series[entry.series.length - 1];
+          return { tempo: set.tempo, side: set.side };
+        });
+        if (persistedSet.tempo !== '3-1-1-0' || persistedSet.side !== 'gauche') {
+          throw new Error('Le tempo et le suivi gauche/droite ne sont pas conservés après rechargement : ' + JSON.stringify(persistedSet));
+        }
+        await page.getByRole('link', { name: 'Calculateur de barre' }).click();
+        await page.waitForURL('**/#/pro/barre');
+        await page.getByRole('heading', { name: 'Calculateur de barre' }).waitFor();
+        await page.locator('.forge-bar-field input').fill('100');
+        await page.getByRole('button', { name: 'Calculer les disques' }).click();
+        const barResult = await page.locator('.forge-bar-result').textContent();
+        if (!barResult.includes('100 kg') || !barResult.includes('25 kg') || !barResult.includes('15 kg')) {
+          throw new Error('Le calculateur de barre ne trouve pas la bonne combinaison : ' + barResult);
+        }
+        await page.locator('.forge-bar-field input').fill('15');
+        await page.getByRole('button', { name: 'Calculer les disques' }).click();
+        if (!(await page.locator('.forge-bar-result').textContent()).includes('supérieure ou égale')) {
+          throw new Error('Le calculateur doit refuser une charge inférieure au poids de la barre.');
+        }
         await page.evaluate(() => { window.FM.app.etat.active = null; window.FM.app.sauver(); window.FM.app.aller('#/classement'); });
         await page.waitForURL('**/#/classement');
         await page.getByRole('heading', { name: 'Rangs Forge' }).waitFor();
