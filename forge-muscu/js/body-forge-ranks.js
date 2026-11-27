@@ -103,10 +103,12 @@
     let attempts=0, mounted=false;
     const showLoadError=message=>{
       if(mounted||!host.isConnected)return;
-      host.replaceChildren(h('div',{class:'forge-avatar-load-error'},
+      const panel=h('div',{class:'forge-avatar-load-error'},
         h('strong',{},'Avatar 3D indisponible'),
         h('span',{},message||'Le moteur 3D ne s’est pas chargé. Vérifie ta connexion puis réessaie.'),
-        h('button',{type:'button',class:'btn primaire',onclick:()=>{attempts=0;host.replaceChildren();init();}},'Réessayer')));
+        h('button',{type:'button',class:'btn primaire'},'Réessayer'));
+      panel.querySelector('button').addEventListener('click',()=>{attempts=0;host.replaceChildren();init();});
+      host.replaceChildren(panel);
     };
     const init=()=>{
       if(mounted)return;
