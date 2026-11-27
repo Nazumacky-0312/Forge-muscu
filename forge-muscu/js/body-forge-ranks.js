@@ -107,18 +107,50 @@
     const figures=h('div',{class:'forge-bodygraph-pair'});
     const draw=sex=>{figures.innerHTML='<div class="forge-bodygraph-person">'+figure('front',sex)+'<span>AVANT</span></div><div class="forge-bodygraph-person">'+figure('back',sex)+'<span>ARRIÈRE</span></div>';};
     draw(initialSex);
+    const stage=h('div',{class:'forge-avatar-3d-stage','aria-label':'Avatar musculaire 3D interactif'});
+    const viewControls=h('div',{class:'forge-avatar-3d-views','aria-label':'Orientation de l’avatar'},
+      h('button',{type:'button',class:'forge-avatar-choice active','data-view':'front'},'Vue de face'),
+      h('button',{type:'button',class:'forge-avatar-choice','data-view':'back'},'Vue de dos'));
     const legend=RANKS.map((r,i)=>'<span class="forge-avatar-legend-item"><i style="background:'+RANK_COLORS[i]+'"></i>'+r.name+'</span>').join('');
     const section=h('section',{class:'carte forge-avatar-card forge-bodygraph-card forge-bodygraph-depth'},
       h('div',{class:'forge-card-head'},h('div',{},h('span',{class:'surtitre'},'BODYGRAPH'),h('h2',{},'Tes muscles')),
-        h('span',{class:'forge-tag'},'RELIEF MUSCULAIRE')),
-      h('p',{class:'discret'},'Une silhouette plus détaillée, avec des volumes et des contours pour mieux distinguer chaque groupe musculaire.'), 
+        h('span',{class:'forge-tag'},'AVATAR 3D')),
+      h('p',{class:'discret'},'Fais glisser le modèle pour le faire pivoter. Utilise les vues avant et arrière pour observer les groupes musculaires colorés selon tes rangs.'),
       h('div',{class:'forge-avatar-controls'},initialButtons),
+      stage,
+      viewControls,
       figures,
       h('div',{class:'forge-avatar-legend',innerHTML:legend}));
+    let avatarApi=null;
+    const ranksForModel={...rankByMuscle,upperarms:Math.max(rankByMuscle.biceps??-1,rankByMuscle.triceps??-1)};
+    const mount3D=()=>{
+      if(!root.ForgeAvatar3D||avatarApi||!stage.isConnected)return;
+      try{avatarApi=root.ForgeAvatar3D.mount(stage,{sex:initialSex,ranks:ranksForModel});}
+      catch(error){console.warn('Forge Muscu — avatar 3D indisponible :',error);}
+    };
+    const stageObserver=new MutationObserver(()=>{
+      if(stage.dataset.avatarLoaded==='true')section.classList.add('is-3d-ready');
+    });
+    stageObserver.observe(stage,{attributes:true,attributeFilter:['data-avatar-loaded']});
+    if(root.ForgeAvatar3D)mount3D();
+    else root.addEventListener('forge-avatar-ready',mount3D,{once:true});
     section.querySelectorAll('[data-sex]').forEach(button=>button.addEventListener('click',()=>{
       section.querySelectorAll('[data-sex]').forEach(b=>b.classList.toggle('active',b===button));
       draw(button.dataset.sex);
+      avatarApi?.setSex(button.dataset.sex);
     }));
+    section.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
+      section.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b===button));
+      avatarApi?.setView(button.dataset.view);
+    }));
+    const cleanupObserver=new MutationObserver(()=>{
+      if(!section.isConnected){
+        avatarApi?.dispose();
+        stageObserver.disconnect();
+        cleanupObserver.disconnect();
+      }
+    });
+    cleanupObserver.observe(root.document.body,{childList:true,subtree:true});
     return section;
   }
   function bodyForge(app){
