@@ -88,7 +88,117 @@
     const current=paliers[index],next=paliers[index+1]||null;
     return {sessions,sets,prs,cardio,xp,index,current,next,progress:next?Math.min(100,(xp-current.min)/(next.min-current.min)*100):100};
   }
-  FM.vues.classement=function(app){
+  function ongletsClassement(bodyActif){
+    return h('nav',{class:'forge-seance-tabs forge-rank-tabs','aria-label':'Classements'},
+      h('a',{class:'forge-seance-tab'+(!bodyActif?' active':''),href:'#/classement','aria-current':!bodyActif?'page':null},'Rangs Forge'),
+      h('a',{class:'forge-seance-tab'+(bodyActif?' active':''),href:'#/classement/body','aria-current':bodyActif?'page':null},'Body Forge'));
+  }
+  function semaineBodyForge(){
+    const lundi=new Date();lundi.setHours(0,0,0,0);lundi.setDate(lundi.getDate()-((lundi.getDay()+6)%7));
+    const fin=new Date(lundi);fin.setDate(fin.getDate()+7);
+    const iso=lundi.getFullYear()+'-'+String(lundi.getMonth()+1).padStart(2,'0')+'-'+String(lundi.getDate()).padStart(2,'0');
+    return {debut:lundi,fin,iso,label:lundi.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})};
+  }
+  function calculBodyForge(e,semaine){
+    const sessions=(e.seances||[]).filter(s=>Number(s.debut)>=semaine.debut.getTime()&&Number(s.debut)<semaine.fin.getTime());
+    const sets=sessions.reduce((n,s)=>n+(s.exercices||[]).reduce((a,x)=>a+(x.series||[]).filter(y=>y.fait&&Number(y.reps)>0&&y.type!=='echauffement').length,0),0);
+    const records=sessions.reduce((n,s)=>n+FM.nouveauxRecords(e.seances||[],s).length,0);
+    const points=sessions.length*100+sets*5+records*25;
+    const divisions=[{nom:'Rookie',min:0,icone:'🌱'},{nom:'Bronze',min:200,icone:'🥉'},{nom:'Argent',min:400,icone:'🥈'},{nom:'Or',min:700,icone:'🥇'},{nom:'Diamant',min:1000,icone:'💎'}];
+    let division=divisions[0],suivante=divisions[1];
+    divisions.forEach((d,i)=>{if(points>=d.min){division=d;suivante=divisions[i+1]||null;}});
+    return {sessions:sessions.length,sets,records,points,division,suivante};
+  }
+  function bodyForge(app){
+    const semaine=semaineBodyForge(),score=calculBodyForge(app.etat,semaine);
+    const rootPage=h('div',{class:'forge-page forge-body-forge'},ongletsClassement(true),
+      h('p',{class:'surtitre'},'LA COMPÉTITION FORGE'),h('h1',{},'Body Forge'),
+      h('p',{class:'discret'},'Chaque semaine, grimpe au classement grâce à ta régularité, tes séries validées et tes records. Les charges ne donnent aucun avantage.'),
+      carte(h('div',{class:'forge-body-score-head'},h('div',{},h('p',{class:'surtitre'},'TA SAISON · SEMAINE DU '+semaine.label.toUpperCase()),h('h2',{},score.division.icone+' '+score.division.nom)),h('strong',{class:'forge-body-points'},score.points.toLocaleString('fr-FR')+' pts')),
+        h('div',{class:'forge-body-stats'},
+          h('div',{},h('strong',{},String(score.sessions)),h('span',{},'Séances')),
+          h('div',{},h('strong',{},String(score.sets)),h('span',{},'Séries')),
+          h('div',{},h('strong',{},String(score.records)),h('span',{},'Records'))),
+        h('p',{class:'discret'},score.suivante?(score.suivante.min-score.points).toLocaleString('fr-FR')+' points pour atteindre '+score.suivante.nom:'Tu as atteint la division maximale de la semaine.')),
+      carte(h('div',{class:'forge-card-head'},h('h2',{},'Classement hebdomadaire'),h('span',{class:'forge-tag'},'TOP 20')),
+        h('p',{class:'discret'},'Les membres apparaissent avec un pseudo public. Ton adresse e-mail et tes données personnelles ne sont jamais affichées.'),
+        h('div',{class:'forge-body-board-status','aria-live':'polite'},'Chargement du classement…'),
+        h('div',{class:'forge-body-board'}),
+        h('div',{class:'forge-body-join'}),
+        FM.btn('Actualiser le classement',()=>charger(),'primaire geant forge-body-refresh')),
+      carte(h('h2',{},'Comment gagner des points ?'),
+        h('div',{class:'forge-body-rules'},
+          h('div',{},h('strong',{},'+100'),h('span',{},'Séance terminée')),
+          h('div',{},h('strong',{},'+5'),h('span',{},'Série de travail validée')),
+          h('div',{},h('strong',{},'+25'),h('span',{},'Record personnel battu'))),
+        h('p',{class:'discret'},'Le classement repart à zéro chaque lundi. Pas de points pour les séries d’échauffement. Le but : progresser régulièrement, pas s’entraîner sans récupérer.')));
+    const status=rootPage.querySelector('.forge-body-board-status');
+    const board=rootPage.querySelector('.forge-body-board');
+    const join=rootPage.querySelector('.forge-body-join');
+    const safeGet=k=>{try{return root.localStorage.getItem(k);}catch(_){return null;}};
+    const safeSet=(k,v)=>{try{root.localStorage.setItem(k,v);}catch(_){/* stockage local indisponible */}};
+    let client=null,session=null,ownNickname='';
+    function afficherBoard(rows){
+      board.replaceChildren();
+      if(!rows.length){board.append(h('p',{class:'discret'},'Le classement est encore vide. Rejoins Body Forge pour ouvrir la saison !'));return;}
+      rows.forEach((r,i)=>{
+        const isYou=!!ownNickname&&r.nickname===ownNickname;
+        board.append(h('div',{class:'forge-body-board-row'+(isYou?' is-you':'')},
+          h('span',{class:'forge-body-position'},i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)),
+          h('div',{class:'forge-body-member'},h('strong',{},r.nickname),h('small',{},(r.weekly_sessions||0)+' séances · '+(r.weekly_sets||0)+' séries')),
+          h('strong',{class:'forge-body-member-points'},Number(r.weekly_points||0).toLocaleString('fr-FR')+' pts')));
+      });
+      if(ownNickname&&!rows.some(r=>r.nickname===ownNickname))board.append(h('p',{class:'discret'},'Tu es inscrit, mais tu es actuellement en dehors du top 20. Continue ta progression !'));
+    }
+    function afficherConnexion(){
+      join.replaceChildren();
+      if(!session){
+        join.append(h('p',{class:'discret'},'Pour apparaître dans le classement, connecte-toi à ton compte Forge puis reviens ici.'),FM.lien('#/profil','Se connecter dans Profil','forge-body-profile-link'));
+        return;
+      }
+      if(ownNickname){join.append(h('p',{class:'forge-body-optin'},'✓ Tu participes au classement sous le pseudo '+ownNickname+'.'));return;}
+      const form=h('form',{class:'forge-body-join-form'},h('label',{},'Choisis ton pseudo public',h('input',{type:'text',name:'nickname',minlength:2,maxlength:20,required:true,autocomplete:'nickname',placeholder:'Ex. IronMax'})),h('p',{class:'discret'},'Ton pseudo et tes points hebdomadaires seront visibles par les autres membres. Tu peux quitter le classement en supprimant ta participation depuis cet écran.'));
+      const submit=h('button',{type:'submit',class:'btn primaire geant'},'Rejoindre Body Forge');form.append(submit);
+      form.addEventListener('submit',async ev=>{
+        ev.preventDefault();const field=form.querySelector('input');const nickname=field.value.trim().replace(/\\s+/g,' ');
+        if(nickname.length<2||nickname.length>20||nickname.includes('@')){status.textContent='Choisis un pseudo de 2 à 20 caractères, sans adresse e-mail.';return;}
+        submit.disabled=true;status.textContent='Inscription au classement…';
+        const saved=await enregistrer(nickname);
+        submit.disabled=false;
+        if(saved){ownNickname=nickname;safeSet('forge-body-nickname:'+session.user.id,nickname);afficherConnexion();await charger();}
+      });
+      join.append(form);
+    }
+    async function enregistrer(nickname){
+      if(!client||!session)return false;
+      const {error}=await client.from('body_forge_leaderboard').upsert({user_id:session.user.id,nickname,weekly_points:score.points,weekly_sessions:score.sessions,weekly_sets:score.sets,week_start:semaine.iso},{onConflict:'user_id'});
+      if(error){status.textContent='Inscription impossible : '+error.message;return false;}
+      return true;
+    }
+    async function charger(){
+      status.textContent='Actualisation du classement…';
+      try{
+        if(!client){const module=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');client=module.createClient('https://xqvmfdvzgywinddxkbdl.supabase.co','sb_publishable_tHLViJ0JO41Phe24lPCL_g_XepTcbeQ',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}});}
+        const auth=await client.auth.getSession();if(auth.error)throw auth.error;session=auth.data.session;
+        if(session){
+          ownNickname=safeGet('forge-body-nickname:'+session.user.id)||'';
+          if(!ownNickname){const own=await client.from('body_forge_leaderboard').select('nickname').eq('user_id',session.user.id).maybeSingle();if(own.error)throw own.error;if(own.data){ownNickname=own.data.nickname;safeSet('forge-body-nickname:'+session.user.id,ownNickname);}}
+          if(ownNickname){const ok=await enregistrer(ownNickname);if(!ok)throw new Error('Mise à jour de ton score impossible.');}
+        }
+        const result=await client.from('body_forge_leaderboard').select('nickname,weekly_points,weekly_sessions,weekly_sets,week_start,updated_at').eq('week_start',semaine.iso).order('weekly_points',{ascending:false}).order('updated_at',{ascending:true}).limit(20);
+        if(result.error)throw result.error;
+        afficherBoard(result.data||[]);afficherConnexion();
+        status.textContent='Classement actualisé · semaine du '+semaine.label+'.';
+      }catch(error){
+        status.textContent='Classement indisponible pour le moment. Tes statistiques restent enregistrées sur cet appareil.';
+        afficherConnexion();
+      }
+    }
+    Promise.resolve().then(charger);
+    return rootPage;
+  }
+  FM.vues.classement=function(app,sousPage){
+    if(sousPage==='body')return bodyForge(app);
     const s=stats(app.etat),e=app.etat;
     const bar=h('div',{class:'forge-rank-track'},h('i',{style:'width:'+s.progress+'%'}));
     const achievements=[
@@ -107,6 +217,7 @@
       h('div',{},h('strong',{},a[0]),h('small',{},a[1])),
       h('b',{class:'forge-achievement-state'},a[2]?'Obtenu':'À débloquer')));
     return h('div',{class:'forge-page forge-ranks-page'},
+      ongletsClassement(false),
       h('p',{class:'surtitre'},'TA PROGRESSION PERSONNELLE'),
       h('h1',{},'Rangs Forge'),
       carte(h('div',{class:'forge-rank-hero'},
