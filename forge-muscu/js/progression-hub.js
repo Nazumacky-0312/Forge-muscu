@@ -15,7 +15,8 @@
     records:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 14.7 8.4 20.7 9.3 16.4 13.5 17.4 19.5 12 16.7 6.6 19.5 7.6 13.5 3.3 9.3 9.3 8.4 12 3Z"/></svg>',
     history:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8m0-5v5h5m4-1v5l3 2"/></svg>',
     measures:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16 12-12 4 4L8 20H4v-4ZM13 7l4 4m-7-1 2 2m-5 1 2 2"/></svg>',
-    nutrition:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21c-4.5-2.2-7-6.2-7-10.2C5 6.5 8 4 12 4s7 2.5 7 6.8c0 4-2.5 8-7 10.2ZM12 4c0-1.2.7-2 2-2m-2 8c-2-2-4-2.3-6-2"/></svg>'
+    nutrition:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21c-4.5-2.2-7-6.2-7-10.2C5 6.5 8 4 12 4s7 2.5 7 6.8c0 4-2.5 8-7 10.2ZM12 4c0-1.2.7-2 2-2m-2 8c-2-2-4-2.3-6-2"/></svg>',
+    recovery:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"/></svg>'
   };
   const cards=[
     {key:'ranks',title:'Rangs Forge & Body Forge',description:'Tes niveaux, ton avatar musculaire et tes classements.',href:'#/classement'},
@@ -23,6 +24,7 @@
     {key:'records',title:'Records personnels',description:'Tes meilleures performances et tes 1RM estimés.',href:'#/suivi/records'},
     {key:'history',title:'Historique des séances',description:'Retrouve tes entraînements et compare tes périodes.',href:'#/suivi/historique'},
     {key:'measures',title:'Poids & mensurations',description:'Suis ton poids et tes mesures corporelles.',href:'#/profil'},
+    {key:'recovery',title:'Récupération musculaire',description:'Estimation des groupes sollicités et du repos nécessaire.',href:'#/recuperation'},
     {key:'nutrition',title:'Nutrition',description:'Calories, protéines, glucides, lipides et repas.',href:'#/nutrition'}
   ];
   FM.vues.progression=function(){
