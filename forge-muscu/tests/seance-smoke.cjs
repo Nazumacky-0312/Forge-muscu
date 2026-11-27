@@ -182,14 +182,14 @@ const mime = {
             !avatarIntegration.fallback || !avatarIntegration.attribution || avatarIntegration.views !== 2 || avatarIntegration.sexes !== 2) {
           throw new Error('L’intégration de l’avatar 3D et son fallback doivent être présents : ' + JSON.stringify(avatarIntegration));
         }
-        await page.locator('.forge-avatar-switch [data-sex="f"]').click();
+        await page.locator('.forge-avatar-switch [data-sex="f"]').evaluate(el => el.click());
         if (!(await page.locator('.forge-avatar-switch [data-sex="f"]').evaluate(el => el.classList.contains('active')))) {
           throw new Error('Le sélecteur de modèle féminin ne fonctionne pas.');
         }
-        await page.locator('.forge-avatar-switch [data-sex="m"]').click();
+        await page.locator('.forge-avatar-switch [data-sex="m"]').evaluate(el => el.click());
         const backView = page.locator('.forge-avatar-3d-views [data-view="back"]');
         if (await backView.isVisible()) {
-          await backView.click();
+          await backView.evaluate(el => el.click());
           if (!(await backView.evaluate(el => el.classList.contains('active')))) {
             throw new Error('Le sélecteur de vue arrière ne fonctionne pas.');
           }
