@@ -293,7 +293,7 @@ const mime = {
         if (warmupVolume !== 0) throw new Error('Les séries d’échauffement sont comptées dans le volume de travail.');
 
         /* Distance et temps sous tension sont des champs réels, persistés avec la série. */
-        await page.locator('.forge-meta-field select').selectOption('distance');
+        await page.locator('.forge-set-details label').filter({ hasText: 'Type de série' }).locator('select').selectOption('distance');
         await page.locator('.forge-set-details input[type=number]').nth(2).fill('1250');
         await page.locator('.forge-set-details input[type=number]').nth(2).press('Tab');
         await page.evaluate(() => window.FM.app.sauver());
@@ -302,7 +302,7 @@ const mime = {
         let distance = await page.evaluate(() => window.FM.app.etat.active.exercices[0].series[0].distance);
         if (distance !== 1250) throw new Error('La distance n’est pas conservée après rechargement.');
 
-        await page.locator('.forge-meta-field select').selectOption('tension');
+        await page.locator('.forge-set-details label').filter({ hasText: 'Type de série' }).locator('select').selectOption('tension');
         await page.locator('.forge-set-details input[type=number]').nth(2).fill('35');
         await page.locator('.forge-set-details input[type=number]').nth(2).press('Tab');
         await page.evaluate(() => window.FM.app.sauver());
