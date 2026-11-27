@@ -217,7 +217,7 @@ const mime = {
         await page.locator('.forge-set-details textarea').press('Tab');
         await page.evaluate(() => window.FM.app.sauver());
         await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-session-details.png`, fullPage: true });
-        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.reload({ waitUntil: 'commit' });
         await page.locator('.forge-set-details').waitFor();
         const metadata = await page.evaluate(() => {
           const entry = window.FM.app.etat.active.exercices[0];
@@ -234,7 +234,7 @@ const mime = {
         await page.locator('.forge-set-details input[type=number]').nth(2).fill('1250');
         await page.locator('.forge-set-details input[type=number]').nth(2).press('Tab');
         await page.evaluate(() => window.FM.app.sauver());
-        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.reload({ waitUntil: 'commit' });
         await page.locator('.forge-set-details').waitFor();
         let distance = await page.evaluate(() => window.FM.app.etat.active.exercices[0].series[0].distance);
         if (distance !== 1250) throw new Error('La distance n’est pas conservée après rechargement.');
@@ -243,7 +243,7 @@ const mime = {
         await page.locator('.forge-set-details input[type=number]').nth(2).fill('35');
         await page.locator('.forge-set-details input[type=number]').nth(2).press('Tab');
         await page.evaluate(() => window.FM.app.sauver());
-        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.reload({ waitUntil: 'commit' });
         await page.locator('.forge-set-details').waitFor();
         const duration = await page.evaluate(() => window.FM.app.etat.active.exercices[0].series[0].duration);
         if (duration !== 35) throw new Error('Le temps sous tension n’est pas conservé après rechargement.');
@@ -273,7 +273,7 @@ const mime = {
         await pauseButton.waitFor();
         await pauseButton.click();
         if (!(await page.evaluate(() => window.FM.app.etat.repos.paused))) throw new Error('Le minuteur ne passe pas en pause.');
-        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.reload({ waitUntil: 'commit' });
         await page.locator('[data-forge-pause]').waitFor();
         if ((await page.locator('[data-forge-pause]').innerText()) !== 'Reprendre') throw new Error('La pause du minuteur n’est pas conservée après rechargement.');
         await page.locator('[data-forge-pause]').click();
