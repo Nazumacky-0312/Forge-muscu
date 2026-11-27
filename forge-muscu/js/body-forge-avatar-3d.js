@@ -170,7 +170,7 @@ function mount(container,initial){
       while(part&&part!==avatar&&!Object.prototype.hasOwnProperty.call(MUSCLE_GROUP,part.name))part=part.parent;
       const active=part&&part!==avatar&&MUSCLE_GROUP[part.name]===selectedGroup;
       node.material.emissive.set(active?'#344d24':'#000000');
-      node.material.emissiveIntensity=active?.65:0;
+      node.material.emissiveIntensity=active ? .65 : 0;
     });
     container.dispatchEvent(new CustomEvent('forge-muscle-select',{detail:{muscle:selectedGroup,structure:owner.name}}));
   }
