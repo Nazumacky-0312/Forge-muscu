@@ -1,5 +1,15 @@
 /* Avatar 3D Body Forge — modèles musculaires homme/femme, couleurs liées aux rangs. */
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+let THREE;
+try {
+  THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js');
+} catch (primaryError) {
+  try {
+    THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js');
+  } catch (secondaryError) {
+    window.dispatchEvent(new CustomEvent('forge-avatar-error', {detail: String(secondaryError || primaryError)}));
+    throw secondaryError || primaryError;
+  }
+}
 
 const RANK_COLORS=['#8b929b','#b87945','#b9c0c9','#e4bd4c','#65c5c2','#59a8f4','#a17bf2','#f07855','#f4e3a0'];
 const BASE='#29323b', EDGE='#111820';
