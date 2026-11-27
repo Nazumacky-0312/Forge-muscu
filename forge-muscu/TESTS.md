@@ -11,6 +11,7 @@ Le test `tests/seance-smoke.cjs` est exécuté sur deux viewports :
 Parcours couverts :
 - ouverture de Séance et vérification des quatre rubriques principales ;
 - vérification des trois onglets Programme / Exercices / Suivi ;
+- vérification du style responsive de la navigation Séance : position sticky, trois colonnes, onglet actif et absence de débordement horizontal sur mobile et desktop ;
 - recherche, ouverture d'une fiche exercice et retour ;
 - affichage de l'état vide du suivi ;
 - rappel de reprise d'une séance active ;
