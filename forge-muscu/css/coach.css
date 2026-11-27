@@ -54,3 +54,36 @@
  .coach-prompt{font-size:.7rem;padding:8px}
  .coach-messages p{font-size:.84rem;max-width:96%}
 }
+
+
+/* Forge Coach autonome et démonstrations 2D locales */
+.forge-demo-svg{display:block;width:100%;height:auto;max-height:185px;border-radius:14px;background:radial-gradient(ellipse at 50% 65%,#263526 0%,#141c20 55%,#111820 100%)}
+.forge-demo-svg .demo-person{fill:none;stroke:#e6edf0;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;transform-box:fill-box;transform-origin:center bottom}
+.forge-demo-svg .demo-head{fill:#b8f34a;stroke:#e6edf0;stroke-width:2}
+.forge-demo-svg .demo-gear{transform-box:fill-box;transform-origin:center;animation:forge-gear-move 1.8s ease-in-out infinite}
+.forge-demo-svg .demo-joint{fill:#b8f34a}
+.forge-demo-svg .demo-path{animation:forge-path-pulse 1.3s ease-in-out infinite}
+.forge-demo-svg.squat .demo-person{animation:forge-squat-move 2.2s ease-in-out infinite}
+.forge-demo-svg.press .demo-person{transform:rotate(90deg) translateY(-18px) scale(.8);animation:forge-press-move 2s ease-in-out infinite}
+.forge-demo-svg.pull .demo-arm{animation:forge-pull-move 2s ease-in-out infinite}
+.forge-demo-svg.raise .demo-arm{animation:forge-raise-move 2s ease-in-out infinite}
+.forge-demo-svg.core .demo-body{animation:forge-core-move 2s ease-in-out infinite;transform-origin:160px 70px}
+.forge-demo-svg.hinge .demo-body{animation:forge-hinge-move 2s ease-in-out infinite;transform-origin:160px 70px}
+@keyframes forge-squat-move{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(12px) scaleY(.88)}}
+@keyframes forge-press-move{0%,100%{translate:0 0}50%{translate:0 -8px}}
+@keyframes forge-pull-move{0%,100%{transform:rotate(0)}50%{transform:rotate(-18deg)}}
+@keyframes forge-raise-move{0%,100%{transform:rotate(0)}50%{transform:rotate(-35deg)}}
+@keyframes forge-core-move{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
+@keyframes forge-hinge-move{0%,100%{transform:rotate(0)}50%{transform:rotate(22deg)}}
+@keyframes forge-gear-move{0%,100%{translate:0 0}50%{translate:0 -9px}}
+@keyframes forge-path-pulse{0%,100%{opacity:.35}50%{opacity:1}}
+.forge-media-fallback{display:grid;gap:8px;padding:14px;border:1px solid var(--bord);border-radius:14px}
+.forge-demo-title{font-weight:850;font-size:.86rem;margin-top:8px}
+.forge-demo-subtitle{font-size:.76rem;color:var(--accent,#b8f34a);font-weight:750;margin-top:3px}
+.forge-demo-phases{display:flex;justify-content:space-between;gap:10px;font-size:.7rem;color:var(--doux);margin-top:8px}
+.forge-demo-phases span{max-width:48%}
+.forge-demo-note{font-size:.62rem;color:var(--doux);margin:7px 0 0}
+.forge-ai-page .coach-status{border-color:#b8f34a45;color:#b8f34a}
+.forge-ai-page .coach-status i{background:#b8f34a;box-shadow:0 0 9px #b8f34a}
+.coach-answer-ready{animation:forge-answer-in .18s ease-out}
+@keyframes forge-answer-in{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
