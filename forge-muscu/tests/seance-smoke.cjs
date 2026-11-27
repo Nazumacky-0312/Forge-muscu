@@ -38,7 +38,11 @@ const mime = {
         route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
       page.on('pageerror', error => failures.push(`${viewport.name}: ${error.message}`));
       page.on('console', msg => { if (msg.type() === 'error' && !msg.text().includes('Failed to load resource')) failures.push(`${viewport.name} console: ${msg.text()}`); });
-      page.on('requestfailed', req => failures.push(`${viewport.name} request failed: ${req.url()} :: ${req.failure()?.errorText || 'unknown'}`));
+      page.on('requestfailed', req => {
+        const url = req.url();
+        const optionalAvatarAsset = /(?:cdn\.jsdelivr\.net\/npm\/three@0\.160\.0|esm\.sh\/three@0\.160\.0|open-anatomy-3d@0\.1\.0)/i.test(url);
+        if (!optionalAvatarAsset) failures.push(`${viewport.name} request failed: ${url} :: ${req.failure()?.errorText || 'unknown'}`);
+      });
       try {
         await page.goto(`http://127.0.0.1:${port}/#/programme`, { waitUntil: 'domcontentloaded' });
         await page.getByRole('heading', { name: 'Séance' }).waitFor();
