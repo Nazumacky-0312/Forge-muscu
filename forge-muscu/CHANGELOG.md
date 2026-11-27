@@ -25,5 +25,6 @@ La branche reste en brouillon. La connexion e-mail réelle, la synchronisation m
 - Amélioration de la hiérarchie visuelle de l'espace Séance et de son en-tête.
 - Navigation Programme / Exercices / Suivi mise en évidence, sticky et adaptée aux petits écrans.
 - États actif, survol et focus clavier clarifiés ; animations désactivées si l'utilisateur préfère réduire les mouvements.
-- Ajout d'assertions Playwright sur la navigation responsive, l'onglet actif et les débordements horizontaux.
-- Validation CI réussie sur mobile et desktop (run `45941596067`, commit `b0eed459`).
+- Ajout d'assertions Playwright sur la navigation responsive, l'onglet actif, les débordements horizontaux et les libellés de boutons sur une seule ligne.
+- Inspection des captures Playwright : correction d'un retour à la ligne indésirable sur le bouton « Modifier » en mobile.
+- Validation CI réussie sur mobile et desktop (runs `45941596067` et `45941761861`, commits `b0eed459` et `2852879f`).
