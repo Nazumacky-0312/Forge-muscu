@@ -56,6 +56,14 @@ const mime = {
         if (!hubLayout.sticky || hubLayout.columns !== 3 || hubLayout.activeLabel !== 'Programme' || hubLayout.overflow) {
           throw new Error('La navigation responsive de Séance est incorrecte : ' + JSON.stringify(hubLayout));
         }
+        const editButton = page.getByRole('button', { name: 'Modifier' }).first();
+        const editButtonLayout = await editButton.evaluate(button => {
+          const style = getComputedStyle(button);
+          return { whiteSpace: style.whiteSpace, fits: button.scrollWidth <= button.clientWidth + 1 };
+        });
+        if (editButtonLayout.whiteSpace !== 'nowrap' || !editButtonLayout.fits) {
+          throw new Error('Le bouton Modifier doit rester lisible sur une seule ligne : ' + JSON.stringify(editButtonLayout));
+        }
         await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-programme.png`, fullPage: true });
 
         await page.getByRole('link', { name: 'Exercices' }).click();
