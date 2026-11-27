@@ -100,19 +100,40 @@
       h('div',{class:'forge-avatar-3d-frame'},host),
       h('div',{class:'forge-avatar-legend',innerHTML:legend}),
       h('div',{class:'forge-avatar-customize'},h('span',{},'PERSONNALISATION'),h('b',{},'Prochaine étape'),h('small',{},'Visage, coiffure, morphologie et équipements à débloquer')));
-    const init=()=>{
-      if(!host.isConnected)return;
-      if(!root.ForgeAvatar3D){root.addEventListener('forge-avatar-ready',init,{once:true});return;}
-      const avatar=root.ForgeAvatar3D.mount(host,{sex:initialSex,ranks:rankByMuscle});
-      section.querySelectorAll('[data-sex]').forEach(button=>button.addEventListener('click',()=>{
-        avatar.setSex(button.dataset.sex);
-        section.querySelectorAll('[data-sex]').forEach(b=>b.classList.toggle('active',b===button));
-      }));
-      section.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
-        avatar.setView(button.dataset.view);
-        section.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b===button));
-      }));
+    let attempts=0, mounted=false;
+    const showLoadError=message=>{
+      if(mounted||!host.isConnected)return;
+      host.replaceChildren(h('div',{class:'forge-avatar-load-error'},
+        h('strong',{},'Avatar 3D indisponible'),
+        h('span',{},message||'Le moteur 3D ne s’est pas chargé. Vérifie ta connexion puis réessaie.'),
+        h('button',{type:'button',class:'btn primaire',onclick:()=>{attempts=0;host.replaceChildren();init();}},'Réessayer')));
     };
+    const init=()=>{
+      if(mounted)return;
+      if(!host.isConnected){if(attempts++<120)root.requestAnimationFrame(init);return;}
+      if(!root.ForgeAvatar3D){
+        if(attempts++===0)root.addEventListener('forge-avatar-ready',init,{once:true});
+        if(attempts<120)root.setTimeout(init,100);
+        else showLoadError('Le moteur 3D ne répond pas. Recharge la page et réessaie.');
+        return;
+      }
+      try{
+        const avatar=root.ForgeAvatar3D.mount(host,{sex:initialSex,ranks:rankByMuscle});
+        mounted=true;
+        section.querySelectorAll('[data-sex]').forEach(button=>button.addEventListener('click',()=>{
+          avatar.setSex(button.dataset.sex);
+          section.querySelectorAll('[data-sex]').forEach(b=>b.classList.toggle('active',b===button));
+        }));
+        section.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
+          avatar.setView(button.dataset.view);
+          section.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b===button));
+        }));
+      }catch(error){
+        console.error('Body Forge avatar 3D:',error);
+        showLoadError('Ton appareil n’a pas pu démarrer le rendu 3D. Appuie sur Réessayer.');
+      }
+    };
+    root.addEventListener('forge-avatar-error',event=>showLoadError(String(event.detail||'')),{once:true});
     root.requestAnimationFrame(init);
     return section;
   }
