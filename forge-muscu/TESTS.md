@@ -2,44 +2,45 @@
 
 Dernière mise à jour : 27 novembre 2026
 
-## Tests existants
+## Couverture Playwright ajoutée
 
-Le dépôt contient `tests/seance-smoke.cjs`, exécuté par GitHub Actions après extraction de `forge-muscu.zip` et superposition des modules du dossier `forge-muscu/`.
+Le test `tests/seance-smoke.cjs` est exécuté sur deux viewports :
+- mobile : 390×844 ;
+- ordinateur : 1365×900.
 
-Ce test vérifie :
-- ouverture de la page Séance ;
-- présence des quatre rubriques principales ;
-- présence des trois onglets Programme / Exercices / Suivi ;
-- recherche et ouverture d'une fiche exercice ;
-- retour à la bibliothèque ;
+Parcours couverts :
+- ouverture de Séance et vérification des quatre rubriques principales ;
+- vérification des trois onglets Programme / Exercices / Suivi ;
+- recherche, ouverture d'une fiche exercice et retour ;
 - affichage de l'état vide du suivi ;
-- navigation entre les onglets ;
-- exécution sur un viewport mobile 390×844 et desktop 1365×900 ;
-- présence du rappel de reprise d'une séance active ;
-- déclenchement de la sauvegarde de sécurité sur l'événement pagehide.
+- rappel de reprise d'une séance active ;
+- déclenchement de la sauvegarde de sécurité sur pagehide ;
+- saisie du type de série, RPE, RIR et note d'exercice ;
+- conservation de ces champs après rechargement ;
+- exclusion des séries d'échauffement du volume de travail ;
+- pause du minuteur, rechargement et reprise ;
+- ouverture du profil et présence du mode hors ligne malgré le module cloud facultatif.
 
 ## CI
 
 - Workflow : Deploy Forge Muscu to GitHub Pages
 - Dernier run de référence main : succès, commit `9ba36389d6e6e21e302bfcd88f659f592a286c30`
 - Run de référence : https://github.com/Nazumacky-0312/Forge-muscu/actions/runs/45938636091
-- Un run sur la branche de travail a démarré ; son résultat doit être vérifié avant de considérer les tests de reprise comme validés.
+- Les runs de la branche de travail sont déclenchés sur les pull requests. Le dernier résultat doit être vérifié avant de déclarer les nouveaux parcours validés.
+- Les jobs de la branche ne déploient pas sur GitHub Pages ; le déploiement est limité à `main`.
 
-## Limites de vérification
+## Tests non encore effectués
 
-Le poste distant était hors ligne et le navigateur cloud était indisponible faute de crédits. Aucun test visuel manuel n'est revendiqué pour la nouvelle branche.
+- [ ] Connexion réelle avec Magic Link sur l'URL GitHub Pages.
+- [ ] Première sauvegarde cloud avec un compte de test.
+- [ ] Restauration d'une sauvegarde distante.
+- [ ] Conflit de révision avec deux sessions/appareils.
+- [ ] Suppression de la sauvegarde cloud avec vérification que le local reste intact.
+- [ ] Upload et suppression de photos dans le bucket privé (interface non intégrée).
+- [ ] Import/export CSV et JSON sans perte des nouveaux champs.
+- [ ] Coach Forge sans réseau et sans API après les dernières modifications.
+- [ ] Vérification visuelle manuelle sur un vrai Android et sur ordinateur.
 
-## Tests requis avant publication
+## Limites
 
-- [ ] Résultat CI vert sur le dernier commit.
-- [ ] Reprendre une séance après actualisation et fermeture de l'onglet.
-- [ ] Vérifier que les modifications de séries sont persistées après rechargement.
-- [ ] Valider puis annuler une série.
-- [ ] Vérifier le minuteur après changement d'onglet.
-- [ ] Vérifier l'enregistrement de RPE/RIR, notes et douleur.
-- [ ] Vérifier les records et le volume à partir des seules séries validées.
-- [ ] Vérifier l'import/export CSV et JSON sans perte.
-- [ ] Vérifier que Coach Forge répond sans réseau et sans API.
-- [ ] Vérifier le cache PWA et l'activation d'une nouvelle version.
-- [ ] Vérifier l'authentification, les conflits de révision et l'isolation RLS avec deux comptes de test.
-- [ ] Vérifier les vues mobile et desktop.
+Le poste distant était hors ligne et le navigateur cloud était indisponible faute de crédits. Les tests de navigateur sont automatisés par GitHub Actions ; aucun test manuel sur un appareil physique n'est revendiqué.
