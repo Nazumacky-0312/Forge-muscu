@@ -4,26 +4,26 @@
 const API='https://exercise-database.zenithfits.com/api/v1/search?q=';
 const cache=new Map();
 const aliases=[
- [/développé.*couché|bench press|chest press/,'barbell bench press'],
- [/développé.*incliné/,'incline dumbbell bench press'],
- [/développé.*décliné/,'decline bench press'],
- [/écarté.*poulie|crossover|pec deck/,'cable chest fly'],
+ [/developpe.*couche|bench press|chest press/,'barbell bench press'],
+ [/developpe.*incline/,'incline dumbbell bench press'],
+ [/developpe.*decline/,'decline bench press'],
+ [/ecarte.*poulie|crossover|pec deck/,'cable chest fly'],
  [/pompe/,'push up'],[/dips?/,'chest dip'],
  [/tirage.*vertical|lat pulldown/,'lat pulldown'],[/traction/,'pull up'],
  [/rowing|tirage.*horizontal/,'seated cable row'],
- [/soulevé.*terre|deadlift/,'barbell deadlift'],[/squat/,'barbell squat'],
+ [/souleve.*terre|deadlift/,'barbell deadlift'],[/squat/,'barbell squat'],
  [/presse.*cuisse|leg press/,'leg press'],[/extension.*quadriceps|leg extension/,'leg extension'],
  [/curl.*ischio|leg curl/,'lying leg curl'],[/hip thrust|extension.*hanche/,'barbell hip thrust'],
  [/fente|lunge/,'dumbbell lunge'],[/mollet|calf raise/,'standing calf raise'],
  [/curl.*marteau|hammer curl/,'dumbbell hammer curl'],[/curl.*biceps|curl barre/,'barbell curl'],
- [/curl.*haltère|dumbbell curl/,'dumbbell biceps curl'],
+ [/curl.*haltere|dumbbell curl/,'dumbbell biceps curl'],
  [/extension.*triceps.*corde|pushdown/,'cable rope triceps pushdown'],
  [/extension.*triceps|triceps/,'cable triceps extension'],
- [/élévation.*latérale|elevation.*laterale/,'dumbbell lateral raise'],
- [/oiseau|arrière.*épaule|rear delt/,'dumbbell rear delt fly'],
+ [/elevation.*laterale|elevation.*laterale/,'dumbbell lateral raise'],
+ [/oiseau|arriere.*epaule|rear delt/,'dumbbell rear delt fly'],
  [/shrug|haussement/,'dumbbell shrug'],
  [/crunch.*poulie|cable crunch/,'cable crunch'],[/crunch/,'crunch'],
- [/gainage|planche|plank/,'plank'],[/relevé.*jambe|leg raise/,'lying leg raise'],
+ [/gainage|planche|plank/,'plank'],[/releve.*jambe|leg raise/,'lying leg raise'],
  [/rotation.*buste|russian twist|oblique/,'russian twist']
 ];
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
