@@ -102,3 +102,11 @@ Après application :
 - l'advisor performance signale uniquement l'index récent non encore utilisé, ce qui est normal tant qu'aucune donnée de synchronisation n'a été écrite.
 
 La connexion réelle par e-mail et la synchronisation entre deux appareils restent à tester avec un compte utilisateur après configuration de l'URL de redirection.
+
+## URLs d'authentification attendues
+
+- Site URL Supabase : `https://nazumacky-0312.github.io/Forge-muscu/`.
+- Redirect URLs à autoriser : `https://nazumacky-0312.github.io/Forge-muscu/` et `https://nazumacky-0312.github.io/Forge-muscu/preview/`.
+- L'application construit `emailRedirectTo` depuis l'URL courante ; la seconde adresse est donc nécessaire pour tester l'authentification depuis la prévisualisation.
+
+La configuration Auth du projet n'est pas exposée par les actions Supabase disponibles dans cette session.
