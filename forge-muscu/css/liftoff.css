@@ -78,6 +78,5 @@
 @media(prefers-reduced-motion:reduce){.forge-seance-panel{animation:none}.forge-seance-tab{transition:none}}
 
 
-/* Les actions de séance ne doivent pas casser les libellés sur petit écran. */
-.forge-seance-panel button{white-space:nowrap}
-.forge-seance-panel button.btn{min-width:82px}
+/* Le bouton Modifier garde une largeur stable ; les autres actions peuvent revenir à la ligne. */
+.forge-seance-panel .forge-edit-program-button{white-space:nowrap;min-width:82px}
