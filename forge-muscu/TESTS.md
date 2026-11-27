@@ -11,6 +11,7 @@ Le test `tests/seance-smoke.cjs` est exécuté sur deux viewports :
 Parcours couverts :
 - ouverture de Séance et vérification des quatre rubriques principales ;
 - vérification des trois onglets Programme / Exercices / Suivi ;
+- vérification du chargement de `css/premium.css`, de la palette d'accent Forge et de la navigation flottante sur mobile / intégrée sur desktop ;
 - vérification du style responsive de la navigation Séance : position sticky, trois colonnes, onglet actif et absence de débordement horizontal sur mobile et desktop ;
 - vérification que le bouton « Modifier » reste sur une seule ligne et que son libellé tient dans sa zone sur mobile et desktop ;
 - vérification que les boutons « Nouvelle séance » et « Régénérer le programme » ne se chevauchent pas ;
