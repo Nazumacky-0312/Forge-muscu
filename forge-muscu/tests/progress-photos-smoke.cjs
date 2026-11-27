@@ -28,6 +28,7 @@ const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR
       const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
       page.setDefaultTimeout(15000);
       page.on('pageerror', error => errors.push(viewport.name + ': ' + error.message));
+      page.on('console', message => { if (message.type() === 'error') console.log('[browser ' + viewport.name + '] ' + message.text()); });
       await page.goto('http://127.0.0.1:' + port + '/#/suivi/progres', { waitUntil: 'domcontentloaded' });
       await page.locator('.forge-progress-photos').waitFor();
       const controls = await page.evaluate(() => ({
@@ -48,10 +49,33 @@ const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR
         buffer: png
       });
       await page.locator('.forge-progress-photo-form').evaluate(form => form.requestSubmit());
-      await page.waitForFunction(() => {
-        const card = document.querySelector('.forge-progress-photo');
-        return !!card && !!card.querySelector('img') && card.querySelector('img').src.startsWith('blob:');
-      });
+      try {
+        await page.waitForFunction(() => {
+          const card = document.querySelector('.forge-progress-photo');
+          return !!card && !!card.querySelector('img') && card.querySelector('img').src.startsWith('blob:');
+        }, { timeout: 8000 });
+      } catch (error) {
+        const diagnostic = await page.evaluate(async () => {
+          const input = document.querySelector('.forge-progress-photo-file input[type="file"]');
+          let stored = null;
+          try {
+            stored = await new Promise((resolve, reject) => {
+              const request = indexedDB.open('forge-muscu-media-v1', 1);
+              request.onsuccess = () => {
+                const db = request.result;
+                const read = db.transaction('photos', 'readonly').objectStore('photos').getAll();
+                read.onsuccess = () => { resolve(read.result.map(photo => ({ id: photo.id, date: photo.date, type: photo.blob?.type, size: photo.blob?.size }))); db.close(); };
+                read.onerror = () => reject(read.error);
+              };
+              request.onerror = () => reject(request.error);
+            });
+          } catch (e) { stored = 'IndexedDB: ' + e.message; }
+          return { status: document.querySelector('.forge-progress-photos-status')?.textContent, inputFiles: input?.files?.length, fileType: input?.files?.[0]?.type, stored };
+        });
+        console.error('Progress photo upload diagnostic (' + viewport.name + '): ' + JSON.stringify(diagnostic));
+        await page.screenshot({ path: '/tmp/forge-seance-photos-failure-' + viewport.name + '.png', fullPage: true });
+        throw error;
+      }
       await page.waitForFunction(() => document.querySelector('.forge-progress-photos-status')?.textContent.includes('Photo enregistrée sur cet appareil.'));
       const saved = await page.evaluate(() => ({
         count: document.querySelectorAll('.forge-progress-photo').length,
