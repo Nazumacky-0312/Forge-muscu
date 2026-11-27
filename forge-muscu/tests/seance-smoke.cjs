@@ -136,8 +136,8 @@ const mime = {
         if (await page.getByRole('button', { name: 'Démarrer cette séance' }).count() !== 3) {
           throw new Error('Les trois séances du programme doivent proposer un démarrage direct.');
         }
-        if (await page.locator('.forge-program-exercise-thumb').count() < 5) {
-          throw new Error('Les exercices du programme doivent afficher leurs vignettes 3D disponibles.');
+        if (await page.locator('.forge-program-exercise-thumb').count() !== 18) {
+          throw new Error('Les 18 exercices du programme par défaut doivent afficher leur vignette 3D.');
         }
         await page.goto(`http://127.0.0.1:${port}/#/accueil`, { waitUntil: 'domcontentloaded' });
         await page.getByRole('button', { name: 'Commencer ma séance' }).waitFor();
