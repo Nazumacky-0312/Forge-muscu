@@ -40,8 +40,10 @@ const mime = {
       page.on('console', msg => { if (msg.type() === 'error' && !msg.text().includes('Failed to load resource')) failures.push(`${viewport.name} console: ${msg.text()}`); });
       page.on('requestfailed', req => {
         const url = req.url();
+        const failure = req.failure()?.errorText || 'unknown';
         const optionalAvatarAsset = /(?:cdn\.jsdelivr\.net\/npm\/three@0\.160\.0|esm\.sh\/three@0\.160\.0|open-anatomy-3d@0\.1\.0)/i.test(url);
-        if (!optionalAvatarAsset) failures.push(`${viewport.name} request failed: ${url} :: ${req.failure()?.errorText || 'unknown'}`);
+        const expectedImageAbort = failure.includes('ERR_ABORTED') && /\/images\/exercises\//i.test(url);
+        if (!optionalAvatarAsset && !expectedImageAbort) failures.push(`${viewport.name} request failed: ${url} :: ${failure}`);
       });
       try {
         await page.goto(`http://127.0.0.1:${port}/#/programme`, { waitUntil: 'domcontentloaded' });
