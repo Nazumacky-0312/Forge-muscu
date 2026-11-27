@@ -64,6 +64,18 @@ const mime = {
         if (editButtonLayout.whiteSpace !== 'nowrap' || !editButtonLayout.fits) {
           throw new Error('Le bouton Modifier doit rester lisible sur une seule ligne : ' + JSON.stringify(editButtonLayout));
         }
+        const actionButtonsLayout = await page.evaluate(() => {
+          const buttons = [...document.querySelectorAll('.forge-seance-panel button')];
+          const create = buttons.find(button => button.textContent.includes('Nouvelle séance'));
+          const regenerate = buttons.find(button => button.textContent.includes('Régénérer le programme'));
+          if (!create || !regenerate) return { found: false };
+          const a = create.getBoundingClientRect();
+          const b = regenerate.getBoundingClientRect();
+          return { found: true, overlap: a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom };
+        });
+        if (!actionButtonsLayout.found || actionButtonsLayout.overlap) {
+          throw new Error('Les actions Nouvelle séance / Régénérer ne doivent pas se chevaucher : ' + JSON.stringify(actionButtonsLayout));
+        }
         await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-programme.png`, fullPage: true });
 
         await page.getByRole('link', { name: 'Exercices' }).click();
