@@ -69,6 +69,13 @@ Refonte en cours. L'application de production sur `main` n'a pas été modifiée
 - [ ] Faire une vérification visuelle manuelle Android et ordinateur.
 - [ ] Fusionner puis publier uniquement après validation complète.
 
+## Prévisualisation isolée en préparation
+
+- Workflow ajusté pour les PR : reconstruire le site racine depuis `main`, puis placer la version de la branche sous `/preview/`.
+- Objectif : permettre de voir la refonte dans Chrome sans remplacer le contenu de production à la racine.
+- Le changement de workflow est enregistré dans le commit `0eb40c02db5a306b4999f1be90fde800f3de4c07`.
+- **Non validé à ce stade** : le connecteur GitHub n'a pas déclenché de nouvelle exécution Actions après ce commit. Ne pas considérer le lien de prévisualisation comme disponible avant un run réussi et un contrôle HTTP réel.
+
 ## Dernière vérification CI
 
 - Run `45942696341` sur le commit `5a0504330e299a65d9ca46510ac0fcf1f846c34b` : job `build` réussi, préparation du site, médias CC0, tests Playwright mobile/desktop et artefacts QA générés ; job `deploy` ignoré car la branche n'est pas `main`.
