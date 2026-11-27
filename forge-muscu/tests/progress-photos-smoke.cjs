@@ -58,8 +58,10 @@ const image = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="32" he
       await page.locator('.forge-recovery-page').waitFor();
       const recovery = await page.locator('.forge-recovery-muscle').evaluateAll(cards => cards.map(card => card.textContent));
       const recoveryNote = await page.locator('.forge-recovery-note').textContent();
+      const neglected = await page.locator('.forge-recovery-neglected').textContent();
       if (!recovery.some(text => text.includes('Pectoraux') && text.includes('Récupération récente')) ||
           !recovery.some(text => text.includes('Quadriceps')) ||
+          !neglected.includes('Groupes peu sollicités') ||
           !recoveryNote.includes('pas une mesure physiologique')) {
         throw new Error('Estimation de récupération incomplète sur ' + viewport.name + ' : ' + JSON.stringify(recovery));
       }
