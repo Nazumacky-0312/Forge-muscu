@@ -67,15 +67,63 @@ const mime = {
         await page.waitForURL('**/#/programme');
         await page.locator('.forge-seance-panel h2').first().waitFor();
 
+        /* Initialise une séance locale réaliste pour tester les champs avancés. */
+        await page.evaluate(() => {
+          const app = window.FM.app;
+          const exId = Object.keys(window.FM.EX)[0];
+          const item = window.FM.item(exId, app.etat.profil);
+          Object.assign(item, { series: 1, min: 8, max: 12, repos: 60 });
+          app.etat.active = {
+            id: 'qa-session', jourId: 'qa', nom: 'Séance QA', debut: Date.now(), fin: 0,
+            note: '', echauffement: true, index: 0,
+            exercices: [{ exId, prevu: item, ressenti: null, douleur: false,
+              series: [{ kg: 20, reps: 10, fait: false }] }]
+          };
+          app.etat.repos = { fin: Date.now() + 60000, total: 60, libelle: 'Repos QA', signale: false };
+          app.sauver();
+          app.aller('#/seance');
+        });
+        await page.waitForURL('**/#/seance');
+        await page.locator('.forge-set-details').waitFor();
+        await page.locator('.forge-meta-field select').selectOption('echauffement');
+        await page.locator('.forge-meta-grid input').nth(0).fill('9.5');
+        await page.locator('.forge-meta-grid input').nth(0).press('Tab');
+        await page.locator('.forge-meta-grid input').nth(1).fill('1');
+        await page.locator('.forge-meta-grid input').nth(1).press('Tab');
+        await page.locator('.forge-set-details textarea').fill('Tempo contrôlé, bonne amplitude.');
+        await page.locator('.forge-set-details textarea').press('Tab');
+        await page.evaluate(() => window.FM.app.sauver());
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.locator('.forge-set-details').waitFor();
+        const metadata = await page.evaluate(() => {
+          const entry = window.FM.app.etat.active.exercices[0];
+          return { type: entry.series[0].type, rpe: entry.series[0].rpe, rir: entry.series[0].rir, note: entry.note };
+        });
+        if (metadata.type !== 'echauffement' || metadata.rpe !== 9.5 || metadata.rir !== 1 || metadata.note !== 'Tempo contrôlé, bonne amplitude.') {
+          throw new Error('Les métadonnées RPE/RIR/type/note ne survivent pas au rechargement : ' + JSON.stringify(metadata));
+        }
+        const warmupVolume = await page.evaluate(() => window.FM.stats([{ kg: 20, reps: 10, fait: true, type: 'echauffement' }]).volume);
+        if (warmupVolume !== 0) throw new Error('Les séries d’échauffement sont comptées dans le volume de travail.');
+
+        /* Pause et reprise du minuteur, y compris après un rechargement. */
+        const pauseButton = page.locator('[data-forge-pause]');
+        await pauseButton.waitFor();
+        await pauseButton.click();
+        if (!(await page.evaluate(() => window.FM.app.etat.repos.paused))) throw new Error('Le minuteur ne passe pas en pause.');
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.locator('[data-forge-pause]').waitFor();
+        if ((await page.locator('[data-forge-pause]').innerText()) !== 'Reprendre') throw new Error('La pause du minuteur n’est pas conservée après rechargement.');
+        await page.locator('[data-forge-pause]').click();
+        if (await page.evaluate(() => !!window.FM.app.etat.repos.paused)) throw new Error('Le minuteur ne reprend pas correctement.');
+
         /* Vérifie l'accès à la reprise et le flush de sauvegarde avant fermeture. */
+        await page.evaluate(() => window.FM.app.aller('#/programme'));
+        await page.locator('.forge-resume-banner').waitFor();
         await page.evaluate(() => {
           window.__forgeSaveCalls = 0;
           window.FM.store.sauver = () => { window.__forgeSaveCalls += 1; };
-          window.FM.app.etat.active = { nom: 'Séance QA' };
-          window.FM.app.rendre();
           window.dispatchEvent(new Event('pagehide'));
         });
-        await page.locator('.forge-resume-banner').waitFor();
         const saveCalls = await page.evaluate(() => window.__forgeSaveCalls);
         if (saveCalls < 1) throw new Error('La sauvegarde de sécurité pagehide ne s’est pas déclenchée.');
         if (!(await page.locator('.forge-resume-banner').innerText()).includes('Séance QA')) {
