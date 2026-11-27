@@ -35,3 +35,16 @@
 .forge-resume-banner span{overflow:hidden;color:var(--doux);font-size:.75rem;text-overflow:ellipsis;white-space:nowrap}
 .forge-resume-banner button{flex:0 0 auto;min-height:44px}
 @media(max-width:420px){.forge-resume-banner{gap:8px;padding:11px}.forge-resume-banner button{padding-inline:12px}}
+
+
+/* Détails de série : RPE/RIR, type et note d'exercice */
+.forge-set-details{margin:14px 0;padding:14px;background:var(--surface);border:1px solid var(--bord);border-radius:var(--rayon)}
+.forge-set-details h3{margin:0 0 4px}
+.forge-meta-help{margin:4px 0 12px;color:var(--doux);font-size:.76rem}
+.forge-meta-field{display:flex;flex-direction:column;gap:6px;margin:9px 0;color:var(--doux);font-size:.78rem;font-weight:700}
+.forge-meta-input{width:100%;min-height:44px;padding:9px 11px;background:var(--fond);color:var(--texte);border:1px solid var(--bord);border-radius:10px;font:inherit}
+.forge-meta-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.forge-set-summary{display:block;margin:3px 0 0;color:var(--accent);font-size:.7rem}
+#repos.repos-pause{border-color:var(--alerte)}
+#repos.repos-pause .titre{color:var(--alerte)}
+@media(max-width:360px){.forge-meta-grid{grid-template-columns:1fr}}
