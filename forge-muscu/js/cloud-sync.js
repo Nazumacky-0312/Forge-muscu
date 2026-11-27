@@ -346,7 +346,7 @@
   FM.vues.profil = function (app) {
     const view = profileOriginal(app);
     view.append(card(app));
-    if (!state.client && !state.loading) Promise.resolve().then(() => initClient());
+    if (!state.client && !state.loading && !state.error && root.navigator.onLine) Promise.resolve().then(() => initClient());
     return view;
   };
 
