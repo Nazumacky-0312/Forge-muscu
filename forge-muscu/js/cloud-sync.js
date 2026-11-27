@@ -14,6 +14,7 @@
     message: 'Tes données restent enregistrées localement. Le cloud est facultatif.',
     busy: false, auto: false, timer: null
   };
+  const announceAuth = () => root.dispatchEvent(new CustomEvent('forge-cloud-auth-changed', {detail:{user:state.user}}));
   const revisionKey = userId => 'forge-muscu:cloud-revision:' + userId;
   const autoKey = userId => 'forge-muscu:cloud-auto:' + userId;
   const autoMasterKey = 'forge-muscu:cloud-auto-enabled';
@@ -87,6 +88,7 @@
       state.client.auth.onAuthStateChange((event, session) => {
         if (event === 'INITIAL_SESSION') return;
         state.user = session && session.user ? session.user : null;
+        announceAuth();
         state.remote = null;
         if (state.user) {
           state.auto = autoEnabled();
@@ -104,6 +106,7 @@
       const { data, error } = await state.client.auth.getSession();
       if (error) throw error;
       state.user = data.session ? data.session.user : null;
+      announceAuth();
       state.auto = autoEnabled();
       if (state.user) { await loadRemote(); if (autoEnabled()) scheduleAutoSync(); }
       else state.message = 'Connecte-toi par lien envoyé par e-mail pour activer la sauvegarde cloud.';
@@ -116,6 +119,23 @@
       refresh();
     }
   }
+
+  async function getCloudSession() {
+    if (!state.client && !state.loading) await initClient();
+    while (state.loading) await new Promise(resolve => root.setTimeout(resolve, 40));
+    if (!state.client) return { client: null, session: null, user: null, error: state.error || state.message };
+    const { data, error } = await state.client.auth.getSession();
+    if (error) throw error;
+    state.user = data.session && data.session.user ? data.session.user : null;
+    announceAuth();
+    return { client: state.client, session: data.session || null, user: state.user, error: null };
+  }
+
+  root.ForgeCloud = Object.freeze({
+    getSession: getCloudSession,
+    getUser: () => state.user,
+    isReady: () => !!state.client
+  });
 
   async function sendMagicLink(email) {
     if (!state.client) throw new Error('Le service cloud n’est pas initialisé.');
