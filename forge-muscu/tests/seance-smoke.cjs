@@ -42,6 +42,20 @@ const mime = {
         await page.locator('.forge-seance-tab').nth(0).waitFor();
         if (await page.locator('#menu a').count() !== 4) throw new Error('La navigation principale ne contient pas exactement 4 rubriques.');
         if (await page.locator('.forge-seance-tab').count() !== 3) throw new Error('Les 3 onglets de Séance ne sont pas présents.');
+        const hubLayout = await page.evaluate(() => {
+          const nav = document.querySelector('.forge-seance-tabs');
+          const active = nav && nav.querySelector('[aria-current="page"]');
+          const style = nav ? getComputedStyle(nav) : null;
+          return {
+            sticky: style && style.position === 'sticky',
+            columns: style && style.gridTemplateColumns.split(' ').length,
+            activeLabel: active && active.textContent.trim(),
+            overflow: nav && nav.scrollWidth > nav.clientWidth + 1
+          };
+        });
+        if (!hubLayout.sticky || hubLayout.columns !== 3 || hubLayout.activeLabel !== 'Programme' || hubLayout.overflow) {
+          throw new Error('La navigation responsive de Séance est incorrecte : ' + JSON.stringify(hubLayout));
+        }
         await page.screenshot({ path: `/tmp/forge-seance-${viewport.name}-programme.png`, fullPage: true });
 
         await page.getByRole('link', { name: 'Exercices' }).click();
