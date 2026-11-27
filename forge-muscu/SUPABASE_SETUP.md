@@ -11,7 +11,7 @@ Le projet existait déjà. Sa base publique ne contenait aucune table ni migrati
 
 ## Migration appliquée
 
-Fichier source : `supabase/migrations/202611270001_forge_cloud_sync.sql`
+Fichiers source :\n- `supabase/migrations/202611270001_forge_cloud_sync.sql`\n- `supabase/migrations/202611270002_forge_user_data_delete.sql`
 
 Migration appliquée : `forge_cloud_sync_v1`
 
@@ -31,7 +31,7 @@ Stockage :
 Sécurité :
 - RLS activé sur les deux tables.
 - Policies limitées à `auth.uid() = user_id`.
-- Bucket privé avec policies SELECT / INSERT / UPDATE / DELETE limitées au dossier de l'utilisateur.
+- Bucket privé avec policies SELECT / INSERT / UPDATE / DELETE limitées au dossier de l'utilisateur.\n- Policies DELETE sur les tables cloud afin que chaque utilisateur puisse supprimer uniquement ses propres données.
 - Aucun service-role ou secret key dans le client.
 
 ## Configuration restante
