@@ -133,8 +133,11 @@ const mime = {
         await page.getByRole('link', { name: 'Programme' }).click();
         await page.waitForURL('**/#/programme');
         await page.locator('.forge-seance-panel h2').first().waitFor();
-        if (await page.getByRole('button', { name: 'Démarrer cette séance' }).count() < 1) {
-          throw new Error('Chaque séance du programme doit proposer un démarrage direct.');
+        if (await page.getByRole('button', { name: 'Démarrer cette séance' }).count() !== 3) {
+          throw new Error('Les trois séances du programme doivent proposer un démarrage direct.');
+        }
+        if (await page.locator('.forge-program-exercise-thumb').count() < 5) {
+          throw new Error('Les exercices du programme doivent afficher leurs vignettes 3D disponibles.');
         }
         await page.goto(`http://127.0.0.1:${port}/#/accueil`, { waitUntil: 'domcontentloaded' });
         await page.getByRole('button', { name: 'Commencer ma séance' }).waitFor();
