@@ -71,6 +71,34 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
 
+      # Sur une PR, le site racine est reconstruit depuis main (production inchangée).
+      # La version candidate est publiée séparément sous /preview/ pour permettre un vrai contrôle mobile.
+      - name: Build safe PR preview alongside current production
+        if: github.event_name == 'pull_request'
+        run: |
+          mv public /tmp/forge-preview
+          git fetch origin main
+          git worktree add /tmp/forge-production origin/main
+          mkdir -p public
+          unzip -q /tmp/forge-production/forge-muscu.zip -d /tmp/forge-prod-extracted
+          cp -a /tmp/forge-prod-extracted/forge-muscu/. public/
+          if [ -d /tmp/forge-production/forge-muscu ]; then
+            cp -a /tmp/forge-production/forge-muscu/. public/
+          fi
+          touch public/.nojekyll
+          # Même lot d'illustrations CC0 que la version candidate.
+          SOURCE_COMMIT=2786aefa4b36a08faeca8114e0d1eb0af3ef6732
+          curl --fail --location --retry 3 "https://github.com/hitmanrepo/open-exercise-illustrations/archive/${SOURCE_COMMIT}.zip" -o /tmp/exercise-illustrations-production.zip
+          mkdir -p /tmp/exercise-illustrations-production
+          unzip -q /tmp/exercise-illustrations-production.zip -d /tmp/exercise-illustrations-production
+          SOURCE_DIR="/tmp/exercise-illustrations-production/open-exercise-illustrations-${SOURCE_COMMIT}"
+          mkdir -p public/images/exercises public/credits
+          cp -a "${SOURCE_DIR}/images/." public/images/exercises/
+          cp "${SOURCE_DIR}/LICENSE" public/credits/exercise-illustrations-CC0.txt
+          cp -a /tmp/forge-preview public/preview
+          test -f public/index.html
+          test -f public/preview/index.html
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
@@ -82,7 +110,7 @@ jobs:
           path: public
 
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
     needs: build
     environment:
       name: github-pages
