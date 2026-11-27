@@ -4,6 +4,14 @@
 const F=w.FM,h=F.h;
 const motion={pouss_h:'push',pouss_inc:'push',pouss_v:'up',tir_h:'row',tir_v:'pull',squat:'squat',fente:'lunge',hanche:'hinge',ischios:'curl',mollets:'calf',marteau:'curl',triceps:'tri',elev_lat:'raise',arriere:'raise',ecarte:'fly',dips:'dip',gainage:'plank',abd_bas:'leg',abd_flex:'crunch',obliques:'twist',avb_flex:'curl',avb_ext:'curl',shrug:'shrug',portage:'walk'};
 F.animationExercice=function(ex,mini){
+ const el=h('div',{class:'forge3d'+(mini?' mini':''),'data-3d':'1','data-pattern':ex.pattern||'curl',role:'img','aria-label':'Démonstration 3D animée : '+ex.nom});
+ return el;
+}; Coach Forge : animations SVG et fenêtre de conseils. */
+(function(w){
+'use strict';
+const F=w.FM,h=F.h;
+const motion={pouss_h:'push',pouss_inc:'push',pouss_v:'up',tir_h:'row',tir_v:'pull',squat:'squat',fente:'lunge',hanche:'hinge',ischios:'curl',mollets:'calf',marteau:'curl',triceps:'tri',elev_lat:'raise',arriere:'raise',ecarte:'fly',dips:'dip',gainage:'plank',abd_bas:'leg',abd_flex:'crunch',obliques:'twist',avb_flex:'curl',avb_ext:'curl',shrug:'shrug',portage:'walk'};
+F.animationExercice=function(ex,mini){
  const type=motion[ex.pattern]||'curl',svg=h('svg',{viewBox:'0 0 220 150',class:'forge-motion '+(mini?'mini':'')+' move-'+type,role:'img','aria-label':'Démonstration animée : '+ex.nom});
  svg.innerHTML='<path d="M12 128H208" stroke="#526174" stroke-width="2"/><g class="athlete" fill="none" stroke="#b8f34a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><circle cx="110" cy="22" r="10" fill="#d9e8c1" stroke-width="2"/><path class="torso" d="M110 34L110 79"/><path class="arm a1" d="M108 45L83 61L69 83"/><path class="arm a2" d="M112 45L137 61L151 83"/><path class="leg l1" d="M108 79L91 103L83 126"/><path class="leg l2" d="M112 79L129 103L137 126"/></g><path class="bar" d="M55 82H165M62 75V89M158 75V89" stroke="#dce5ef" stroke-width="4" stroke-linecap="round"/><text x="110" y="145" fill="#aab7c8" font-size="8" text-anchor="middle">MOUVEMENT ILLUSTRATIF</text>';
  return svg;
@@ -32,7 +40,7 @@ function local(q,ex){
  if(/combien|série|series|répét|repet/.test(s))return 'Repère général : 2 à 4 séries de 6 à 15 répétitions, en gardant 1 à 3 répétitions en réserve. Ajuste selon ton niveau et ta récupération.';
  if(/repos|pause/.test(s))return 'Prends environ 2 à 3 minutes sur les mouvements lourds et 60 à 120 secondes sur l’isolation. Reprends quand ta technique reste propre.';
  if(/charge|progres|augment|poids/.test(s))return 'Quand tu atteins le haut de ta fourchette de répétitions sur toutes tes séries avec une technique propre, augmente légèrement la charge.';
- if(ex)return ex.nom+' : '+ex.consignes.join(' ')+' À éviter : '+ex.erreurs.join(' ; ');
+ if(ex)return ex.nom+' : '+(ex.consignes||[]).join(' ')+' À éviter : '+(ex.erreurs||[]).join(' ; ');
  return 'Je peux conseiller sur la technique, les séries, les répétitions, les charges, le repos, la récupération et les programmes. Précise ton objectif et ton contexte pour une réponse plus utile.';
 }
 const listBefore=F.vues.exercices;
