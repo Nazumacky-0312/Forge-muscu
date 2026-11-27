@@ -175,11 +175,12 @@ function mount(container,initial){
     container.dispatchEvent(new CustomEvent('forge-muscle-select',{detail:{muscle:selectedGroup,structure:owner.name}}));
   }
   function pointerUp(e){dragging=false;selectMuscle(e);}
+  function pointerCancel(){dragging=false;pointerMoved=true;}
   function wheel(e){e.preventDefault();targetDistance=THREE.MathUtils.clamp(targetDistance+Math.sign(e.deltaY)*.12,1.65,4.8);}
   canvas.addEventListener('pointerdown',pointerDown);
   canvas.addEventListener('pointermove',pointerMove);
   canvas.addEventListener('pointerup',pointerUp);
-  canvas.addEventListener('pointercancel',pointerUp);
+  canvas.addEventListener('pointercancel',pointerCancel);
   canvas.addEventListener('wheel',wheel,{passive:false});
   canvas.style.touchAction='pan-y';
   function animate(){
@@ -206,7 +207,7 @@ function mount(container,initial){
     dispose(){
       if(disposed)return;disposed=true;loadingToken++;cancelAnimationFrame(raf);resize.disconnect();
       canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointermove',pointerMove);
-      canvas.removeEventListener('pointerup',pointerUp);canvas.removeEventListener('pointercancel',pointerUp);
+      canvas.removeEventListener('pointerup',pointerUp);canvas.removeEventListener('pointercancel',pointerCancel);
       canvas.removeEventListener('wheel',wheel);
       if(avatar){scene.remove(avatar);avatar.traverse(n=>{if(n.isMesh&&n.material)n.material.dispose();});}
       renderer.dispose();delete container.dataset.avatarLoaded;delete container.dataset.avatarSex;delete container.dataset.muscleMeshes;container.replaceChildren();
