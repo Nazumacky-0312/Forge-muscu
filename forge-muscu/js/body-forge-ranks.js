@@ -95,11 +95,11 @@
     const section=h('section',{class:'carte forge-avatar-card forge-avatar-3d-card'},
       h('div',{class:'forge-card-head'},h('div',{},h('span',{class:'surtitre'},'BODYGRAPH 3D'),h('h2',{},'Ton personnage')),
         h('span',{class:'forge-tag'},'3D INTERACTIF')),
-      h('p',{class:'discret'},'Deux personnages sculptés en 3D. Fais glisser ton doigt sur le modèle pour le tourner : chaque muscle prend la couleur de son rang.'),
+      h('p',{class:'discret'},'Modèle anatomique 3D détaillé, avec les muscles isolés. Fais glisser ton doigt pour tourner le corps : chaque groupe musculaire prend la couleur de son rang.'),
       h('div',{class:'forge-avatar-controls'},sexButtons,viewButtons),
       h('div',{class:'forge-avatar-3d-frame'},host),
       h('div',{class:'forge-avatar-legend',innerHTML:legend}),
-      h('div',{class:'forge-avatar-customize'},h('span',{},'PERSONNALISATION'),h('b',{},'Prochaine étape'),h('small',{},'Visage, coiffure, morphologie et équipements à débloquer')));
+      h('small',{class:'forge-avatar-credit'},'Modèle Open Anatomy 3D · CC BY 4.0 · Adapté pour Forge Muscu')));
     let attempts=0, mounted=false;
     const showLoadError=message=>{
       if(mounted||!host.isConnected)return;
