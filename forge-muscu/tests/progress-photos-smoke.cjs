@@ -29,6 +29,16 @@ const image = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="32" he
       page.setDefaultTimeout(15000);
       page.on('pageerror', error => errors.push(viewport.name + ': ' + error.message));
       page.on('console', message => { if (message.type() === 'error') console.log('[browser ' + viewport.name + '] ' + message.text()); });
+      await page.goto('http://127.0.0.1:' + port + '/#/progression', { waitUntil: 'domcontentloaded' });
+      await page.locator('.forge-progression-hub').waitFor();
+      const hub = await page.evaluate(() => ({
+        nav: document.querySelector('#menu a[data-vue="progression"]')?.textContent.trim(),
+        cards: [...document.querySelectorAll('.forge-progression-card')].map(card => card.getAttribute('href'))
+      }));
+      const expectedRoutes = ['#/classement','#/suivi/progres','#/suivi/records','#/suivi/historique','#/profil','#/nutrition'];
+      if (hub.nav !== 'Progression' || expectedRoutes.some(route => !hub.cards.includes(route)) || hub.cards.length !== 6) {
+        throw new Error('Hub Progression incomplet sur ' + viewport.name + ' : ' + JSON.stringify(hub));
+      }
       await page.goto('http://127.0.0.1:' + port + '/#/suivi/progres', { waitUntil: 'domcontentloaded' });
       await page.locator('.forge-progress-photos').waitFor();
       const controls = await page.evaluate(() => ({
