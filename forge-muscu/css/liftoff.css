@@ -57,3 +57,5 @@
 .forge-cloud-auto input{width:24px;height:24px;min-height:0;accent-color:var(--accent)}
 .forge-cloud-card .btn{width:100%;margin:6px 0}
 .forge-cloud-card .btn.danger{color:var(--danger)}
+
+.forge-meta-history-note{margin:8px 0;color:var(--doux);font-size:.8rem;line-height:1.45}
