@@ -84,66 +84,40 @@
     rankByMuscle.obliques=rankByMuscle.abs??-1;
     rankByMuscle.traps=Math.max(rankByMuscle.shoulders??-1,rankByMuscle.back??-1);
     const initialSex=settings.sex==='f'?'f':'m';
-    const host=h('div',{class:'forge-avatar-3d-canvas','aria-label':'Avatar musculaire 3D interactif'});
-    const sexButtons=h('div',{class:'forge-avatar-switch','aria-label':'Choisir le personnage'},
+    const color=id=>RANK_COLORS[Math.max(0,rankByMuscle[id]??-1)]||'#d4dae3';
+    const figure=(side,sex)=>{
+      const female=sex==='f';
+      const torso=female
+        ?'M70 49 Q85 44 100 49 L108 75 L102 119 Q101 132 108 146 L62 146 Q69 132 68 119 L62 75Z'
+        :'M66 49 Q85 43 104 49 L112 75 L106 120 Q101 137 96 147 L74 147 Q69 137 64 120 L58 75Z';
+      const legs=female
+        ?'M65 141 Q60 155 64 180 L70 222 L67 271 Q66 283 74 285 L82 285 Q87 281 85 271 L89 224 L92 180 Q94 156 105 141Z'
+        :'M72 141 Q63 155 66 180 L70 222 L67 271 Q66 283 74 285 L82 285 Q87 281 85 271 L89 224 L94 180 Q96 155 98 141Z';
+      const arms='<path class="bf-base" d="M62 54 C51 55 46 66 43 82 L35 126 Q33 137 40 140 Q47 141 50 131 L62 94 L73 77Z"/><path class="bf-base" d="M108 54 C119 55 124 66 127 82 L135 126 Q137 137 130 140 Q123 141 120 131 L108 94 L97 77Z"/>';
+      const base='<circle class="bf-base" cx="85" cy="25" r="13"/><path class="bf-base" d="M78 37 L92 37 L94 52 L76 52Z"/><path class="bf-base" d="'+torso+'"/>'+arms+'<path class="bf-base" d="'+legs+'"/><path class="bf-base" d="M67 278 Q72 274 82 279 L83 291 Q78 296 65 294 Q61 291 67 278Z M88 279 Q98 274 103 278 L109 294 Q96 296 87 291Z"/>';
+      const muscles=side==='front'
+        ?'<g class="bf-muscles"><ellipse fill="'+color('shoulders')+'" cx="62" cy="61" rx="11" ry="10"/><ellipse fill="'+color('shoulders')+'" cx="108" cy="61" rx="11" ry="10"/><path fill="'+color('chest')+'" d="M69 66 Q84 61 84 81 Q78 91 68 84 Q63 77 69 66Z M101 66 Q86 61 86 81 Q92 91 102 84 Q107 77 101 66Z"/><path fill="'+color('biceps')+'" d="M48 82 Q57 80 60 91 L55 115 Q48 119 45 109Z M122 82 Q113 80 110 91 L115 115 Q122 119 125 109Z"/><path fill="'+color('abs')+'" d="M77 91 Q85 88 93 91 L94 129 Q85 134 76 129Z"/><path fill="'+color('quads')+'" d="M70 151 Q79 147 84 157 L82 210 Q77 220 72 211 L67 179Z M100 151 Q91 147 86 157 L88 210 Q93 220 98 211 L103 179Z"/><path fill="'+color('calves')+'" d="M71 225 Q78 221 82 229 L79 268 Q75 275 70 266Z M99 225 Q92 221 88 229 L91 268 Q95 275 100 266Z"/></g>'
+        :'<g class="bf-muscles"><path fill="'+color('traps')+'" d="M72 53 Q85 47 98 53 L105 77 L85 94 L65 77Z"/><ellipse fill="'+color('shoulders')+'" cx="61" cy="62" rx="11" ry="10"/><ellipse fill="'+color('shoulders')+'" cx="109" cy="62" rx="11" ry="10"/><path fill="'+color('back')+'" d="M67 80 Q76 75 84 92 L80 129 Q69 126 64 105Z M103 80 Q94 75 86 92 L90 129 Q101 126 106 105Z"/><path fill="'+color('triceps')+'" d="M47 83 Q55 79 60 92 L54 116 Q47 119 44 108Z M123 83 Q115 79 110 92 L116 116 Q123 119 126 108Z"/><path fill="'+color('glutes')+'" d="M70 132 Q85 127 100 132 L98 158 Q85 166 72 158Z"/><path fill="'+color('hamstrings')+'" d="M70 161 Q79 157 84 166 L82 215 Q77 225 72 215 L67 184Z M100 161 Q91 157 86 166 L88 215 Q93 225 98 215 L103 184Z"/><path fill="'+color('calves')+'" d="M71 226 Q78 222 82 230 L79 268 Q75 275 70 266Z M99 226 Q92 222 88 230 L91 268 Q95 275 100 266Z"/></g>';
+      return '<svg class="forge-bodygraph-figure" viewBox="0 0 170 302" role="img" aria-label="'+(side==='front'?'Vue de face':'Vue de dos')+' du corps '+(female?'féminin':'masculin')+'">'+base+muscles+'</svg>';
+    };
+    const initialButtons=h('div',{class:'forge-avatar-switch','aria-label':'Choisir le personnage'},
       h('button',{type:'button',class:'forge-avatar-choice'+(initialSex==='m'?' active':''),'data-sex':'m'},'Homme'),
       h('button',{type:'button',class:'forge-avatar-choice'+(initialSex==='f'?' active':''),'data-sex':'f'},'Femme'));
-    const viewButtons=h('div',{class:'forge-avatar-switch forge-avatar-view-switch','aria-label':'Choisir la vue'},
-      h('button',{type:'button',class:'forge-avatar-choice active','data-view':'front'},'Face'),
-      h('button',{type:'button',class:'forge-avatar-choice','data-view':'back'},'Dos'));
+    const figures=h('div',{class:'forge-bodygraph-pair'});
+    const draw=sex=>{figures.innerHTML='<div class="forge-bodygraph-person">'+figure('front',sex)+'<span>AVANT</span></div><div class="forge-bodygraph-person">'+figure('back',sex)+'<span>ARRIÈRE</span></div>';};
+    draw(initialSex);
     const legend=RANKS.map((r,i)=>'<span class="forge-avatar-legend-item"><i style="background:'+RANK_COLORS[i]+'"></i>'+r.name+'</span>').join('');
-    const section=h('section',{class:'carte forge-avatar-card forge-avatar-3d-card'},
-      h('div',{class:'forge-card-head'},h('div',{},h('span',{class:'surtitre'},'BODYGRAPH 3D'),h('h2',{},'Ton personnage')),
-        h('span',{class:'forge-tag'},'3D INTERACTIF')),
-      h('p',{class:'discret'},'Modèle anatomique 3D détaillé, avec les muscles isolés. Fais glisser ton doigt pour tourner le corps : chaque groupe musculaire prend la couleur de son rang.'),
-      h('div',{class:'forge-avatar-controls'},sexButtons,viewButtons),
-      h('div',{class:'forge-avatar-3d-frame'},host),
-      h('div',{class:'forge-avatar-legend',innerHTML:legend}),
-      h('small',{class:'forge-avatar-credit'},'Anatomie : BodyParts3D © DBCLS (CC BY 4.0) ; organes féminins : HuBMAP (CC BY 4.0) ; corps féminin : MakeHuman (CC0). Modifié par ',h('a',{href:'https://github.com/MervinR07/open-anatomy-3d',target:'_blank',rel:'noopener'},'Open Anatomy 3D'),' · CC BY 4.0.'));
-    let attempts=0, mounted=false;
-    const showLoadError=message=>{
-      if(mounted||!host.isConnected)return;
-      const panel=h('div',{class:'forge-avatar-load-error'},
-        h('strong',{},'Avatar 3D indisponible'),
-        h('span',{},message||'Le moteur 3D ne s’est pas chargé. Vérifie ta connexion puis réessaie.'),
-        h('button',{type:'button',class:'btn primaire'},'Réessayer'));
-      panel.querySelector('button').addEventListener('click',()=>root.location.reload());
-      host.replaceChildren(panel);
-    };
-    const init=()=>{
-      if(mounted)return;
-      if(!host.isConnected){if(attempts++<120)root.requestAnimationFrame(init);return;}
-      if(!root.ForgeAvatar3D){
-        if(attempts++===0)root.addEventListener('forge-avatar-ready',init,{once:true});
-        if(attempts<120)root.setTimeout(init,100);
-        else showLoadError('Le moteur 3D ne répond pas. Recharge la page et réessaie.');
-        return;
-      }
-      try{
-        const avatar=root.ForgeAvatar3D.mount(host,{sex:initialSex,ranks:rankByMuscle});
-        mounted=true;
-        section.querySelectorAll('[data-sex]').forEach(button=>button.addEventListener('click',()=>{
-          avatar.setSex(button.dataset.sex);
-          section.querySelectorAll('[data-sex]').forEach(b=>b.classList.toggle('active',b===button));
-        }));
-        section.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
-          avatar.setView(button.dataset.view);
-          section.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b===button));
-        }));
-      }catch(error){
-        console.error('Body Forge avatar 3D:',error);
-        showLoadError('Ton appareil n’a pas pu démarrer le rendu 3D. Appuie sur Réessayer.');
-      }
-    };
-    root.addEventListener('forge-avatar-error',event=>showLoadError(String(event.detail||'')),{once:true});
-    if(!root.ForgeAvatar3D&&!root.document.querySelector('[data-forge-avatar-module]')){
-      const moduleScript=root.document.createElement('script');
-      moduleScript.type='module';moduleScript.src='js/body-forge-avatar-3d.js?v=20261127j';
-      moduleScript.dataset.forgeAvatarModule='true';
-      moduleScript.onerror=()=>root.dispatchEvent(new CustomEvent('forge-avatar-error',{detail:'Le module 3D ne peut pas être téléchargé.'}));
-      root.document.head.append(moduleScript);
-    }
-    root.requestAnimationFrame(init);
+    const section=h('section',{class:'carte forge-avatar-card forge-bodygraph-card'},
+      h('div',{class:'forge-card-head'},h('div',{},h('span',{class:'surtitre'},'BODYGRAPH'),h('h2',{},'Tes muscles')),
+        h('span',{class:'forge-tag'},'VUE SIMPLIFIÉE')),
+      h('p',{class:'discret'},'Repère rapidement tes groupes musculaires et leurs rangs, avec une silhouette claire de face et de dos.'),
+      h('div',{class:'forge-avatar-controls'},initialButtons),
+      figures,
+      h('div',{class:'forge-avatar-legend',innerHTML:legend}));
+    section.querySelectorAll('[data-sex]').forEach(button=>button.addEventListener('click',()=>{
+      section.querySelectorAll('[data-sex]').forEach(b=>b.classList.toggle('active',b===button));
+      draw(button.dataset.sex);
+    }));
     return section;
   }
   function bodyForge(app){
