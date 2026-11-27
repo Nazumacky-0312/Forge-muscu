@@ -131,7 +131,7 @@ const mime = {
         }
 
         /* Le profil et le mode local restent accessibles hors ligne, même avec le cloud configuré. */
-        await page.setOffline(true);
+        await page.context().setOffline(true);
         await page.evaluate(() => window.FM.app.aller('#/profil'));
         await page.locator('.forge-cloud-card').waitFor();
         const cloudStatus = await page.locator('.forge-cloud-status').innerText();
