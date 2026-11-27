@@ -19,3 +19,11 @@
 - Ajout des tests Playwright correspondants et incrément du cache PWA jusqu'à v22.
 
 La branche reste en brouillon. La connexion e-mail réelle, la synchronisation multi-appareils et l'envoi des photos doivent encore être validés.
+
+## 27 novembre 2026 — Finition de l'espace Séance
+
+- Amélioration de la hiérarchie visuelle de l'espace Séance et de son en-tête.
+- Navigation Programme / Exercices / Suivi mise en évidence, sticky et adaptée aux petits écrans.
+- États actif, survol et focus clavier clarifiés ; animations désactivées si l'utilisateur préfère réduire les mouvements.
+- Ajout d'assertions Playwright sur la navigation responsive, l'onglet actif et les débordements horizontaux.
+- Validation CI du nouveau parcours en attente.
