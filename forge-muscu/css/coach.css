@@ -76,3 +76,10 @@
 .forge-demo-phases{display:flex;justify-content:space-between;gap:10px;font-size:.7rem;color:var(--doux);margin-top:8px}
 .forge-demo-note{font-size:.62rem;color:var(--doux);margin:7px 0 0}
 @media(prefers-reduced-motion:reduce){.forge-3d-frame{animation:none!important}.forge-3d-frame.frame-start{opacity:0}.forge-3d-frame.frame-end{opacity:1}}
+
+/* Raccourci Coach Forge dans l'en-tête de la bibliothèque */
+.forge-exercises-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}
+.forge-exercises-heading h1{margin:0;min-width:0}
+.forge-exercises-heading .btn{flex:0 0 auto;white-space:nowrap}
+.forge-3d-frames{background:radial-gradient(ellipse at 50% 70%,#303a43,#10161e 72%)}
+.forge-3d-frame{padding:8px}
