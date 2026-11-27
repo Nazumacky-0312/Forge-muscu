@@ -161,7 +161,7 @@
         h('div',{class:'forge-avatar-muscle-detail-head'},
           h('div',{},h('span',{class:'surtitre'},'GROUPE SÉLECTIONNÉ'),h('h3',{},label)),
           h('strong',{},best?best.rank.name:'Non classé')),
-        h('p',{class:'discret'},best?'Meilleure performance : '+best.name+' · 1RM estimé '+best.oneRm.toFixed(1)+' kg · '+best.rank.score+'/1000 points.':'Aucune performance classée n’est encore enregistrée pour ce groupe. Continue à enregistrer tes séries de travail pour le suivre.'),
+        h('p',{class:'discret'},best?'Meilleure performance : '+best.name+' · 1RM estimé '+best.oneRm.toFixed(1)+' kg · '+best.score+'/1000 points.':'Aucune performance classée n’est encore enregistrée pour ce groupe. Continue à enregistrer tes séries de travail pour le suivre.'),
         entries.length?h('ul',{class:'forge-avatar-muscle-exercises'},...entries.slice(0,3).map(x=>h('li',{},h('span',{},x.name),h('strong',{},x.rank.name+' · '+x.oneRm.toFixed(1)+' kg')))):h('p',{class:'discret'},'Les muscles sollicités indirectement ne sont pas assimilés à des performances directes.'));
     });
     const cleanupObserver=new MutationObserver(()=>{
