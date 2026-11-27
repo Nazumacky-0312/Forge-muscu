@@ -67,6 +67,9 @@ jobs:
       - name: Test local-first progress photo tracking on mobile and desktop
         run: FORGE_SITE=public node forge-muscu/tests/progress-photos-smoke.cjs
 
+      - name: Test nutrition favorites on mobile and desktop
+        run: FORGE_SITE=public node forge-muscu/tests/nutrition-favorites-smoke.cjs
+
 
       - name: Save browser screenshots
         if: always()
