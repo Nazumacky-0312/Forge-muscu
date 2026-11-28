@@ -61,7 +61,7 @@ const port = 4174;
         coloredMuscles: nodes.map(el => el.querySelectorAll('.bf-muscles path,.bf-muscles ellipse').length),
         coloredRankMuscles: nodes.map(el => [...el.querySelectorAll('.bf-muscles path')].filter(path => path.getAttribute('fill') === '#c5f36b').length),
         highlightColors: [...new Set(nodes.flatMap(el => [...el.querySelectorAll('.bf-muscles path')].map(path => path.getAttribute('fill')).filter(fill => fill && fill !== '#87939d')))],
-        legendText: document.querySelector('.forge-avatar-legend')?.textContent || '',
+        legendText: [...document.querySelectorAll('.forge-avatar-legend-item')].map(el => el.textContent).join(' '),
         fallbackVisible: !!pair && getComputedStyle(pair).display !== 'none' && pair.clientWidth > 0,
         stageVisible: !!stage && getComputedStyle(stage).display !== 'none' && !!rect && rect.width > 0,
         stageLoaded: stage?.dataset.avatarLoaded === 'true',
