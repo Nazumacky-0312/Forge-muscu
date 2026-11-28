@@ -204,7 +204,7 @@ const mime = {
         }
         await page.locator('.forge-body-rank-ladder .forge-body-rank-step').nth(8).waitFor();
         const avatarIntegration = await page.evaluate(() => ({
-          module: !!document.querySelector('script[type="module"][src="js/body-forge-avatar-3d.js"]'),
+          module: !!document.querySelector('script[type="module"][src^="js/body-forge-avatar-3d.js"]'),
           stylesheet: !!document.querySelector('link[href^="css/body-forge-avatar-3d.css"]')?.sheet,
           stage: !!document.querySelector('.forge-avatar-3d-stage'),
           muscleDetails: !!document.querySelector('.forge-avatar-muscle-details'),
