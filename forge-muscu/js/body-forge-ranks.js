@@ -115,7 +115,9 @@
     const viewControls=h('div',{class:'forge-avatar-3d-views','aria-label':'Orientation de l’avatar'},
       h('button',{type:'button',class:'forge-avatar-choice active','data-view':'front'},'Vue de face'),
       h('button',{type:'button',class:'forge-avatar-choice','data-view':'back'},'Vue de dos'));
-    const legend='<span class="forge-avatar-legend-item"><i style="background:'+AVATAR_ACCENT+'"></i>Muscles suivis</span><span class="forge-avatar-legend-item"><i style="background:'+AVATAR_BASE+'"></i>À développer</span>';
+    const legend=h('div',{class:'forge-avatar-legend'},
+      h('span',{class:'forge-avatar-legend-item'},h('i',{style:'background:'+AVATAR_ACCENT}), 'Muscles suivis'),
+      h('span',{class:'forge-avatar-legend-item'},h('i',{style:'background:'+AVATAR_BASE}), 'À développer'));
     const section=h('section',{class:'carte forge-avatar-card forge-bodygraph-card forge-bodygraph-depth'},
       h('div',{class:'forge-card-head'},h('div',{},h('span',{class:'surtitre'},'BODYGRAPH'),h('h2',{},'Tes muscles')),
         h('span',{class:'forge-tag'},'AVATAR 3D')),
@@ -125,7 +127,7 @@
       viewControls,
       muscleDetails,
       figures,
-      h('div',{class:'forge-avatar-legend',innerHTML:legend}),
+      legend,
       h('p',{class:'forge-avatar-attribution'},'Anatomy: BodyParts3D © The Database Center for Life Science (CC BY 4.0); female organs: Human Reference Atlas 3D Reference Organs, HuBMAP (CC BY 4.0); female body: MakeHuman (CC0). Modified by open-anatomy-3d (github.com/MervinR07/open-anatomy-3d), CC BY 4.0. Illustration pédagogique, non destinée au diagnostic.'));
     let avatarApi=null,selectedSex=initialSex,mountScheduled=false;
     const ranksForModel={...rankByMuscle,upperarms:Math.max(rankByMuscle.biceps??-1,rankByMuscle.triceps??-1)};
