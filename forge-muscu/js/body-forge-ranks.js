@@ -76,7 +76,7 @@
     {id:'glutes',label:'Fessiers',test:/squat|soulevé de terre|deadlift|hip thrust|fessier/i},
     {id:'calves',label:'Mollets',test:/mollets|calf raise/i}
   ];
-  const RANK_COLORS=['#8b929b','#b87945','#b9c0c9','#e4bd4c','#65c5c2','#59a8f4','#a17bf2','#f07855','#f4e3a0'];
+  const AVATAR_ACCENT='#c5f36b',AVATAR_BASE='#87939d';
   function avatar3D(ranked,settings){
     const rankByMuscle={};
     MUSCLES.forEach(m=>{const score=ranked.filter(x=>m.test.test(x.name)).reduce((n,x)=>Math.max(n,x.score),0);rankByMuscle[m.id]=score?getRank(score).index:-1;});
@@ -84,7 +84,7 @@
     rankByMuscle.obliques=rankByMuscle.abs??-1;
     rankByMuscle.traps=Math.max(rankByMuscle.shoulders??-1,rankByMuscle.back??-1);
     const initialSex=settings.sex==='f'?'f':'m';
-    const color=id=>RANK_COLORS[Math.max(0,rankByMuscle[id]??-1)]||'#d4dae3';
+    const color=id=>(rankByMuscle[id]??-1)>=0?AVATAR_ACCENT:AVATAR_BASE;
     const figure=(side,sex)=>{
       const female=sex==='f';
       const back=side==='back';
@@ -115,11 +115,11 @@
     const viewControls=h('div',{class:'forge-avatar-3d-views','aria-label':'Orientation de l’avatar'},
       h('button',{type:'button',class:'forge-avatar-choice active','data-view':'front'},'Vue de face'),
       h('button',{type:'button',class:'forge-avatar-choice','data-view':'back'},'Vue de dos'));
-    const legend=RANKS.map((r,i)=>'<span class="forge-avatar-legend-item"><i style="background:'+RANK_COLORS[i]+'"></i>'+r.name+'</span>').join('');
+    const legend='<span class="forge-avatar-legend-item"><i style="background:'+AVATAR_ACCENT+'"></i>Muscles suivis</span><span class="forge-avatar-legend-item"><i style="background:'+AVATAR_BASE+'"></i>À développer</span>';
     const section=h('section',{class:'carte forge-avatar-card forge-bodygraph-card forge-bodygraph-depth'},
       h('div',{class:'forge-card-head'},h('div',{},h('span',{class:'surtitre'},'BODYGRAPH'),h('h2',{},'Tes muscles')),
         h('span',{class:'forge-tag'},'AVATAR 3D')),
-      h('p',{class:'discret'},'Fais glisser le modèle pour le faire pivoter. Utilise les vues avant et arrière pour observer les groupes musculaires colorés selon tes rangs.'),
+      h('p',{class:'discret'},'Fais glisser le modèle pour le faire pivoter. Utilise les vues avant et arrière pour observer les muscles suivis, mis en évidence dans une couleur unique.'),
       h('div',{class:'forge-avatar-controls'},initialButtons),
       stage,
       viewControls,

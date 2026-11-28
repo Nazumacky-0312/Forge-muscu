@@ -20,8 +20,9 @@ try {
   }
 }
 
-const RANK_COLORS=['#8b929b','#b87945','#b9c0c9','#e4bd4c','#65c5c2','#59a8f4','#a17bf2','#f07855','#f4e3a0'];
+const ACTIVE_MUSCLE_COLOR='#c5f36b';
 const BASE_COLOR='#87939d';
+const SKIN_COLOR='#aeb8c2';
 const MUSCLE_GROUP={
   abdominal_muscles:'abs', intercostals_l:'abs', intercostals_r:'abs',
   back_muscles_l:'back', back_muscles_r:'back',
@@ -53,26 +54,41 @@ function rankColor(key,ranks){
   if(!group)return BASE_COLOR;
   let rank=ranks[group]??-1;
   if(group==='upperarms')rank=Math.max(ranks.biceps??-1,ranks.triceps??-1);
-  return rank>=0?RANK_COLORS[Math.min(8,rank)]:BASE_COLOR;
+  return rank>=0?ACTIVE_MUSCLE_COLOR:BASE_COLOR;
 }
 function makeAnatomy(source,ranks){
   const model=source.clone(true);
   model.name='forge-anatomy-model';
   model.traverse(node=>{
     if(node.parent===model){
-      node.visible=node.name==='muscles';
+      node.visible=node.name==='muscles'||node.name==='skin';
     }
   });
-  let muscleCount=0;
+  let muscleCount=0,skinMeshCount=0;
   model.traverse(node=>{
     if(!node.isMesh)return;
+    let systemRoot=node;
+    while(systemRoot&&systemRoot!==model&&systemRoot.parent!==model)systemRoot=systemRoot.parent;
+    if(systemRoot?.name==='skin'){
+      node.material=new THREE.MeshStandardMaterial({
+        color:SKIN_COLOR,roughness:.66,metalness:.01,transparent:true,opacity:.16,
+        depthWrite:false,side:THREE.DoubleSide
+      });
+      node.renderOrder=2;
+      node.raycast=()=>{};
+      node.castShadow=false;
+      node.receiveShadow=true;
+      skinMeshCount++;
+      return;
+    }
     let owner=node;
     while(owner&&owner!==model&&!Object.prototype.hasOwnProperty.call(MUSCLE_GROUP,owner.name))owner=owner.parent;
     if(!owner||owner===model)return;
     const color=rankColor(owner.name,ranks);
     node.material=new THREE.MeshStandardMaterial({
-      color,roughness:.72,metalness:.015,side:THREE.DoubleSide
+      color,roughness:.68,metalness:.01,side:THREE.DoubleSide
     });
+    node.renderOrder=1;
     node.castShadow=true;
     node.receiveShadow=true;
     muscleCount++;
@@ -85,13 +101,14 @@ function makeAnatomy(source,ranks){
   model.position.set(-center.x,-bounds.min.y,-center.z);
   model.userData.bodyHeight=size.y;
   model.userData.muscleCount=muscleCount;
+  model.userData.skinMeshCount=skinMeshCount;
   return model;
 }
 function mount(container,initial){
   if(container.__forge3d?.dispose)container.__forge3d.dispose();
   const width=Math.max(220,container.clientWidth||300),height=Math.max(320,container.clientHeight||390);
   const scene=new THREE.Scene();
-  scene.background=new THREE.Color('#111820');
+  scene.background=new THREE.Color('#151d25');
   const camera=new THREE.PerspectiveCamera(31,width/height,.01,100);
   const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.4));
@@ -100,9 +117,10 @@ function mount(container,initial){
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure=1.18;
   container.replaceChildren(renderer.domElement);
-  const hemi=new THREE.HemisphereLight('#f0f5ff','#46505a',2.15);scene.add(hemi);
+  const hemi=new THREE.HemisphereLight('#f3f6fa','#46515b',2.25);scene.add(hemi);
   const keyLight=new THREE.DirectionalLight('#fff4e8',3.1);keyLight.position.set(-2.8,4.2,4);scene.add(keyLight);
-  const fill=new THREE.DirectionalLight('#8bb9df',1.45);fill.position.set(3,2,-3);scene.add(fill);
+  const fill=new THREE.DirectionalLight('#a9c1d5',1.2);fill.position.set(3,2,-3);scene.add(fill);
+  const rim=new THREE.DirectionalLight('#d9e3eb',1.05);rim.position.set(-1,2,-4);scene.add(rim);
   const front=new THREE.DirectionalLight('#ffffff',.85);front.position.set(0,1,5);scene.add(front);
   const ground=new THREE.Mesh(new THREE.CircleGeometry(.72,64),new THREE.MeshStandardMaterial({color:'#202a33',roughness:.9,metalness:.05}));
   ground.rotation.x=-Math.PI/2;ground.position.y=-.018;ground.scale.set(1.3,1.3,1);scene.add(ground);
