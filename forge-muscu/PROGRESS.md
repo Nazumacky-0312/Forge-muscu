@@ -152,3 +152,14 @@ Continuer depuis la branche `forge-avatar-3d-integration`. Ne pas fusionner les 
 - Les groupes d'entraînement sont validés par `tests/workout-structures-smoke.cjs` sur mobile et ordinateur ; le workflow Pages inclut cette suite.
 - Cache hors ligne incrémenté à v34 pour les nouveaux fichiers.
 - **À confirmer avant livraison** : exécution des quatre suites historiques après cette tranche, résultat CI sur la branche candidate, puis déploiement et vérification de la version publiée.
+
+---
+
+## Mise à jour du 28 novembre 2026 — bibliothèque d’exercices
+
+- Recherche par nom, groupes musculaires principaux et secondaires, ou matériel, sans accents obligatoires.
+- Filtres combinables par matériel, niveau et équipement renseigné dans le profil.
+- Tri calculé depuis l’historique local des séances, par fréquence ou récence.
+- Favoris enregistrés sur l’appareil avec vue filtrée et commandes accessibles.
+- Cache PWA incrémenté à v35 ; test Playwright dédié ajouté au workflow.
+- À valider sur la candidate : test de bibliothèque et suites existantes, contrôles CI, puis publication si tous les contrôles passent.

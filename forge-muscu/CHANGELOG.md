@@ -1,5 +1,13 @@
 # Changelog Forge Muscu
 
+## 28 novembre 2026 — Bibliothèque d'exercices
+
+- Recherche par nom, groupe musculaire principal ou secondaire et matériel, sans dépendre des accents.
+- Filtres combinables par groupe, matériel, niveau et équipement du profil.
+- Tri par date ou fréquence des séances réellement enregistrées.
+- Favoris conservés sur l'appareil, filtre dédié et commandes adaptées au mobile.
+- Nouveau test Playwright dédié ; cache PWA incrémenté à v35.
+
 ## 28 novembre 2026 — Enchaînements et édition rapide des programmes
 
 - Ajout des supersets (deux exercices) et circuits (deux exercices ou plus) pendant une séance.

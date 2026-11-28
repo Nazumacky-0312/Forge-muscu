@@ -73,6 +73,9 @@ jobs:
       - name: Test nutrition favorites on mobile and desktop
         run: FORGE_SITE=public node forge-muscu/tests/nutrition-favorites-smoke.cjs
 
+      - name: Test exercise library filters and favorites on mobile and desktop
+        run: FORGE_SITE=public node forge-muscu/tests/exercise-library-smoke.cjs
+
 
       - name: Save browser screenshots
         if: always()

@@ -39,6 +39,10 @@ Parcours couverts :
 
 `tests/workout-structures-smoke.cjs` vérifie les supersets/circuits, l'alternance automatique, la persistance locale des groupes, le glisser-déposer de l'éditeur de programme et la duplication d'une séance sur les viewports mobile et ordinateur. Le workflow GitHub Actions exécute ce scénario avec les autres suites.
 
+## Bibliothèque d'exercices
+
+`tests/exercise-library-smoke.cjs` couvre sur mobile (390×844) et ordinateur (1365×900) la recherche sans accents dans les noms, muscles et équipements, les filtres par groupe principal/secondaire, matériel et niveau, le tri selon l'historique réel, les favoris locaux, le rechargement, la suppression et l'absence de débordement des commandes.
+
 ## Dernière exécution
 
 - `45942696341` : préparation du site réussie, médias CC0 ajoutés, smoke tests Playwright mobile et desktop réussis, captures QA produites, artefact Pages construit. Aucun déploiement n'a eu lieu.
