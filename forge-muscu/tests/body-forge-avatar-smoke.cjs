@@ -59,7 +59,9 @@ const port = 4174;
         widths: nodes.map(el => Math.round(el.getBoundingClientRect().width)),
         heights: nodes.map(el => Math.round(el.getBoundingClientRect().height)),
         coloredMuscles: nodes.map(el => el.querySelectorAll('.bf-muscles path,.bf-muscles ellipse').length),
-        coloredRankMuscles: nodes.map(el => [...el.querySelectorAll('.bf-muscles path')].filter(path => path.getAttribute('fill') !== '#8b929b').length),
+        coloredRankMuscles: nodes.map(el => [...el.querySelectorAll('.bf-muscles path')].filter(path => path.getAttribute('fill') === '#c5f36b').length),
+        highlightColors: [...new Set(nodes.flatMap(el => [...el.querySelectorAll('.bf-muscles path')].map(path => path.getAttribute('fill')).filter(fill => fill && fill !== '#87939d')))],
+        legendText: document.querySelector('.forge-avatar-legend')?.textContent || '',
         fallbackVisible: !!pair && getComputedStyle(pair).display !== 'none' && pair.clientWidth > 0,
         stageVisible: !!stage && getComputedStyle(stage).display !== 'none' && !!rect && rect.width > 0,
         stageLoaded: stage?.dataset.avatarLoaded === 'true',
@@ -69,14 +71,14 @@ const port = 4174;
       };
     });
     const fallbackValid = mobile.count === 2 && mobile.labels[0].includes('masculin') && mobile.labels[1].includes('masculin') &&
-      mobile.coloredMuscles.every(x => x >= 6) && mobile.coloredRankMuscles[0] > 0;
+      mobile.coloredMuscles.every(x => x >= 6) && mobile.coloredRankMuscles[0] > 0 && mobile.highlightColors.length === 1 && mobile.highlightColors[0] === '#c5f36b' && mobile.legendText.includes('Muscles suivis');
     const fallbackVisible = mobile.fallbackVisible && mobile.widths.every(x => x >= 90) && mobile.heights.every(x => x >= 160);
     const modelVisible = mobile.stageVisible && mobile.stageLoaded && mobile.canvas && mobile.stageWidth >= 220 && mobile.stageHeight >= 320;
     if (!fallbackValid || (!fallbackVisible && !modelVisible)) {
       throw new Error('Body Forge doit afficher le modèle 3D chargé ou conserver un bodygraph de secours visible sur mobile : ' + JSON.stringify(mobile));
     }
     const integration = await page.evaluate(() => ({
-      module: !!document.querySelector('script[type="module"][src="js/body-forge-avatar-3d.js"]'),
+      module: !!document.querySelector('script[type="module"][src^="js/body-forge-avatar-3d.js"]'),
       attribution: !!document.querySelector('.forge-avatar-attribution')?.textContent.includes('BodyParts3D'),
       details: !!document.querySelector('.forge-avatar-muscle-details')
     }));
